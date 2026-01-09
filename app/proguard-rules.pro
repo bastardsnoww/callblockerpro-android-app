@@ -97,6 +97,9 @@
 -dontskipnonpubliclibraryclasses
 -verbose
 
+# Fix for Missing ErrorProne annotations (referenced by Tink/Security-Crypto)
+-dontwarn com.google.errorprone.annotations.**
+
 # Uncomment for debugging ProGuard issues
 # -printconfiguration proguard-config.txt
 # -printmapping proguard-mapping.txt
