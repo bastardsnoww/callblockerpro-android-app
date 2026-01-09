@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -65,8 +66,6 @@ fun DashboardScreen(
             Box(Modifier.fillMaxSize()) {
                     // Capture Scroll State
                     val listState = rememberLazyListState()
-                    val firstItemOffsetState = remember { derivedStateOf<Int> { listState.firstVisibleItemScrollOffset } }
-                    val firstItemIndexState = remember { derivedStateOf<Int> { listState.firstVisibleItemIndex } }
 
                     LazyColumn(
                         state = listState,
@@ -109,8 +108,8 @@ fun DashboardScreen(
                         // Status Card (PARALLAX ENABLED) (Index 1)
                         item {
                             // Calculate Parallax Progress
-                            val index: Int = firstItemIndexState.value.let { it as Int }
-                            val offset: Int = firstItemOffsetState.value.let { it as Int }
+                            val index = listState.firstVisibleItemIndex
+                            val offset = listState.firstVisibleItemScrollOffset
                             val parallaxProgress = if (index > 2) 1f else (offset.toFloat() / 500f)
                             
                             AnimatedEntrance(index = 1) {
