@@ -5,6 +5,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -41,74 +43,94 @@ fun LogsScreen(onNavigate: (String) -> Unit) {
                     contentPadding = PaddingValues(top = 100.dp, bottom = 120.dp, start = 24.dp, end = 24.dp),
                     verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    // Search
+                    // Search (Index 0)
                     item {
-                        PremiumSearchBar(
-                            query = searchQuery,
-                            onQueryChange = { searchQuery = it },
-                            placeholder = "Search logs for threats...",
-                            onFilterClick = {}
-                        )
-                    }
-
-                    // Filters
-                    item {
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                            FilterChipItem("All Activity", true)
-                            FilterChipItem("Blocked", false)
-                            FilterChipItem("Whitelisted", false)
+                        AnimatedEntrance(index = 0) {
+                            PremiumSearchBar(
+                                query = searchQuery,
+                                onQueryChange = { searchQuery = it },
+                                placeholder = "Search logs for threats...",
+                                onFilterClick = {}
+                            )
                         }
                     }
 
-                    // Logs Section
+                    // Filters (Index 1)
                     item {
-                        Spacer(Modifier.height(8.dp))
-                        Text("TODAY", style = MaterialTheme.typography.labelSmall, color = CrystalDesign.Colors.TextSecondary, fontWeight = FontWeight.Black, letterSpacing = 2.sp)
+                        AnimatedEntrance(index = 1) {
+                            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                                FilterChipItem("All Activity", true)
+                                FilterChipItem("Blocked", false)
+                                FilterChipItem("Whitelisted", false)
+                            }
+                        }
+                    }
+
+                    // Logs Section (Index 2)
+                    item {
+                        AnimatedEntrance(index = 2) {
+                            Column {
+                                Spacer(Modifier.height(8.dp))
+                                Text("TODAY", style = MaterialTheme.typography.labelSmall, color = CrystalDesign.Colors.TextSecondary, fontWeight = FontWeight.Black, letterSpacing = 2.sp)
+                            }
+                        }
                     }
 
                     item {
-                        LogItem(
-                            number = "+1 (555) 019-2834",
-                            label = "Spam Risk",
-                            time = "10:42 AM",
-                            type = LogType.BLOCKED,
-                            onClick = {}
-                        )
+                        AnimatedEntrance(index = 3) {
+                            LogItem(
+                                number = "+1 (555) 019-2834",
+                                label = "Spam Risk",
+                                time = "10:42 AM",
+                                type = LogType.BLOCKED,
+                                onClick = {}
+                            )
+                        }
                     }
 
                     item {
-                        LogItem(
-                            number = "John Doe",
-                            label = "Known Contact",
-                            time = "9:15 AM",
-                            type = LogType.ALLOWED,
-                            onClick = {}
-                        )
+                        AnimatedEntrance(index = 4) {
+                            LogItem(
+                                number = "John Doe",
+                                label = "Known Contact",
+                                time = "9:15 AM",
+                                type = LogType.ALLOWED,
+                                onClick = {}
+                            )
+                        }
                     }
 
                     item {
-                        Spacer(Modifier.height(8.dp))
-                        Text("YESTERDAY", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = FontWeight.Black, letterSpacing = 2.sp)
+                        AnimatedEntrance(index = 5) {
+                            Column {
+                                Spacer(Modifier.height(8.dp))
+                                Text("YESTERDAY", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = FontWeight.Black, letterSpacing = 2.sp)
+                            }
+                        }
                     }
 
                     item {
-                        LogItem(
-                            number = "Unknown Caller",
-                            label = "Potential Fraud",
-                            time = "Mon 4:32 PM",
-                            type = LogType.SPAM,
-                            onClick = {}
-                        )
+                        AnimatedEntrance(index = 6) {
+                            LogItem(
+                                number = "Unknown Caller",
+                                label = "Potential Fraud",
+                                time = "Mon 4:32 PM",
+                                type = LogType.SPAM,
+                                onClick = {}
+                            )
+                        }
                     }
 
                     item {
-                        LogItem(
-                            number = "Pizza Delivery",
-                            label = "Whitelisted Business",
-                            time = "Mon 12:01 PM",
-                            type = LogType.ALLOWED,
-                            onClick = {}
-                        )
+                        AnimatedEntrance(index = 7) {
+                            LogItem(
+                                number = "Pizza Delivery",
+                                label = "Whitelisted Business",
+                                time = "Mon 12:01 PM",
+                                type = LogType.ALLOWED,
+                                onClick = {}
+                            )
+                        }
                     }
                 }
 
