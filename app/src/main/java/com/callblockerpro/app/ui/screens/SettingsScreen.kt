@@ -24,6 +24,7 @@ import com.callblockerpro.app.ui.theme.BackgroundDark
 import com.callblockerpro.app.ui.theme.Emerald
 import com.callblockerpro.app.ui.theme.Primary
 import com.callblockerpro.app.ui.theme.PrimaryLight
+import com.callblockerpro.app.ui.theme.CrystalDesign
 
 @Composable
 fun SettingsScreen(
@@ -31,7 +32,7 @@ fun SettingsScreen(
     viewModel: com.callblockerpro.app.ui.viewmodel.SettingsViewModel = hiltViewModel()
 ) {
     Scaffold(
-        containerColor = BackgroundDark,
+        containerColor = CrystalDesign.Colors.BackgroundDeep,
         bottomBar = { BottomNavBar(currentRoute = "settings", onNavigate = onNavigate) }
     ) { paddingValues ->
         val searchQuery by viewModel.searchQuery.collectAsState()
@@ -46,8 +47,8 @@ fun SettingsScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues),
-                    contentPadding = PaddingValues(top = 100.dp, bottom = 120.dp, start = 24.dp, end = 24.dp),
-                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                    contentPadding = PaddingValues(top = 100.dp, bottom = 120.dp, start = CrystalDesign.Spacing.l, end = CrystalDesign.Spacing.l),
+                    verticalArrangement = Arrangement.spacedBy(CrystalDesign.Spacing.l)
                 ) {
                     // Profile Card
                     item {
@@ -74,13 +75,13 @@ fun SettingsScreen(
                                 Spacer(Modifier.width(16.dp))
                                 Column(Modifier.weight(1f)) {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Text("John Doe", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Black, color = Color.White)
-                                        Spacer(Modifier.width(8.dp))
+                                        Text("John Doe", style = MaterialTheme.typography.titleMedium, fontWeight = CrystalDesign.Typography.WeightBlack, color = Color.White)
+                                        Spacer(Modifier.width(CrystalDesign.Spacing.xs))
                                         Box(Modifier.background(Primary.copy(0.2f), RoundedCornerShape(6.dp)).padding(horizontal = 8.dp, vertical = 2.dp)) {
-                                            Text("PRO", style = MaterialTheme.typography.labelSmall, color = PrimaryLight, fontWeight = FontWeight.Black, fontSize = 10.sp)
+                                            Text("PRO", style = MaterialTheme.typography.labelSmall, color = PrimaryLight, fontWeight = CrystalDesign.Typography.WeightBlack, fontSize = 10.sp)
                                         }
                                     }
-                                    Text("+1 (555) 012-3456", style = MaterialTheme.typography.bodySmall, color = Color.Gray, fontWeight = FontWeight.Medium)
+                                    Text("+1 (555) 012-3456", style = MaterialTheme.typography.bodySmall, color = CrystalDesign.Colors.TextTertiary, fontWeight = CrystalDesign.Typography.WeightMedium)
                                 }
                                 Icon(Icons.Default.ChevronRight, null, tint = Color.Gray.copy(0.5f))
                             }
@@ -101,7 +102,7 @@ fun SettingsScreen(
                         SettingsGroup("Protection Preferences") {
                             SettingsToggleRow(
                                 icon = Icons.Default.Block,
-                                iconColor = Color(0xFFEF4444),
+                                iconColor = CrystalDesign.Colors.NeonRed,
                                 title = "Block Unknown Callers",
                                 subtitle = "Only allow contacts",
                                 checked = blockUnknown,
@@ -109,7 +110,7 @@ fun SettingsScreen(
                             )
                             SettingsToggleRow(
                                 icon = Icons.Default.Warning,
-                                iconColor = Color(0xFFF59E0B),
+                                iconColor = CrystalDesign.Colors.NeonGold,
                                 title = "Scam Protection",
                                 subtitle = "Aggressive filtering",
                                 checked = scamProtection,
@@ -117,7 +118,7 @@ fun SettingsScreen(
                             )
                             SettingsLinkRow(
                                 icon = Icons.Default.Schedule,
-                                iconColor = Color(0xFF3B82F6),
+                                iconColor = CrystalDesign.Colors.NeonBlue,
                                 title = "Auto-Schedule",
                                 subtitle = "10:00 PM - 7:00 AM"
                             )
@@ -129,7 +130,7 @@ fun SettingsScreen(
                         SettingsGroup("General") {
                             SettingsToggleRow(
                                 icon = Icons.Default.Notifications,
-                                iconColor = Color(0xFFA855F7),
+                                iconColor = CrystalDesign.Colors.NeonPurple,
                                 title = "Notifications",
                                 subtitle = null,
                                 checked = notifications,
@@ -137,7 +138,7 @@ fun SettingsScreen(
                             )
                             SettingsToggleRow(
                                 icon = Icons.Default.Face,
-                                iconColor = Emerald,
+                                iconColor = CrystalDesign.Colors.NeonGreen,
                                 title = "FaceID Unlock",
                                 subtitle = null,
                                 checked = faceId,
@@ -145,7 +146,7 @@ fun SettingsScreen(
                             )
                             SettingsLinkRow(
                                 icon = Icons.Default.Language,
-                                iconColor = Color.Gray,
+                                iconColor = CrystalDesign.Colors.TextTertiary,
                                 title = "Language",
                                 subtitle = null,
                                 trailingText = "English"
@@ -159,24 +160,24 @@ fun SettingsScreen(
                             SettingsLinkRow(title = "Help Center", icon = null, iconColor = Color.Unspecified, trailingIcon = Icons.Default.OpenInNew)
                             SettingsLinkRow(title = "Report an Issue", icon = null, iconColor = Color.Unspecified)
                         }
-                        Spacer(Modifier.height(8.dp))
+                        Spacer(Modifier.height(CrystalDesign.Spacing.m))
 
                         // Destructive Action: Log Out
                         Button(
                             onClick = { /* TODO: Logout */ },
                             modifier = Modifier.fillMaxWidth().height(56.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFEF4444).copy(alpha = 0.5f)),
-                            shape = RoundedCornerShape(16.dp)
+                            border = androidx.compose.foundation.BorderStroke(1.dp, CrystalDesign.Colors.NeonRed.copy(alpha = 0.5f)),
+                            shape = RoundedCornerShape(CrystalDesign.Glass.CornerRadiusSmall)
                         ) {
-                            Icon(Icons.Default.Logout, null, tint = Color(0xFFEF4444))
-                            Spacer(Modifier.width(8.dp))
-                            Text("Log Out", color = Color(0xFFEF4444), fontWeight = FontWeight.Bold)
+                            Icon(Icons.Default.Logout, null, tint = CrystalDesign.Colors.NeonRed)
+                            Spacer(Modifier.width(CrystalDesign.Spacing.xs))
+                            Text("Log Out", color = CrystalDesign.Colors.NeonRed, fontWeight = CrystalDesign.Typography.WeightBold)
                         }
 
-                        Spacer(Modifier.height(16.dp))
+                        Spacer(Modifier.height(CrystalDesign.Spacing.m))
                         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("Version 4.2.0 (Build 302)", style = MaterialTheme.typography.labelSmall, color = Color.Gray, letterSpacing = 2.sp)
+                            Text("Version 4.2.0 (Build 302)", style = MaterialTheme.typography.labelSmall, color = CrystalDesign.Colors.TextTertiary, letterSpacing = 2.sp)
                         }
                     }
                 }

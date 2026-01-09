@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="gcm_defaultSenderId" translatable="false">725147145390</string>
-    <string name="google_api_key" translatable="false">AIzaSyA4mmmSUhmLn4TCSxBYQNNRWzToNPg9ANI</string>
-    <string name="google_app_id" translatable="false">1:725147145390:android:37dd85203611e36b22c93f</string>
-    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyA4mmmSUhmLn4TCSxBYQNNRWzToNPg9ANI</string>
-    <string name="google_storage_bucket" translatable="false">callblockerpro-82f02.firebasestorage.app</string>
-    <string name="project_id" translatable="false">callblockerpro-82f02</string>
-</resources>

@@ -31,9 +31,11 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.animation.core.*
 import com.callblockerpro.app.ui.theme.BackgroundDark
+import com.callblockerpro.app.ui.theme.CrystalDesign
 import com.callblockerpro.app.ui.theme.Emerald
 import com.callblockerpro.app.ui.theme.Primary
 import com.callblockerpro.app.ui.theme.PrimaryLight
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 
 /**
  * A unified, high-quality search bar for all list screens.
@@ -101,10 +103,14 @@ fun PremiumSearchBar(
                 modifier = Modifier.size(56.dp),
                 cornerRadius = 16.dp
             ) {
+                val hapticSearch = androidx.compose.ui.platform.LocalHapticFeedback.current
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .clickable(onClick = onFilterClick),
+                        .clickable {
+                            hapticSearch.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                            onFilterClick()
+                        },
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -156,12 +162,12 @@ fun PremiumListItem(
                         isPressed = false
                     },
                     onTap = {
-                        haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove) // Selection/Light tap
                         onClick()
                     }
                 )
             },
-        cornerRadius = 24.dp,
+        cornerRadius = CrystalDesign.Glass.CornerRadius,
         borderAlpha = 0.12f
     ) {
         Row(
@@ -190,7 +196,7 @@ fun PremiumListItem(
                     text = title,
                     style = MaterialTheme.typography.titleSmall,
                     color = Color.White,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = CrystalDesign.Typography.WeightBold
                 )
                 if (tag != null) {
                     Spacer(modifier = Modifier.width(8.dp))
@@ -204,8 +210,8 @@ fun PremiumListItem(
                             text = tag.uppercase(),
                             style = MaterialTheme.typography.labelSmall,
                             color = tagColor,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold
+                            fontSize = CrystalDesign.Typography.SizeCaption,
+                            fontWeight = CrystalDesign.Typography.WeightBlack
                         )
                     }
                 }
@@ -356,7 +362,7 @@ fun NeonButton(
                             isPressed = false
                         },
                         onTap = {
-                            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress) // Action/Medium bump
                             onClick()
                         }
                     )
@@ -418,7 +424,7 @@ fun NeonButton(
                 Text(
                     text = text.uppercase(),
                     style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Black,
+                    fontWeight = CrystalDesign.Typography.WeightBlack,
                     color = Color.White,
                     letterSpacing = 1.sp
                 )
@@ -497,15 +503,19 @@ fun PremiumHeader(
             .height(80.dp),
         cornerRadius = 100.dp 
     ) {
+        val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = CrystalDesign.Spacing.l),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (onBack != null) {
                 IconButton(
-                    onClick = onBack,
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        onBack()
+                    },
                     modifier = Modifier
                         .size(40.dp)
                         .background(Color.White.copy(0.1f), CircleShape)
@@ -527,7 +537,7 @@ fun PremiumHeader(
                 Text(
                     text = title.uppercase(),
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Black,
+                    fontWeight = CrystalDesign.Typography.WeightBlack,
                     color = Color.White,
                     letterSpacing = 1.sp
                 )
@@ -542,7 +552,10 @@ fun PremiumHeader(
 
             if (actionIcon != null && onAction != null) {
                 IconButton(
-                    onClick = onAction,
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        onAction()
+                    },
                     modifier = Modifier
                         .size(40.dp)
                         .background(Color.White.copy(0.1f), CircleShape)

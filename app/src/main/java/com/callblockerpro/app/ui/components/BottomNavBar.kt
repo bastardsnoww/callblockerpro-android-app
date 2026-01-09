@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import com.callblockerpro.app.ui.theme.Primary
 import com.callblockerpro.app.ui.theme.BackgroundDark
 import com.callblockerpro.app.ui.theme.PrimaryLight
+import com.callblockerpro.app.ui.theme.CrystalDesign
 
 @Composable
 fun BottomNavBar(
@@ -207,10 +208,14 @@ fun NavItem(
     val iconColor = if (isSelected) Primary else Color.White.copy(alpha = 0.4f)
     val textColor = if (isSelected) Color.White else Color.White.copy(alpha = 0.4f)
     
+    val hapticNav = androidx.compose.ui.platform.LocalHapticFeedback.current
     Column(
         modifier = modifier
-            .clickable(onClick = onClick)
-            .padding(8.dp),
+            .clickable { 
+                hapticNav.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                onClick() 
+            }
+            .padding(CrystalDesign.Spacing.xs),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -234,7 +239,7 @@ fun NavItem(
         Text(
             text = label,
             fontSize = 11.sp,
-            fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Medium,
+            fontWeight = if (isSelected) CrystalDesign.Typography.WeightBlack else CrystalDesign.Typography.WeightMedium,
             color = textColor,
             letterSpacing = if (isSelected) 0.5.sp else 0.sp
         )

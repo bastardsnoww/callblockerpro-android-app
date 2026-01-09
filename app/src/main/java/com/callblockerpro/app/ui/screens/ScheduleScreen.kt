@@ -47,8 +47,8 @@ fun ScheduleScreen(currentRoute: String, onNavigate: (String) -> Unit) {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(horizontal = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+                    .padding(horizontal = CrystalDesign.Spacing.l),
+                verticalArrangement = Arrangement.spacedBy(CrystalDesign.Spacing.l)
             ) {
              // Header Spacer
              item { Spacer(Modifier.height(80.dp)) }
@@ -63,12 +63,12 @@ fun ScheduleScreen(currentRoute: String, onNavigate: (String) -> Unit) {
 
              // Config Panel
              item {
-                 Text("NEW CONFIGURATION", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
-                 Spacer(Modifier.height(16.dp))
+                 Text("NEW CONFIGURATION", style = MaterialTheme.typography.labelSmall, color = CrystalDesign.Colors.TextTertiary, fontWeight = CrystalDesign.Typography.WeightBlack, letterSpacing = 2.sp)
+                 Spacer(Modifier.height(CrystalDesign.Spacing.m))
                  GlassPanel(Modifier.fillMaxWidth()) {
-                     Column(Modifier.padding(24.dp)) {
-                         Text("SCHEDULE NAME", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = FontWeight.Bold)
-                         Spacer(Modifier.height(12.dp))
+                     Column(Modifier.padding(CrystalDesign.Spacing.l)) {
+                         Text("SCHEDULE NAME", style = MaterialTheme.typography.labelSmall, color = CrystalDesign.Colors.TextTertiary, fontWeight = CrystalDesign.Typography.WeightBold)
+                         Spacer(Modifier.height(CrystalDesign.Spacing.s))
                          // Custom Crystal Input
                          BasicTextField(
                             value = "",
@@ -88,23 +88,24 @@ fun ScheduleScreen(currentRoute: String, onNavigate: (String) -> Unit) {
                          )
                          
                          Spacer(Modifier.height(24.dp))
-                         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                         Row(horizontalArrangement = Arrangement.spacedBy(CrystalDesign.Spacing.m)) {
                              // Start Time
-                             Column(Modifier.weight(1f).background(Color.White.copy(0.03f), RoundedCornerShape(16.dp)).border(1.dp, Color.White.copy(0.05f), RoundedCornerShape(16.dp)).padding(16.dp)) {
-                                 Text("START", style = MaterialTheme.typography.labelSmall, color = PrimaryLight, fontWeight = FontWeight.Bold)
-                                 Text("09:00 AM", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = FontWeight.Bold)
+                             Column(Modifier.weight(1f).background(Color.White.copy(0.03f), RoundedCornerShape(16.dp)).border(1.dp, Color.White.copy(0.05f), RoundedCornerShape(16.dp)).padding(CrystalDesign.Spacing.m)) {
+                                 Text("START", style = MaterialTheme.typography.labelSmall, color = PrimaryLight, fontWeight = CrystalDesign.Typography.WeightBold)
+                                 Text("09:00 AM", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = CrystalDesign.Typography.WeightBold)
                              }
                              // End Time
-                             Column(Modifier.weight(1f).background(Color.White.copy(0.03f), RoundedCornerShape(16.dp)).border(1.dp, Color.White.copy(0.05f), RoundedCornerShape(16.dp)).padding(16.dp)) {
-                                 Text("END", style = MaterialTheme.typography.labelSmall, color = PrimaryLight, fontWeight = FontWeight.Bold)
-                                 Text("05:00 PM", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = FontWeight.Bold)
+                             Column(Modifier.weight(1f).background(Color.White.copy(0.03f), RoundedCornerShape(16.dp)).border(1.dp, Color.White.copy(0.05f), RoundedCornerShape(16.dp)).padding(CrystalDesign.Spacing.m)) {
+                                 Text("END", style = MaterialTheme.typography.labelSmall, color = PrimaryLight, fontWeight = CrystalDesign.Typography.WeightBold)
+                                 Text("05:00 PM", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = CrystalDesign.Typography.WeightBold)
                              }
                          }
                          
-                         Spacer(Modifier.height(24.dp))
-                         Text("REPEATS ON", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = FontWeight.Bold)
-                         Spacer(Modifier.height(12.dp))
+                         Spacer(Modifier.height(CrystalDesign.Spacing.l))
+                         Text("REPEATS ON", style = MaterialTheme.typography.labelSmall, color = CrystalDesign.Colors.TextTertiary, fontWeight = CrystalDesign.Typography.WeightBold)
+                         Spacer(Modifier.height(CrystalDesign.Spacing.s))
                          Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                             val hapticDay = androidx.compose.ui.platform.LocalHapticFeedback.current
                              listOf("M", "T", "W", "T", "F", "S", "S").forEachIndexed { index, day ->
                                  val active = index < 5
                                  Box(
@@ -112,10 +113,13 @@ fun ScheduleScreen(currentRoute: String, onNavigate: (String) -> Unit) {
                                         .size(36.dp)
                                         .clip(CircleShape)
                                         .background(if (active) Primary else Color.White.copy(0.05f))
-                                        .border(1.dp, if(active) PrimaryLight else Color.Transparent, CircleShape),
+                                        .border(1.dp, if(active) PrimaryLight else Color.Transparent, CircleShape)
+                                        .clickable { 
+                                            hapticDay.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                                        },
                                      contentAlignment = Alignment.Center
                                  ) {
-                                     Text(day, style = MaterialTheme.typography.labelSmall, color = if (active) Color.White else Color.Gray, fontWeight = FontWeight.Bold)
+                                     Text(day, style = MaterialTheme.typography.labelSmall, color = if (active) Color.White else Color.Gray, fontWeight = CrystalDesign.Typography.WeightBold)
                                  }
                              }
                          }
@@ -134,10 +138,10 @@ fun ScheduleScreen(currentRoute: String, onNavigate: (String) -> Unit) {
              // Active Schedules
              item {
                  Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                     Text("ACTIVE SCHEDULES", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
-                     Text("2 Enabled", style = MaterialTheme.typography.labelSmall, color = PrimaryLight, fontWeight = FontWeight.Bold)
+                     Text("ACTIVE SCHEDULES", style = MaterialTheme.typography.labelSmall, color = CrystalDesign.Colors.TextTertiary, fontWeight = CrystalDesign.Typography.WeightBlack, letterSpacing = 2.sp)
+                     Text("2 Enabled", style = MaterialTheme.typography.labelSmall, color = PrimaryLight, fontWeight = CrystalDesign.Typography.WeightBold)
                  }
-                 Spacer(Modifier.height(16.dp))
+                 Spacer(Modifier.height(CrystalDesign.Spacing.m))
                  PremiumListItem(
                      title = "Night Shift",
                      subtitle = "10:00 PM - 07:00 AM • Daily",
@@ -223,11 +227,11 @@ fun ScheduleStatusCard(
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                      Box(modifier = Modifier.size(8.dp).background(Primary, CircleShape))
-                     Text("CURRENT STATUS", color = PrimaryLight, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                     Text("CURRENT STATUS", color = PrimaryLight, style = MaterialTheme.typography.labelSmall, fontWeight = CrystalDesign.Typography.WeightBold)
                 }
-                Spacer(modifier = Modifier.height(12.dp))
-                Text(mode, style = MaterialTheme.typography.headlineMedium, color = Color.White, fontWeight = FontWeight.ExtraBold)
-                Text(time, style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
+                Spacer(modifier = Modifier.height(CrystalDesign.Spacing.s))
+                Text(mode, style = MaterialTheme.typography.headlineMedium, color = Color.White, fontWeight = CrystalDesign.Typography.WeightBlack)
+                Text(time, style = MaterialTheme.typography.bodyMedium, color = CrystalDesign.Colors.TextSecondary)
             }
             
             // 3D Icon Container

@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import com.callblockerpro.app.ui.theme.Amber
 import com.callblockerpro.app.ui.theme.Emerald
 import com.callblockerpro.app.ui.theme.Red
+import com.callblockerpro.app.ui.theme.CrystalDesign
 
 enum class LogType {
     BLOCKED, ALLOWED, SPAM
@@ -98,12 +99,12 @@ fun LogItem(
                         isPressed = false
                     },
                     onTap = {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                         onClick()
                     }
                 )
             },
-        cornerRadius = 24.dp,
+        cornerRadius = CrystalDesign.Glass.CornerRadius,
         borderAlpha = 0.1f
     ) {
         Row(
@@ -133,7 +134,7 @@ fun LogItem(
                 Text(
                     text = number,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Black,
+                    fontWeight = CrystalDesign.Typography.WeightBlack,
                     color = Color.White
                 )
                 Spacer(modifier = Modifier.height(4.dp))
@@ -147,7 +148,7 @@ fun LogItem(
                         Text(
                             text = label.uppercase(),
                             style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Black,
+                            fontWeight = CrystalDesign.Typography.WeightBlack,
                             color = color,
                             fontSize = 9.sp,
                             letterSpacing = 1.sp
@@ -161,7 +162,7 @@ fun LogItem(
                     text = time,
                     style = MaterialTheme.typography.labelSmall,
                     color = Color.White.copy(alpha = 0.5f),
-                    fontWeight = FontWeight.Bold
+                    fontWeight = CrystalDesign.Typography.WeightBold
                 )
             }
         }

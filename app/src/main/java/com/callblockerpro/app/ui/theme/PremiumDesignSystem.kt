@@ -4,6 +4,7 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -70,11 +71,32 @@ object CrystalDesign {
         )
     }
     
-    // --- 4. The Glass Physics ---
+    // --- 4. The Typography (Manrope Standard) ---
+    object Typography {
+        val WeightMedium = FontWeight.Medium
+        val WeightBold = FontWeight.Bold
+        val WeightBlack = FontWeight.Black
+        
+        val SizeCaption = 10.sp
+        val SizeLabel = 12.sp
+        val SizeBody = 16.sp
+        val SizeHeadline = 24.sp
+        val SizeDisplay = 32.sp
+    }
+    
+    // --- 5. The Glass Physics ---
     object Glass {
         val BorderThin = 0.5.dp
         val BorderStandard = 1.dp
         val CornerRadius = 24.dp
         val CornerRadiusSmall = 12.dp
+    }
+
+    // --- 6. The Tactile Symphony (Haptics) ---
+    object Haptics {
+        // Semantic haptic roles
+        const val Selection = 0 // HapticFeedbackType.TextHandleMove (light tap)
+        const val Action = 1    // HapticFeedbackType.LongPress (medium bump)
+        const val Error = 2     // Vibration (simulated or heavy)
     }
 }

@@ -40,8 +40,8 @@ fun LogsScreen(onNavigate: (String) -> Unit) {
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues),
-                    contentPadding = PaddingValues(top = 100.dp, bottom = 120.dp, start = 24.dp, end = 24.dp),
-                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                    contentPadding = PaddingValues(top = 100.dp, bottom = 120.dp, start = CrystalDesign.Spacing.l, end = CrystalDesign.Spacing.l),
+                    verticalArrangement = Arrangement.spacedBy(CrystalDesign.Spacing.m)
                 ) {
                     // Search (Index 0)
                     item {
@@ -58,7 +58,7 @@ fun LogsScreen(onNavigate: (String) -> Unit) {
                     // Filters (Index 1)
                     item {
                         AnimatedEntrance(index = 1) {
-                            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            Row(horizontalArrangement = Arrangement.spacedBy(CrystalDesign.Spacing.s)) {
                                 FilterChipItem("All Activity", true)
                                 FilterChipItem("Blocked", false)
                                 FilterChipItem("Whitelisted", false)
@@ -66,12 +66,11 @@ fun LogsScreen(onNavigate: (String) -> Unit) {
                         }
                     }
 
-                    // Logs Section (Index 2)
                     item {
                         AnimatedEntrance(index = 2) {
                             Column {
-                                Spacer(Modifier.height(8.dp))
-                                Text("TODAY", style = MaterialTheme.typography.labelSmall, color = CrystalDesign.Colors.TextSecondary, fontWeight = FontWeight.Black, letterSpacing = 2.sp)
+                                Spacer(Modifier.height(CrystalDesign.Spacing.xs))
+                                Text("TODAY", style = MaterialTheme.typography.labelSmall, color = CrystalDesign.Colors.TextSecondary, fontWeight = CrystalDesign.Typography.WeightBlack, letterSpacing = 2.sp)
                             }
                         }
                     }
@@ -103,8 +102,8 @@ fun LogsScreen(onNavigate: (String) -> Unit) {
                     item {
                         AnimatedEntrance(index = 5) {
                             Column {
-                                Spacer(Modifier.height(8.dp))
-                                Text("YESTERDAY", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = FontWeight.Black, letterSpacing = 2.sp)
+                                Spacer(Modifier.height(CrystalDesign.Spacing.xs))
+                                Text("YESTERDAY", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = CrystalDesign.Typography.WeightBlack, letterSpacing = 2.sp)
                             }
                         }
                     }
@@ -149,6 +148,7 @@ fun LogsScreen(onNavigate: (String) -> Unit) {
 
 @Composable
 fun FilterChipItem(text: String, selected: Boolean) {
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     val bgColor = if (selected) CrystalDesign.Colors.NeonPurple.copy(alpha = 0.8f) else Color.White.copy(0.05f)
     val borderColor = if (selected) CrystalDesign.Colors.NeonPurple else Color.White.copy(0.1f)
     val textColor = if (selected) Color.White else CrystalDesign.Colors.TextSecondary
@@ -164,9 +164,11 @@ fun FilterChipItem(text: String, selected: Boolean) {
                     )
                 )
             )
-            .border(1.dp, borderColor, RoundedCornerShape(12.dp))
-            .clickable { }
-            .padding(horizontal = 16.dp, vertical = 10.dp)
+            .border(1.dp, borderColor, RoundedCornerShape(CrystalDesign.Glass.CornerRadiusSmall))
+            .clickable { 
+                haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+            }
+            .padding(horizontal = CrystalDesign.Spacing.m, vertical = CrystalDesign.Spacing.s)
     ) {
         // Inner Glass Highlight
         if (selected) {
@@ -182,6 +184,7 @@ fun FilterChipItem(text: String, selected: Boolean) {
             )
         }
         
-        Text(text.uppercase(), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black, color = textColor, letterSpacing = 1.sp)
+        
+        Text(text.uppercase(), style = MaterialTheme.typography.labelSmall, fontWeight = CrystalDesign.Typography.WeightBlack, color = textColor, letterSpacing = 1.sp)
     }
 }

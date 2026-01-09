@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.callblockerpro.app.ui.theme.MetallicGradientColors
 import com.callblockerpro.app.ui.theme.MetallicTrackColors
+import com.callblockerpro.app.ui.theme.CrystalDesign
 
 @Composable
 fun MetallicToggle(
@@ -48,10 +49,10 @@ fun MetallicToggle(
             .clip(RoundedCornerShape(12.dp))
             .background(
                 brush = Brush.verticalGradient(MetallicTrackColors),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(CrystalDesign.Glass.CornerRadiusSmall)
             )
-            .border(1.dp, Color.White.copy(0.1f), RoundedCornerShape(12.dp))
-            .padding(4.dp)
+            .border(1.dp, Color.White.copy(0.1f), RoundedCornerShape(CrystalDesign.Glass.CornerRadiusSmall))
+            .padding(CrystalDesign.Spacing.xxs)
     ) {
         val maxWidth = maxWidth
         val itemWidth = maxWidth / options.size
@@ -92,7 +93,7 @@ fun MetallicToggle(
                         .clip(RoundedCornerShape(8.dp))
                         .clickable { 
                             if (!isSelected) {
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                 onOptionSelected(index)
                             }
                         },
@@ -101,7 +102,7 @@ fun MetallicToggle(
                     Text(
                         text = option,
                         style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = CrystalDesign.Typography.WeightBold,
                         color = if (isSelected) Color(0xFF1a1a1a) else Color.Gray
                     )
                 }

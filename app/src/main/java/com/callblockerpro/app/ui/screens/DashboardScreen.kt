@@ -130,20 +130,29 @@ fun DashboardScreen(
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Text("Weekly Activity", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = FontWeight.Black)
-                                        Text("FULL REPORT", style = MaterialTheme.typography.labelSmall, color = PrimaryLight, fontWeight = FontWeight.Bold, modifier = Modifier.clickable {})
+                                        Text("Weekly Activity", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = CrystalDesign.Typography.WeightBlack)
+                                        val hapticReporting = androidx.compose.ui.platform.LocalHapticFeedback.current
+                                        Text(
+                                            "FULL REPORT", 
+                                            style = MaterialTheme.typography.labelSmall, 
+                                            color = PrimaryLight, 
+                                            fontWeight = CrystalDesign.Typography.WeightBold, 
+                                            modifier = Modifier.clickable {
+                                                hapticReporting.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                                            }
+                                        )
                                     }
                                     Spacer(modifier = Modifier.height(20.dp))
                                     GlassPanel(modifier = Modifier.fillMaxWidth()) {
                                         Column(Modifier.padding(24.dp).fillMaxWidth()) {
                                             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(32.dp)) {
                                                 Column {
-                                                    Text("AVG. DAILY", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = FontWeight.Bold)
-                                                    Text("18 Calls", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = FontWeight.Black)
+                                                    Text("AVG. DAILY", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = CrystalDesign.Typography.WeightBold)
+                                                    Text("18 Calls", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = CrystalDesign.Typography.WeightBlack)
                                                 }
                                                 Column {
-                                                    Text("PEAK DAY", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = FontWeight.Bold)
-                                                    Text("Tuesday", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = FontWeight.Black)
+                                                    Text("PEAK DAY", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = CrystalDesign.Typography.WeightBold)
+                                                    Text("Tuesday", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = CrystalDesign.Typography.WeightBlack)
                                                 }
                                             }
                                             Spacer(Modifier.height(24.dp))
@@ -157,7 +166,7 @@ fun DashboardScreen(
                                             Spacer(Modifier.height(16.dp))
                                             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                                                 listOf("M", "T", "W", "T", "F", "S", "S").forEach { 
-                                                    Text(it, style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.6f), modifier = Modifier.width(24.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center, fontWeight = FontWeight.Bold)
+                                                    Text(it, style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.6f), modifier = Modifier.width(CrystalDesign.Spacing.l), textAlign = androidx.compose.ui.text.style.TextAlign.Center, fontWeight = CrystalDesign.Typography.WeightBold)
                                                 }
                                             }
                                         }
@@ -166,12 +175,11 @@ fun DashboardScreen(
                             }
                         }
 
-                        // Recent Activity (Index 3)
                         item {
                             AnimatedEntrance(index = 3) {
-                                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                                    Text("Recent Activity", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = FontWeight.Black)
-                                    Spacer(modifier = Modifier.height(8.dp))
+                                Column(verticalArrangement = Arrangement.spacedBy(CrystalDesign.Spacing.m)) {
+                                    Text("Recent Activity", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = CrystalDesign.Typography.WeightBlack)
+                                    Spacer(modifier = Modifier.height(CrystalDesign.Spacing.xs))
                                     
                                      PremiumListItem(
                                             title = "+1 (555) 019-2834",

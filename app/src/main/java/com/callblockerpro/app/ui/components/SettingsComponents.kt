@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.callblockerpro.app.ui.theme.CrystalDesign
 
 @Composable
 fun SettingsGroup(title: String, content: @Composable ColumnScope.() -> Unit) {
@@ -23,18 +24,18 @@ fun SettingsGroup(title: String, content: @Composable ColumnScope.() -> Unit) {
         Text(
             text = title,
             style = MaterialTheme.typography.labelSmall,
-            color = Color.Gray,
-            fontWeight = FontWeight.Black,
+            color = CrystalDesign.Colors.TextTertiary,
+            fontWeight = CrystalDesign.Typography.WeightBlack,
             letterSpacing = 2.sp,
-            modifier = Modifier.padding(start = 4.dp, bottom = 12.dp)
+            modifier = Modifier.padding(start = 4.dp, bottom = CrystalDesign.Spacing.s)
         )
         GlassPanel(
             modifier = Modifier.fillMaxWidth(),
-            cornerRadius = 24.dp,
+            cornerRadius = CrystalDesign.Glass.CornerRadius,
             borderAlpha = 0.1f
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                modifier = Modifier.fillMaxWidth().padding(vertical = CrystalDesign.Spacing.xs)
             ) {
                 content()
             }
@@ -51,11 +52,15 @@ fun SettingsToggleRow(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
+    val hapticToggle = androidx.compose.ui.platform.LocalHapticFeedback.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onCheckedChange(!checked) }
-            .padding(16.dp),
+            .clickable { 
+                hapticToggle.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                onCheckedChange(!checked) 
+            }
+            .padding(CrystalDesign.Spacing.m),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
@@ -103,11 +108,15 @@ fun SettingsLinkRow(
     trailingIcon: ImageVector? = Icons.Default.ChevronRight,
     onClick: () -> Unit = {}
 ) {
+    val hapticLink = androidx.compose.ui.platform.LocalHapticFeedback.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(16.dp),
+            .clickable {
+                hapticLink.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                onClick()
+            }
+            .padding(CrystalDesign.Spacing.m),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (icon != null) {
@@ -145,10 +154,10 @@ fun SettingsLinkRow(
             Text(
                 text = trailingText,
                 style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray,
-                fontWeight = FontWeight.Bold
+                color = CrystalDesign.Colors.TextTertiary,
+                fontWeight = CrystalDesign.Typography.WeightBold
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(CrystalDesign.Spacing.xs))
         }
         if (trailingIcon != null) {
             Icon(
