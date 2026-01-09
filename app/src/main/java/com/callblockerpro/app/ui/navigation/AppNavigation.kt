@@ -43,7 +43,7 @@ fun AppNavigation() {
         composable("home") { DashboardScreen { navController.navigate(it) } }
         composable("logs") { LogsScreen { navController.navigate(it) } }
         composable("lists") { ListsScreen { navController.navigate(it) } }
-        composable("settings") { SettingsScreen { navController.navigate(it) } }
+        composable("settings") { SettingsScreen(onNavigate = { navController.navigate(it) }) }
         composable("add") { 
             com.callblockerpro.app.ui.screens.AddScreen(
                 onNavigateBack = { navController.popBackStack() }
