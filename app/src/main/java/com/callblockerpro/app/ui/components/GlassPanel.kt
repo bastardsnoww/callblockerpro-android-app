@@ -48,47 +48,49 @@ fun GlassPanel(
     )
 
     Box(modifier = modifier) {
-        // 1. Background Layer (frosted glass effect)
+        // 1. Crystal Background Layer
         Box(
             modifier = Modifier
                 .matchParentSize()
                 .graphicsLayer {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                         val blurEffect = RenderEffect.createBlurEffect(
-                            15f,
-                            15f,
+                            10f, // Reduced for clarity
+                            10f,
                             Shader.TileMode.MIRROR
                         )
                         renderEffect = blurEffect.asComposeRenderEffect()
                     }
-                    alpha = 0.9f 
+                    alpha = 0.6f // More transparent
                 }
                 .clip(RoundedCornerShape(cornerRadius))
                 .background(
                     brush = Brush.linearGradient(
-                        colors = GlassGradientColors,
+                        colors = listOf(
+                            Color.White.copy(alpha = 0.1f),
+                            Color.Transparent
+                        ),
                         start = Offset(0f, 0f),
-                        end = Offset(1000f, 1000f)
+                        end = Offset(500f, 500f)
                     )
                 )
         )
 
-        // 2. Frosted Noise Overlay
+        // 2. Crystal Highlight Layer (Replacing Noise)
         Box(
             modifier = Modifier
                 .matchParentSize()
-                .alpha(0.03f)
                 .clip(RoundedCornerShape(cornerRadius))
                 .background(
                     brush = Brush.radialGradient(
-                        colors = listOf(Color.White, Color.Transparent),
-                        center = Offset(0.5f, 0.5f),
-                        radius = 2000f
+                        colors = listOf(Color.White.copy(alpha = 0.05f), Color.Transparent),
+                        center = Offset(0f, 0f),
+                        radius = 400f
                     )
                 )
         )
 
-        // 3. Shimmer Border
+        // 3. Sharp Crystal Border
         Box(
             modifier = Modifier
                 .matchParentSize()
@@ -96,18 +98,18 @@ fun GlassPanel(
                     width = 1.dp,
                     brush = Brush.linearGradient(
                         colors = listOf(
-                            Color.White.copy(alpha = 0.05f),
-                            Color.White.copy(alpha = 0.2f),
-                            Color.White.copy(alpha = 0.05f)
+                            Color.White.copy(alpha = 0.1f),
+                            Color.White.copy(alpha = 0.4f), // Brighter highlight
+                            Color.White.copy(alpha = 0.1f)
                         ),
                         start = Offset(shimmerOffset, shimmerOffset),
-                        end = Offset(shimmerOffset + 200f, shimmerOffset + 200f)
+                        end = Offset(shimmerOffset + 150f, shimmerOffset + 150f)
                     ),
                     shape = RoundedCornerShape(cornerRadius)
                 )
         )
 
-        // 4. Content Layer (sharp, non-blurred)
+        // 4. Content Layer
         Box(
             modifier = Modifier.fillMaxWidth().padding(1.dp), 
             content = content

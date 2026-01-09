@@ -28,25 +28,27 @@ val TextPrimaryLight = Color(0xFF0F172A) // Slate 900
 val TextSecondaryLight = Color(0xFF64748B) // Slate 500
 
 // Luxury Gradients
+// Luxury Gradients - Updated for Crystal Clarity
 val GlassGradientColors = listOf(
-    Color(0xFF2d2a42).copy(alpha = 0.7f),
-    Color(0xFF1f1c27).copy(alpha = 0.4f)
+    Color(0xFF352F44).copy(alpha = 0.5f), // More vibrant purple-gray
+    Color(0xFF1F1C27).copy(alpha = 0.3f)
 )
 
 val GlassBorderColors = listOf(
-    Color.White.copy(alpha = 0.15f),
-    Color.White.copy(alpha = 0.02f)
+    Color.White.copy(alpha = 0.25f),
+    Color.White.copy(alpha = 0.05f)
 )
 
+// Crystal-Liquid Selection (formerly Metallic)
 val MetallicGradientColors = listOf(
-    Color(0xFFE0E0E0), // Highlight
-    Color(0xFFBDBDBD), // Mid
-    Color(0xFF9E9E9E), // Shadow
-    Color(0xFFBDBDBD), // Reflection
-    Color(0xFFE0E0E0)  // Highlight
+    Color(0xFFFFFFFF), // Pure Shine
+    Color(0xFFE0E7FF), // Crystal Blue-ish
+    Color(0xFFC7D2FE), // Light Indigo
+    Color(0xFFE0E7FF),
+    Color(0xFFFFFFFF)
 )
 
 val MetallicTrackColors = listOf(
-    Color(0xFF151515),
-    Color(0xFF252525)
+    Color(0xFF0F0A1A),
+    Color(0xFF1F1C27)
 )
