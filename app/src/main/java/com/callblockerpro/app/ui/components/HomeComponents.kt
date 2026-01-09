@@ -31,7 +31,8 @@ import com.callblockerpro.app.ui.theme.Red
 @Composable
 fun HomeStatusCard(
     blockedCount: Int = 0,
-    threatCount: Int = 0
+    threatCount: Int = 0,
+    modifier: Modifier = Modifier
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "PulsingGlow")
     val pulseScale by infiniteTransition.animateFloat(
@@ -54,7 +55,7 @@ fun HomeStatusCard(
     )
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(32.dp))
             .background(

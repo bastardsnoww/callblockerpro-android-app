@@ -63,47 +63,59 @@ fun DashboardScreen(
     ) { paddingValues ->
         PremiumBackground {
             Box(Modifier.fillMaxSize()) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
-                    contentPadding = PaddingValues(top = 100.dp, bottom = 120.dp, start = 24.dp, end = 24.dp),
-                    verticalArrangement = Arrangement.spacedBy(28.dp)
-                ) {
-                    // Spacer for header
-                    item { Spacer(Modifier.height(0.dp)) }
+                    // Capture Scroll State
+                    val listState = rememberLazyListState()
+                    val firstItemOffset by remember { derivedStateOf { listState.firstVisibleItemScrollOffset } }
+                    val firstItemIndex by remember { derivedStateOf { listState.firstVisibleItemIndex } }
 
-                    // Mode Selector
-                    item {
-                        if (!isRoleGranted) {
-                            PremiumWarningCard(
-                                title = "System Role Required",
-                                message = "Set as default blocker to enable protection.",
-                                buttonText = "FIX",
-                                onClick = {
-                                    com.callblockerpro.app.util.CallScreeningPermissions.createRoleRequestIntent(context)?.let {
-                                        roleLauncher.launch(it)
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)
+                            .padding(horizontal = CrystalDesign.Spacing.l),
+                        contentPadding = PaddingValues(top = 100.dp, bottom = 120.dp), // Removed side padding from contentPadding as it is now in Modifier
+                        verticalArrangement = Arrangement.spacedBy(CrystalDesign.Spacing.l) // 24dp
+                    ) {
+                        // Spacer for header
+                        item { Spacer(Modifier.height(0.dp)) }
+
+                        // Mode Selector
+                        item {
+                            // ... (Warning Card logic remains same) ...
+                           if (!isRoleGranted) {
+                                PremiumWarningCard(
+                                    title = "System Role Required",
+                                    message = "Set as default blocker to enable protection.",
+                                    buttonText = "FIX",
+                                    onClick = {
+                                        com.callblockerpro.app.util.CallScreeningPermissions.createRoleRequestIntent(context)?.let {
+                                            roleLauncher.launch(it)
+                                        }
                                     }
-                                }
+                                )
+                                Spacer(modifier = Modifier.height(24.dp))
+                            }
+
+                            MetallicToggle(
+                                options = listOf("Normal", "Whitelist", "Blocklist"),
+                                selectedIndex = selectedMode,
+                                onOptionSelected = { viewModel.onModeSelected(it) },
+                                modifier = Modifier.fillMaxWidth()
                             )
-                            Spacer(modifier = Modifier.height(24.dp))
                         }
 
-                        MetallicToggle(
-                            options = listOf("Normal", "Whitelist", "Blocklist"),
-                            selectedIndex = selectedMode,
-                            onOptionSelected = { viewModel.onModeSelected(it) },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-
-                    // Status Card
-                    item {
-                        HomeStatusCard(
-                            blockedCount = blockedToday,
-                            threatCount = totalThreats
-                        )
-                    }
+                        // Status Card (PARALLAX ENABLED)
+                        item {
+                            // Calculate Parallax Progress: if index > 1 (card scrolled past), progress = 1f. Else calc offset / max.
+                            val parallaxProgress = if (firstItemIndex > 2) 1f else (firstItemOffset.toFloat() / 500f)
+                            
+                            HomeStatusCard(
+                                blockedCount = blockedToday,
+                                threatCount = totalThreats,
+                                modifier = Modifier.scrollParallax(parallaxProgress)
+                            )
+                        }
 
                     // Weekly Insights
                     item {
