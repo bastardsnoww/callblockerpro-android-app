@@ -28,8 +28,8 @@ object CrystalDesign {
 
         // Text
         val TextPrimary = Color(0xFFFFFFFF)
-        val TextSecondary = Color(0xB3FFFFFF) // 70% White
-        val TextTertiary = Color(0x66FFFFFF) // 40% White
+        val TextSecondary = Color(0xD9FFFFFF) // 85% White (Improved from 70%)
+        val TextTertiary = Color(0x99FFFFFF) // 60% White (Improved from 40%)
         
         // Gradients
         val GradientPrimary = Brush.linearGradient(

@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.VerifiedUser
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,8 +33,14 @@ import com.callblockerpro.app.ui.theme.Red
 fun HomeStatusCard(
     blockedCount: Int = 0,
     threatCount: Int = 0,
+    isSystemActive: Boolean = true,
     modifier: Modifier = Modifier
 ) {
+    val statusColor = if (isSystemActive) Emerald else Red
+    val statusText = if (isSystemActive) "SECURE & ACTIVE" else "VULNERABLE / ACTION REQUIRED"
+    val headlineText = if (isSystemActive) "System\nShielded" else "Shield\nInactive"
+    val statusIcon = if (isSystemActive) Icons.Default.VerifiedUser else Icons.Default.Warning
+
     val infiniteTransition = rememberInfiniteTransition(label = "PulsingGlow")
     val pulseScale by infiniteTransition.animateFloat(
         initialValue = 1f,
@@ -45,10 +52,10 @@ fun HomeStatusCard(
         label = "PulseScale"
     )
     val pulseAlpha by infiniteTransition.animateFloat(
-        initialValue = 0.3f,
-        targetValue = 0.6f,
+        initialValue = if (isSystemActive) 0.3f else 0.5f,
+        targetValue = if (isSystemActive) 0.6f else 0.9f,
         animationSpec = infiniteRepeatable(
-            animation = tween(2000, easing = FastOutSlowInEasing),
+            animation = tween(if (isSystemActive) 2000 else 1000, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "PulseAlpha"
@@ -85,7 +92,7 @@ fun HomeStatusCard(
                 .offset(x = 40.dp, y = (-40).dp)
                 .background(
                     brush = Brush.radialGradient(
-                        colors = listOf(Emerald.copy(alpha = 0.15f), Color.Transparent)
+                        colors = listOf(statusColor.copy(alpha = 0.15f), Color.Transparent)
                     )
                 )
         )
@@ -103,7 +110,7 @@ fun HomeStatusCard(
                         Box(
                             modifier = Modifier
                                 .size(8.dp)
-                                .background(Emerald, CircleShape)
+                                .background(statusColor, CircleShape)
                                 .graphicsLayer {
                                     scaleX = pulseScale
                                     scaleY = pulseScale
@@ -111,8 +118,8 @@ fun HomeStatusCard(
                                 }
                         )
                         Text(
-                            text = "SECURE & ACTIVE",
-                            color = Emerald,
+                            text = statusText,
+                            color = statusColor,
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.ExtraBold,
                             letterSpacing = 1.5.sp
@@ -120,7 +127,7 @@ fun HomeStatusCard(
                     }
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = "System\nShielded",
+                        text = headlineText,
                         style = MaterialTheme.typography.headlineLarge,
                         color = Color.White,
                         fontWeight = FontWeight.Black,
@@ -128,7 +135,7 @@ fun HomeStatusCard(
                     )
                 }
 
-                // 3D Pulsing Shield Icon - Fixed Alignment
+                // 3D Pulsing Shield Icon - Integrated Warning
                 Box(
                     modifier = Modifier.size(80.dp),
                     contentAlignment = Alignment.Center
@@ -142,7 +149,7 @@ fun HomeStatusCard(
                                 scaleY = pulseScale
                                 alpha = pulseAlpha * 0.4f
                             }
-                            .background(Emerald.copy(alpha = 0.3f), CircleShape)
+                            .background(statusColor.copy(alpha = 0.3f), CircleShape)
                     )
                     
                     // Glass Shield Container
@@ -153,16 +160,16 @@ fun HomeStatusCard(
                             .background(
                                 Brush.linearGradient(
                                     listOf(
-                                        Color(0xFF10B981).copy(alpha = 0.15f),
-                                        Color(0xFF065F46).copy(alpha = 0.4f)
+                                        statusColor.copy(alpha = 0.15f),
+                                        statusColor.copy(alpha = 0.4f)
                                     )
                                 )
                             )
-                            .border(1.dp, Emerald.copy(alpha = 0.4f), RoundedCornerShape(24.dp)),
+                            .border(1.dp, statusColor.copy(alpha = 0.4f), RoundedCornerShape(24.dp)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = Icons.Default.VerifiedUser,
+                            imageVector = statusIcon,
                             contentDescription = null,
                             tint = Color.White,
                             modifier = Modifier.size(36.dp)

@@ -1,8 +1,6 @@
 package com.callblockerpro.app.ui.components
 
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -66,6 +64,18 @@ fun MetallicToggle(
             label = "IndicatorOffset"
         )
 
+        // Shimmer Animation for Refracting Light
+        val shimmerTransition = rememberInfiniteTransition(label = "Shimmer")
+        val shimmerAlpha by shimmerTransition.animateFloat(
+            initialValue = 0f,
+            targetValue = 0.4f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(2000, easing = LinearEasing),
+                repeatMode = RepeatMode.Reverse
+            ),
+            label = "ShimmerAlpha"
+        )
+
         // Sliding Indicator
         Box(
             modifier = Modifier
@@ -80,11 +90,31 @@ fun MetallicToggle(
                     brush = Brush.verticalGradient(MetallicGradientColors),
                     shape = RoundedCornerShape(8.dp)
                 )
-        )
+        ) {
+            // Refracting Light Overlay
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                Color.White.copy(alpha = 0f),
+                                Color.White.copy(alpha = shimmerAlpha),
+                                Color.White.copy(alpha = 0f)
+                            )
+                        )
+                    )
+            )
+        }
 
         Row(modifier = Modifier.fillMaxSize()) {
             options.forEachIndexed { index, option ->
                 val isSelected = index == selectedIndex
+                val textScale by animateFloatAsState(
+                    targetValue = if (isSelected) 1.1f else 1f,
+                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+                    label = "TextScale"
+                )
                 
                 Box(
                     modifier = Modifier
@@ -93,7 +123,7 @@ fun MetallicToggle(
                         .clip(RoundedCornerShape(8.dp))
                         .clickable { 
                             if (!isSelected) {
-                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress) // Mechanical bump
                                 onOptionSelected(index)
                             }
                         },
@@ -103,7 +133,11 @@ fun MetallicToggle(
                         text = option,
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = CrystalDesign.Typography.WeightBold,
-                        color = if (isSelected) Color(0xFF1a1a1a) else Color.Gray
+                        color = if (isSelected) Color(0xFF1a1a1a) else Color.Gray,
+                        modifier = Modifier.graphicsLayer {
+                            scaleX = textScale
+                            scaleY = textScale
+                        }
                     )
                 }
             }
