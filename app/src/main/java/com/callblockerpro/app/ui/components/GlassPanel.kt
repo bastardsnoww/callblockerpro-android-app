@@ -27,13 +27,22 @@ fun GlassPanel(
     cornerRadius: Dp = 24.dp,
     content: @Composable BoxScope.() -> Unit
 ) {
+    val infiniteTransition = rememberInfiniteTransition(label = "ShimmerTransition")
+    val shimmerOffset by infiniteTransition.animateFloat(
+        initialValue = -1000f,
+        targetValue = 1000f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(4000, easing = LinearEasing)
+        ),
+        label = "ShimmerOffset"
+    )
+
     Box(modifier = modifier) {
         // 1. Background Layer (frosted glass effect)
         Box(
             modifier = Modifier
                 .matchParentSize()
                 .graphicsLayer {
-                    // Reduce radius for better performance and less "washout"
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                         val blurEffect = RenderEffect.createBlurEffect(
                             15f,
@@ -48,22 +57,49 @@ fun GlassPanel(
                 .background(
                     brush = Brush.linearGradient(
                         colors = GlassGradientColors,
-                        start = androidx.compose.ui.geometry.Offset(0f, 0f),
-                        end = androidx.compose.ui.geometry.Offset(FLOAT_INF, FLOAT_INF)
+                        start = Offset(0f, 0f),
+                        end = Offset(1000f, 1000f)
                     )
                 )
+        )
+
+        // 2. Frosted Noise Overlay
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .alpha(0.03f)
+                .clip(RoundedCornerShape(cornerRadius))
+                .background(
+                    brush = Brush.radialGradient(
+                        colors = listOf(Color.White, Color.Transparent),
+                        center = Offset(0.5f, 0.5f),
+                        radius = 2000f
+                    )
+                )
+        )
+
+        // 3. Shimmer Border
+        Box(
+            modifier = Modifier
+                .matchParentSize()
                 .border(
                     width = 1.dp,
                     brush = Brush.linearGradient(
-                        colors = GlassBorderColors
+                        colors = listOf(
+                            Color.White.copy(alpha = 0.05f),
+                            Color.White.copy(alpha = 0.2f),
+                            Color.White.copy(alpha = 0.05f)
+                        ),
+                        start = Offset(shimmerOffset, shimmerOffset),
+                        end = Offset(shimmerOffset + 200f, shimmerOffset + 200f)
                     ),
                     shape = RoundedCornerShape(cornerRadius)
                 )
         )
 
-        // 2. Content Layer (sharp, non-blurred)
+        // 4. Content Layer (sharp, non-blurred)
         Box(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(1.dp), 
             content = content
         )
     }

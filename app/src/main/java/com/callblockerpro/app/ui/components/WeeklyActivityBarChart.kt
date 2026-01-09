@@ -13,17 +13,41 @@ import androidx.compose.ui.unit.dp
 import com.callblockerpro.app.ui.theme.Primary
 import com.callblockerpro.app.ui.theme.PrimaryLight
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+
 @Composable
 fun WeeklyActivityBarChart(
     data: List<Float> = listOf(0.3f, 0.45f, 0.25f, 0.65f, 0.5f, 0.7f, 0.4f),
     modifier: Modifier = Modifier
 ) {
+    var animationStarted by remember { mutableStateOf(false) }
+    
+    LaunchedEffect(Unit) {
+        animationStarted = true
+    }
+
     Canvas(modifier = modifier.fillMaxSize()) {
         val barWidth = size.width / (data.size * 2f)
         val spacing = size.width / data.size
         
         data.forEachIndexed { index, value ->
-            val barHeight = size.height * value
+            // Animate each bar with a slight stagger
+            val animatedValue by animateFloatAsState(
+                targetValue = if (animationStarted) value else 0f,
+                animationSpec = tween(
+                    durationMillis = 1000,
+                    delayMillis = index * 50
+                ),
+                label = "BarAnimation"
+            )
+
+            val barHeight = size.height * animatedValue
             val x = (index * spacing) + (spacing - barWidth) / 2
             val y = size.height - barHeight
             

@@ -12,11 +12,33 @@ import com.callblockerpro.app.ui.screens.ScheduleScreen
 import com.callblockerpro.app.ui.screens.SplashScreen
 import com.callblockerpro.app.ui.screens.OnboardingScreen
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
+
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
     
-    NavHost(navController = navController, startDestination = "splash") {
+    NavHost(
+        navController = navController, 
+        startDestination = "splash",
+        enterTransition = {
+            slideInHorizontally(initialOffsetX = { 1000 }, animationSpec = tween(700)) +
+                    fadeIn(animationSpec = tween(700))
+        },
+        exitTransition = {
+            slideOutHorizontally(targetOffsetX = { -1000 }, animationSpec = tween(700)) +
+                    fadeOut(animationSpec = tween(700))
+        },
+        popEnterTransition = {
+            slideInHorizontally(initialOffsetX = { -1000 }, animationSpec = tween(700)) +
+                    fadeIn(animationSpec = tween(700))
+        },
+        popExitTransition = {
+            slideOutHorizontally(targetOffsetX = { 1000 }, animationSpec = tween(700)) +
+                    fadeOut(animationSpec = tween(700))
+        }
+    ) {
         composable("splash") {
             SplashScreen(
                 onNavigateToHome = {

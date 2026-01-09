@@ -14,11 +14,26 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.unit.dp
 import com.callblockerpro.app.ui.theme.Primary
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.PathMeasure
+
 @Composable
 fun InsightGraph(
     modifier: Modifier = Modifier,
     lineColor: Color = Primary
 ) {
+    val animationProgress = remember { Animatable(0f) }
+    
+    LaunchedEffect(Unit) {
+        animationProgress.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(durationMillis = 1500)
+        )
+    }
+
     Canvas(modifier = modifier.fillMaxSize()) {
         val width = size.width
         val height = size.height
@@ -28,38 +43,47 @@ fun InsightGraph(
         
         if (points.isEmpty()) return@Canvas
 
-        val path = Path()
+        val fullPath = Path()
         val stepX = width / (points.size - 1)
         
         points.forEachIndexed { index, value ->
             val x = index * stepX
-            val y = height - (value * height) // Invert Y
+            val y = height - (value * height)
             if (index == 0) {
-                path.moveTo(x, y)
+                fullPath.moveTo(x, y)
             } else {
-                // Simple cubic bezier smoothing could be added here, 
-                // but for now simple lineTo or quadraticBezier for smoothness
                 val prevX = (index - 1) * stepX
                 val prevY = height - (points[index - 1] * height)
-                
                 val midX = (prevX + x) / 2
-                path.cubicTo(midX, prevY, midX, y, x, y)
+                fullPath.cubicTo(midX, prevY, midX, y, x, y)
             }
         }
 
-        // Draw the gradient fill
+        // Animate the path drawing
+        val pathMeasure = PathMeasure()
+        pathMeasure.setPath(fullPath, false)
+        val animatedPath = Path()
+        pathMeasure.getSegment(0f, pathMeasure.length * animationProgress.value, animatedPath, true)
+
+        // Draw the gradient fill (fades in slightly as the line draws)
         val fillPath = Path().apply {
-            addPath(path)
-            lineTo(width, height)
-            lineTo(0f, height)
-            close()
+            addPath(animatedPath)
+            if (animationProgress.value > 0f) {
+                // Approximate completion of fill path
+                val lastPointX = width * animationProgress.value
+                // For simplicity, we just use the animated path and close it to the bottom
+                // but a perfect fill would follow the line exactly.
+                lineTo(lastPointX, height)
+                lineTo(0f, height)
+                close()
+            }
         }
         
         drawPath(
             path = fillPath,
             brush = Brush.verticalGradient(
                 colors = listOf(
-                    lineColor.copy(alpha = 0.5f),
+                    lineColor.copy(alpha = 0.3f * animationProgress.value),
                     lineColor.copy(alpha = 0.0f)
                 )
             )
@@ -67,7 +91,7 @@ fun InsightGraph(
 
         // Draw the line
         drawPath(
-            path = path,
+            path = animatedPath,
             color = lineColor,
             style = Stroke(
                 width = 3.dp.toPx(),
@@ -75,7 +99,7 @@ fun InsightGraph(
             )
         )
         
-        // Draw Grid lines (dashed effect simulated by low alpha lines)
+        // Draw Grid lines
         val gridStepY = height / 3
         for (i in 1..3) {
             val y = i * gridStepY

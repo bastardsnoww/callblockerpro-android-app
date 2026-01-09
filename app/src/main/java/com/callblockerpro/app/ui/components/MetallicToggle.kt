@@ -26,6 +26,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.Spring
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.width
+
 @Composable
 fun MetallicToggle(
     options: List<String>,
@@ -33,7 +39,7 @@ fun MetallicToggle(
     onOptionSelected: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(
+    BoxWithConstraints(
         modifier = modifier
             .height(56.dp)
             .clip(RoundedCornerShape(12.dp))
@@ -44,6 +50,37 @@ fun MetallicToggle(
             .border(1.dp, Color.White.copy(0.1f), RoundedCornerShape(12.dp))
             .padding(4.dp)
     ) {
+        val maxWidth = maxWidth
+        val itemWidth = maxWidth / options.size
+        
+        val indicatorOffset by animateDpAsState(
+            targetValue = itemWidth * selectedIndex,
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioLowBouncy,
+                stiffness = Spring.StiffnessLow
+            ),
+            label = "IndicatorOffset"
+        )
+
+        // Sliding Indicator
+        Box(
+            modifier = Modifier
+                .width(itemWidth)
+                .fillMaxHeight()
+                .padding(2.dp)
+                .drawWithContent {
+                    drawContent()
+                }
+                .graphicsLayer {
+                    translationX = indicatorOffset.toPx()
+                }
+                .shadow(elevation = 6.dp, shape = RoundedCornerShape(8.dp))
+                .background(
+                    brush = Brush.verticalGradient(MetallicGradientColors),
+                    shape = RoundedCornerShape(8.dp)
+                )
+        )
+
         Row(modifier = Modifier.fillMaxSize()) {
             options.forEachIndexed { index, option ->
                 val isSelected = index == selectedIndex
@@ -53,24 +90,17 @@ fun MetallicToggle(
                         .weight(1f)
                         .fillMaxHeight()
                         .clip(RoundedCornerShape(8.dp))
-                        .then(
-                            if (isSelected) {
-                                Modifier
-                                    .background(
-                                        brush = Brush.verticalGradient(MetallicGradientColors)
-                                    )
-                                    .shadow(elevation = 2.dp, shape = RoundedCornerShape(8.dp))
-                            } else {
-                                Modifier.clickable { onOptionSelected(index) }
-                            }
-                        ),
+                        .clickable { onOptionSelected(index) },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = option,
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
-                        color = if (isSelected) Color(0xFF1a1a1a) else Color.Gray
+                        color = if (isSelected) Color(0xFF1a1a1a) else Color.Gray,
+                        modifier = Modifier.graphicsLayer {
+                            // Slight parallax or scale effect could go here
+                        }
                     )
                 }
             }
