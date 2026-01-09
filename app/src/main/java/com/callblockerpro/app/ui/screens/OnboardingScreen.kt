@@ -39,6 +39,7 @@ import com.callblockerpro.app.ui.theme.Primary
 import com.callblockerpro.app.ui.theme.PrimaryLight
 import com.callblockerpro.app.ui.viewmodel.OnboardingViewModel
 import kotlinx.coroutines.launch
+import com.callblockerpro.app.ui.components.NeonButton
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -160,7 +161,12 @@ fun OnboardingScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // Primary Button
-                Button(
+                NeonButton(
+                    text = when {
+                        pagerState.currentPage < 2 -> "Next"
+                        checkPermissions() -> "Get Started"
+                        else -> "Grant Permissions"
+                    },
                     onClick = {
                         if (pagerState.currentPage < 2) {
                             scope.launch {
@@ -185,26 +191,10 @@ fun OnboardingScreen(
                             }
                         }
                     },
-                    modifier = Modifier.fillMaxWidth().height(56.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (pagerState.currentPage == 2 && !checkPermissions()) Color.White else Primary,
-                        contentColor = if (pagerState.currentPage == 2 && !checkPermissions()) Color.Black else Color.White
-                    ),
-                    shape = RoundedCornerShape(16.dp)
-                ) {
-                    val buttonText = when {
-                        pagerState.currentPage < 2 -> "Next"
-                        checkPermissions() -> "Get Started"
-                        else -> "Grant Permissions"
-                    }
-                    
-                    Text(buttonText, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    
-                    if (pagerState.currentPage < 2) {
-                        Spacer(Modifier.width(8.dp))
-                        Icon(Icons.AutoMirrored.Filled.ArrowForward, null)
-                    }
-                }
+                    modifier = Modifier.fillMaxWidth(),
+                    icon = if (pagerState.currentPage < 2) Icons.AutoMirrored.Filled.ArrowForward else null,
+                    color = if (pagerState.currentPage == 2 && !checkPermissions()) Color.White else Primary
+                )
 
                 // Secondary Action (Always visible on last page for stability)
                 AnimatedVisibility(

@@ -135,23 +135,13 @@ fun ListsScreen(
                 }
 
                 // Floating Crystal Header
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp)
-                        .background(Brush.verticalGradient(listOf(BackgroundDark, Color.Transparent)))
-                        .padding(horizontal = 24.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    GlassPanel(modifier = Modifier.fillMaxWidth().height(64.dp), cornerRadius = 20.dp) {
-                        Row(Modifier.fillMaxSize().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                            Text("Protection Lists", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Black, color = Color.White)
-                            IconButton(onClick = { onNavigate("add") }, modifier = Modifier.background(Primary, CircleShape).size(40.dp)) {
-                                Icon(Icons.Default.Add, null, tint = Color.White, modifier = Modifier.size(24.dp))
-                            }
-                        }
-                    }
-                }
+                PremiumHeader(
+                    title = "Protection Lists",
+                    onBack = null, // Root screen, no back
+                    modifier = Modifier.align(Alignment.TopCenter).padding(top = 24.dp, start = 16.dp, end = 16.dp),
+                    actionIcon = Icons.Default.Add,
+                    onAction = { onNavigate("add") }
+                )
             }
         }
     }

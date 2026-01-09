@@ -112,23 +112,13 @@ fun LogsScreen(onNavigate: (String) -> Unit) {
                 }
 
                 // Floating Crystal Header
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp)
-                        .background(Brush.verticalGradient(listOf(BackgroundDark, Color.Transparent)))
-                        .padding(horizontal = 24.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    GlassPanel(modifier = Modifier.fillMaxWidth().height(64.dp), cornerRadius = 20.dp) {
-                        Row(Modifier.fillMaxSize().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                            Text("Security Logs", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Black, color = Color.White)
-                            IconButton(onClick = { /* Export */ }, modifier = Modifier.background(Color.White.copy(0.05f), CircleShape).size(40.dp)) {
-                                Icon(Icons.Default.CloudSync, null, tint = Color.White, modifier = Modifier.size(20.dp))
-                            }
-                        }
-                    }
-                }
+                PremiumHeader(
+                    title = "Security Logs",
+                    onBack = null,
+                    modifier = Modifier.align(Alignment.TopCenter).padding(top = 24.dp, start = 16.dp, end = 16.dp),
+                    actionIcon = Icons.Default.CloudSync,
+                    onAction = { /* Export */ }
+                )
             }
         }
     }
@@ -136,17 +126,39 @@ fun LogsScreen(onNavigate: (String) -> Unit) {
 
 @Composable
 fun FilterChipItem(text: String, selected: Boolean) {
-    val bgColor = if (selected) Primary else Color.White.copy(0.05f)
+    val bgColor = if (selected) Primary.copy(alpha = 0.8f) else Color.White.copy(0.05f)
+    val borderColor = if (selected) Primary else Color.White.copy(0.1f)
     val textColor = if (selected) Color.White else Color.Gray
 
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(12.dp))
-            .background(bgColor)
-            .then(if (!selected) Modifier.border(1.dp, androidx.compose.ui.graphics.Color.White.copy(0.1f), RoundedCornerShape(12.dp)) else Modifier)
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        bgColor,
+                        bgColor.copy(alpha = if (selected) 0.6f else 0.02f)
+                    )
+                )
+            )
+            .border(1.dp, borderColor, RoundedCornerShape(12.dp))
             .clickable { }
             .padding(horizontal = 16.dp, vertical = 10.dp)
     ) {
-        Text(text, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black, color = textColor, letterSpacing = 0.5.sp)
+        // Inner Glass Highlight
+        if (selected) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(
+                        brush = Brush.radialGradient(
+                            colors = listOf(Color.White.copy(0.2f), Color.Transparent),
+                            radius = 100f
+                        )
+                    )
+            )
+        }
+        
+        Text(text.uppercase(), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black, color = textColor, letterSpacing = 1.sp)
     }
 }
