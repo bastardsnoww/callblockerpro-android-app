@@ -32,21 +32,24 @@ fun WeeklyActivityBarChart(
         animationStarted = true
     }
 
+    // MAP animated values here (outside Canvas)
+    val animatedValues = data.mapIndexed { index, value ->
+        animateFloatAsState(
+            targetValue = if (animationStarted) value else 0f,
+            animationSpec = tween(
+                durationMillis = 1000,
+                delayMillis = index * 50
+            ),
+            label = "BarAnimation_$index"
+        )
+    }
+
     Canvas(modifier = modifier.fillMaxSize()) {
         val barWidth = size.width / (data.size * 2f)
         val spacing = size.width / data.size
         
         data.forEachIndexed { index, value ->
-            // Animate each bar with a slight stagger
-            val animatedValue by animateFloatAsState(
-                targetValue = if (animationStarted) value else 0f,
-                animationSpec = tween(
-                    durationMillis = 1000,
-                    delayMillis = index * 50
-                ),
-                label = "BarAnimation"
-            )
-
+            val animatedValue = animatedValues[index].value
             val barHeight = size.height * animatedValue
             val x = (index * spacing) + (spacing - barWidth) / 2
             val y = size.height - barHeight
