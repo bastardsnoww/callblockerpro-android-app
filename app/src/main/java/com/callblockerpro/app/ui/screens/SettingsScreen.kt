@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.callblockerpro.app.ui.components.*
 import com.callblockerpro.app.ui.theme.BackgroundDark
 import com.callblockerpro.app.ui.theme.Emerald
@@ -37,7 +38,7 @@ import com.callblockerpro.app.ui.theme.PrimaryLight
 @Composable
 fun SettingsScreen(
     onNavigate: (String) -> Unit,
-    viewModel: com.callblockerpro.app.ui.viewmodel.SettingsViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    viewModel: com.callblockerpro.app.ui.viewmodel.SettingsViewModel = hiltViewModel()
 ) {
     Scaffold(
         containerColor = BackgroundDark,

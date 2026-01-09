@@ -13,8 +13,6 @@ import javax.inject.Inject
 class CallBlockerApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var workerFactory: HiltWorkerFactory
-    @Inject lateinit var analyticsHelper: AnalyticsHelper
-    @Inject lateinit var crashlyticsHelper: CrashlyticsHelper
 
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
