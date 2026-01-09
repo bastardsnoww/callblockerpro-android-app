@@ -26,36 +26,46 @@ fun GlassPanel(
     cornerRadius: Dp = 24.dp,
     content: @Composable BoxScope.() -> Unit
 ) {
-    Box(
-        modifier = modifier
-            .graphicsLayer {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    val blurEffect = RenderEffect.createBlurEffect(
-                        30f,
-                        30f,
-                        Shader.TileMode.MIRROR
-                    )
-                    renderEffect = blurEffect.asComposeRenderEffect()
+    Box(modifier = modifier) {
+        // 1. Background Layer (frosted glass effect)
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .graphicsLayer {
+                    // Reduce radius for better performance and less "washout"
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        val blurEffect = RenderEffect.createBlurEffect(
+                            15f,
+                            15f,
+                            Shader.TileMode.MIRROR
+                        )
+                        renderEffect = blurEffect.asComposeRenderEffect()
+                    }
+                    alpha = 0.9f 
                 }
-                alpha = 0.95f // Slight transparency even with blur
-            }
-            .clip(RoundedCornerShape(cornerRadius))
-            .background(
-                brush = Brush.linearGradient(
-                    colors = GlassGradientColors, // Uses our new gradient
-                    start = androidx.compose.ui.geometry.Offset(0f, 0f),
-                    end = androidx.compose.ui.geometry.Offset(FLOAT_INF, FLOAT_INF)
+                .clip(RoundedCornerShape(cornerRadius))
+                .background(
+                    brush = Brush.linearGradient(
+                        colors = GlassGradientColors,
+                        start = androidx.compose.ui.geometry.Offset(0f, 0f),
+                        end = androidx.compose.ui.geometry.Offset(FLOAT_INF, FLOAT_INF)
+                    )
                 )
-            )
-            .border(
-                width = 1.dp,
-                brush = Brush.linearGradient(
-                    colors = GlassBorderColors
-                ),
-                shape = RoundedCornerShape(cornerRadius)
-            ),
-        content = content
-    )
+                .border(
+                    width = 1.dp,
+                    brush = Brush.linearGradient(
+                        colors = GlassBorderColors
+                    ),
+                    shape = RoundedCornerShape(cornerRadius)
+                )
+        )
+
+        // 2. Content Layer (sharp, non-blurred)
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            content = content
+        )
+    }
 }
 
 private const val FLOAT_INF = Float.POSITIVE_INFINITY
