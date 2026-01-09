@@ -46,9 +46,21 @@ fun OnboardingScreen(
     onOnboardingFinished: () -> Unit,
     viewModel: OnboardingViewModel = hiltViewModel()
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     val pagerState = rememberPagerState(pageCount = { 3 })
     val scope = rememberCoroutineScope()
     
+    // Launcher for Role Request
+    val roleLauncher = rememberLauncherForActivityResult(
+        contract = androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(),
+        onResult = { _ ->
+            // Even if they cancel the role request, we finish onboarding
+            // The Dashboard can show a warning later
+            viewModel.completeOnboarding()
+            onOnboardingFinished()
+        }
+    )
+
     // Launcher for Permissions
     val launcher = rememberLauncherForActivityResult(
         contract = androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions(),
@@ -67,19 +79,8 @@ fun OnboardingScreen(
         }
     )
 
-    // Launcher for Role Request
-    val roleLauncher = rememberLauncherForActivityResult(
-        contract = androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(),
-        onResult = { _ ->
-            // Even if they cancel the role request, we finish onboarding
-            // The Dashboard can show a warning later
-            viewModel.completeOnboarding()
-            onOnboardingFinished()
-        }
-    )
-
     // Helper to check if permissions are already granted
-    val context = androidx.compose.ui.platform.LocalContext.current
+
     val checkPermissions = remember(context) {
         {
             val permissionsToCheck = listOf(
