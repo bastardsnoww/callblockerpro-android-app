@@ -28,7 +28,15 @@ import com.callblockerpro.app.ui.theme.Emerald
 import com.callblockerpro.app.ui.theme.PrimaryLight
 
 @Composable
-fun DashboardScreen(onNavigate: (String) -> Unit) {
+fun DashboardScreen(
+    onNavigate: (String) -> Unit,
+    viewModel: com.callblockerpro.app.ui.viewmodel.DashboardViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
+    val selectedMode by viewModel.selectedMode.collectAsState()
+    val blockedToday by viewModel.blockedToday.collectAsState()
+    val totalThreats by viewModel.totalThreats.collectAsState()
+    val weeklyActivity by viewModel.weeklyActivity.collectAsState()
+
     Scaffold(
         containerColor = BackgroundDark,
         bottomBar = { BottomNavBar(currentRoute = "home", onNavigate = onNavigate) }
@@ -82,74 +90,20 @@ fun DashboardScreen(onNavigate: (String) -> Unit) {
             
             // Mode Selector
             item {
-                var selectedMode by remember { mutableIntStateOf(2) } // Blocklist default
                 MetallicToggle(
                     options = listOf("Normal", "Whitelist", "Blocklist"),
                     selectedIndex = selectedMode,
-                    onOptionSelected = { selectedMode = it },
+                    onOptionSelected = { viewModel.onModeSelected(it) },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
 
             // Status Card (Variant 5 Style)
             item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(32.dp))
-                        .background(
-                            brush = Brush.linearGradient(
-                                colors = listOf(Color(0xFF2d2a42), BackgroundDark)
-                            )
-                        )
-                        .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
-                ) {
-                    Column(modifier = Modifier.padding(24.dp)) {
-                         Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Column {
-                                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                     Box(modifier = Modifier.size(8.dp).background(Emerald, CircleShape))
-                                     Text("SYSTEM ACTIVE", color = Emerald, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
-                                }
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text("System\nProtected", style = MaterialTheme.typography.headlineMedium, color = Color.White, fontWeight = FontWeight.ExtraBold, lineHeight = 32.sp)
-                            }
-                            Box(
-                                modifier = Modifier
-                                    .size(64.dp)
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .background(
-                                        Brush.linearGradient(listOf(Color(0xFF1c2e28), Emerald.copy(alpha = 0.2f)))
-                                    )
-                                    .border(1.dp, Emerald.copy(alpha = 0.3f), RoundedCornerShape(16.dp)),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(Icons.Default.VerifiedUser, contentDescription = null, tint = Emerald, modifier = Modifier.size(32.dp))
-                            }
-                        }
-                        
-                        Spacer(modifier = Modifier.height(24.dp))
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                            // Stats Column 1
-                            Column(Modifier.weight(1f).background(Color.Black.copy(0.2f), RoundedCornerShape(12.dp)).padding(12.dp)) {
-                                Text("BLOCKED TODAY", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
-                                Row(verticalAlignment = Alignment.Bottom) {
-                                    Text("24", style = MaterialTheme.typography.titleLarge, color = Color.White, fontWeight = FontWeight.Bold)
-                                    Spacer(Modifier.width(4.dp))
-                                    Text("▲ 12%", style = MaterialTheme.typography.labelSmall, color = Emerald)
-                                }
-                            }
-                            // Stats Column 2
-                            Column(Modifier.weight(1f).background(Color.Black.copy(0.2f), RoundedCornerShape(12.dp)).padding(12.dp)) {
-                                Text("TOTAL THREATS", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
-                                Text("1,832", style = MaterialTheme.typography.titleLarge, color = Color.White, fontWeight = FontWeight.Bold)
-                            }
-                        }
-                    }
-                }
+                HomeStatusCard(
+                    blockedCount = blockedToday,
+                    threatCount = totalThreats
+                )
             }
 
             // Weekly Insights
@@ -178,7 +132,11 @@ fun DashboardScreen(onNavigate: (String) -> Unit) {
                              }
                              Spacer(Modifier.height(24.dp))
                              Box(Modifier.weight(1f).fillMaxWidth()) {
-                                 WeeklyActivityBarChart()
+                                 if (weeklyActivity.isNotEmpty()) {
+                                     WeeklyActivityBarChart(data = weeklyActivity)
+                                 } else {
+                                     WeeklyActivityBarChart()
+                                 }
                              }
                              Spacer(Modifier.height(12.dp))
                              Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {

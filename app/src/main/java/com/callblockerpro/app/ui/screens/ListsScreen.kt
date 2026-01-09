@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.CloudSync
@@ -35,24 +36,27 @@ import com.callblockerpro.app.ui.theme.Primary
 import com.callblockerpro.app.ui.theme.PrimaryLight
 
 @Composable
-fun ListsScreen(onNavigate: (String) -> Unit) {
+fun ListsScreen(
+    onNavigate: (String) -> Unit,
+    viewModel: com.callblockerpro.app.ui.viewmodel.ListsViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
     Scaffold(
         containerColor = BackgroundDark,
-        bottomBar = { BottomNavBar(currentRoute = "lists", onNavigate = onNavigate) }
-    ) { paddingValues ->
-        var listType by remember { mutableIntStateOf(2) } // 2 = Blocklist, 1 = Whitelist
-        var searchQuery by remember { mutableStateOf("") }
-        // Mock Data for Demo
-        val blocklistItems = remember { 
-             listOf(
-                 Triple("+1 (555) 012-3456", "Spam", Color(0xFFEF4444)), 
-                 Triple("Unknown Private", "Hidden ID", Color(0xFFF97316)),
-                 Triple("Telemarketers Inc.", "Business", Color.Gray)
-             )
+        bottomBar = { BottomNavBar(currentRoute = "lists", onNavigate = onNavigate) },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { onNavigate("add") },
+                containerColor = Primary,
+                contentColor = Color.White,
+                shape = CircleShape
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Add Number")
+            }
         }
-        val whitelistItems = remember { listOf<Triple<String, String, Color>>() } // Empty for demo
-        
-        val currentItems = if (listType == 2) blocklistItems else whitelistItems
+    ) { paddingValues ->
+        val listType by viewModel.listType.collectAsState(initial = 1)
+        val searchQuery by viewModel.searchQuery.collectAsState()
+        val currentItems by viewModel.currentItems.collectAsState(initial = emptyList())
 
         PremiumBackground {
         LazyColumn(
@@ -68,8 +72,8 @@ fun ListsScreen(onNavigate: (String) -> Unit) {
                  Spacer(modifier = Modifier.height(24.dp))
                  MetallicToggle(
                      options = listOf("Whitelist", "Blocklist"),
-                     selectedIndex = if (listType == 2) 1 else 0,
-                     onOptionSelected = { listType = if (it == 0) 1 else 2 },
+                     selectedIndex = listType,
+                     onOptionSelected = { viewModel.onListTypeChanged(it) },
                      modifier = Modifier.fillMaxWidth()
                  )
              }
@@ -78,8 +82,8 @@ fun ListsScreen(onNavigate: (String) -> Unit) {
              item {
                  PremiumSearchBar(
                      query = searchQuery,
-                     onQueryChange = { searchQuery = it },
-                     placeholder = if (listType == 2) "Search blocklist..." else "Search whitelist...",
+                     onQueryChange = { viewModel.onSearchQueryChanged(it) },
+                     placeholder = if (listType == 1) "Search blocklist..." else "Search whitelist...",
                      onFilterClick = {}
                  )
              }
@@ -137,18 +141,18 @@ fun ListsScreen(onNavigate: (String) -> Unit) {
                          title = "No Numbers Found",
                          message = "Your list is currently empty.\nAdd a number to start protection.",
                          actionLabel = "Add Number",
-                         onActionClick = { /* TODO */ }
+                         onActionClick = { onNavigate("add") }
                      )
                  }
              } else {
                  items(currentItems) {
                      PremiumListItem(
-                         title = it.first,
-                         subtitle = "Added recently • Auto-detected",
-                         tag = it.second,
-                         tagColor = it.third,
-                         icon = if (it.second == "Business") Icons.Default.DomainDisabled else Icons.Default.PersonOff,
-                         iconColor = it.third,
+                         title = it.title,
+                         subtitle = it.subtitle, // "Added recently • Auto-detected" hardcoded previously, now mapped
+                         tag = if (listType == 1) "BLOCKED" else "ALLOWED", // Dynamic tag
+                         tagColor = it.color,
+                         icon = if (it.subtitle == "Business") Icons.Default.DomainDisabled else Icons.Default.PersonOff,
+                         iconColor = it.color,
                          onClick = {}
                      )
                  }

@@ -35,12 +35,20 @@ import com.callblockerpro.app.ui.theme.Primary
 import com.callblockerpro.app.ui.theme.PrimaryLight
 
 @Composable
-fun SettingsScreen(onNavigate: (String) -> Unit) {
+@Composable
+fun SettingsScreen(
+    onNavigate: (String) -> Unit,
+    viewModel: com.callblockerpro.app.ui.viewmodel.SettingsViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
     Scaffold(
         containerColor = BackgroundDark,
         bottomBar = { BottomNavBar(currentRoute = "settings", onNavigate = onNavigate) }
     ) { paddingValues ->
-        var searchQuery by remember { mutableStateOf("") }
+        val searchQuery by viewModel.searchQuery.collectAsState()
+        val blockUnknown by viewModel.blockUnknown.collectAsState()
+        val scamProtection by viewModel.scamProtection.collectAsState()
+        val notifications by viewModel.notifications.collectAsState()
+        val faceId by viewModel.faceId.collectAsState()
         
         PremiumBackground {
             LazyColumn(
@@ -68,7 +76,7 @@ fun SettingsScreen(onNavigate: (String) -> Unit) {
                  
                  PremiumSearchBar(
                      query = searchQuery,
-                     onQueryChange = { searchQuery = it },
+                     onQueryChange = { viewModel.onSearchQueryChanged(it) },
                      placeholder = "Search settings..."
                  )
              }
@@ -129,16 +137,16 @@ fun SettingsScreen(onNavigate: (String) -> Unit) {
                          iconColor = Color(0xFFEF4444),
                          title = "Block Unknown Callers",
                          subtitle = "Only allow contacts",
-                         checked = false,
-                         onCheckedChange = {}
+                         checked = blockUnknown,
+                         onCheckedChange = { viewModel.toggleBlockUnknown() }
                      )
                      SettingsToggleRow(
                          icon = Icons.Default.Warning,
                          iconColor = Color(0xFFF59E0B),
                          title = "Scam Protection",
                          subtitle = "Aggressive filtering",
-                         checked = true,
-                         onCheckedChange = {}
+                         checked = scamProtection,
+                         onCheckedChange = { viewModel.toggleScamProtection() }
                      )
                      SettingsLinkRow(
                          icon = Icons.Default.Schedule,
@@ -157,16 +165,16 @@ fun SettingsScreen(onNavigate: (String) -> Unit) {
                          iconColor = Color(0xFFA855F7),
                          title = "Notifications",
                          subtitle = null,
-                         checked = true,
-                         onCheckedChange = {}
+                         checked = notifications,
+                         onCheckedChange = { viewModel.toggleNotifications() }
                      )
                      SettingsToggleRow(
                          icon = Icons.Default.Face,
                          iconColor = Emerald,
                          title = "FaceID Unlock",
                          subtitle = null,
-                         checked = false,
-                         onCheckedChange = {}
+                         checked = faceId,
+                         onCheckedChange = { viewModel.toggleFaceId() }
                      )
                      SettingsLinkRow(
                          icon = Icons.Default.Language,
@@ -178,117 +186,33 @@ fun SettingsScreen(onNavigate: (String) -> Unit) {
                  }
              }
 
-             // Support Group
-             item {
-                 SettingsGroup("Support") {
-                     SettingsLinkRow(title = "Help Center", icon = null, iconColor = Color.Unspecified, trailingIcon = Icons.Default.OpenInNew)
-                     SettingsLinkRow(title = "Report an Issue", icon = null, iconColor = Color.Unspecified)
-                 }
-                 Spacer(Modifier.height(24.dp))
-                 
-                 // Destructive Action: Log Out
-                 Button(
-                     onClick = { /* TODO: Logout */ },
-                     modifier = Modifier.fillMaxWidth().height(56.dp),
-                     colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                     border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFEF4444).copy(alpha = 0.5f)),
-                     shape = RoundedCornerShape(16.dp)
-                 ) {
-                     Icon(Icons.Default.Logout, null, tint = Color(0xFFEF4444))
-                     Spacer(Modifier.width(8.dp))
-                     Text("Log Out", color = Color(0xFFEF4444), fontWeight = FontWeight.Bold)
-                 }
-                 
-                 Spacer(Modifier.height(16.dp))
-                 Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                     Text("Version 4.2.0 (Build 302)", style = MaterialTheme.typography.labelSmall, color = Color.Gray, letterSpacing = 2.sp)
-                 }
-             }
-        }
-    }
-}
-}
+                // Support Group
+                item {
+                    SettingsGroup("Support") {
+                        SettingsLinkRow(title = "Help Center", icon = null, iconColor = Color.Unspecified, trailingIcon = Icons.Default.OpenInNew)
+                        SettingsLinkRow(title = "Report an Issue", icon = null, iconColor = Color.Unspecified)
+                    }
+                    Spacer(Modifier.height(24.dp))
 
-@Composable
-fun SettingsGroup(title: String, content: @Composable ColumnScope.() -> Unit) {
-    Column {
-        Text(title, style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = FontWeight.Bold, letterSpacing = 2.sp, modifier = Modifier.padding(start = 8.dp, bottom = 8.dp))
-        GlassPanel(
-            modifier = Modifier.fillMaxWidth(),
-            cornerRadius = 16.dp
-        ) {
-            Column(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                content()
+                    // Destructive Action: Log Out
+                    Button(
+                        onClick = { /* TODO: Logout */ },
+                        modifier = Modifier.fillMaxWidth().height(56.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFEF4444).copy(alpha = 0.5f)),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Icon(Icons.Default.Logout, null, tint = Color(0xFFEF4444))
+                        Spacer(Modifier.width(8.dp))
+                        Text("Log Out", color = Color(0xFFEF4444), fontWeight = FontWeight.Bold)
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+                    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("Version 4.2.0 (Build 302)", style = MaterialTheme.typography.labelSmall, color = Color.Gray, letterSpacing = 2.sp)
+                    }
+                }
             }
         }
     }
-}
-
-@Composable
-fun SettingsToggleRow(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    iconColor: Color,
-    title: String,
-    subtitle: String?,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onCheckedChange(!checked) }
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(modifier = Modifier.size(32.dp).background(iconColor.copy(0.1f), RoundedCornerShape(8.dp)), contentAlignment = Alignment.Center) {
-            Icon(icon, null, tint = iconColor, modifier = Modifier.size(20.dp))
-        }
-        Spacer(Modifier.width(16.dp))
-        Column(Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.bodyMedium, color = Color.White, fontWeight = FontWeight.Bold)
-            if (subtitle != null) Text(subtitle, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
-        }
-        
-        PremiumSwitch(checked = checked, onCheckedChange = onCheckedChange)
-    }
-    HorizontalDivider(thickness = 1.dp, color = Color.White.copy(0.05f))
-}
-
-@Composable
-fun SettingsLinkRow(
-    title: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector?,
-    iconColor: Color,
-    subtitle: String? = null,
-    trailingText: String? = null,
-    trailingIcon: androidx.compose.ui.graphics.vector.ImageVector? = Icons.Default.ChevronRight
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { }
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        if (icon != null) {
-            Box(modifier = Modifier.size(32.dp).background(iconColor.copy(0.1f), RoundedCornerShape(8.dp)), contentAlignment = Alignment.Center) {
-                Icon(icon, null, tint = iconColor, modifier = Modifier.size(20.dp))
-            }
-            Spacer(Modifier.width(16.dp))
-        }
-        Column(Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.bodyMedium, color = Color.White, fontWeight = FontWeight.Bold)
-            if (subtitle != null) Text(subtitle, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
-        }
-        if (trailingText != null) {
-            Text(trailingText, style = MaterialTheme.typography.bodySmall, color = Color.Gray, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.width(8.dp))
-        }
-        if (trailingIcon != null) {
-            Icon(trailingIcon, null, tint = Color.Gray)
-        }
-    }
-    HorizontalDivider(thickness = 1.dp, color = Color.White.copy(0.05f))
 }
