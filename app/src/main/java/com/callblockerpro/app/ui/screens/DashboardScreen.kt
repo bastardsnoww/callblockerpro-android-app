@@ -109,8 +109,8 @@ fun DashboardScreen(
                         // Status Card (PARALLAX ENABLED) (Index 1)
                         item {
                             // Calculate Parallax Progress
-                            val index = firstItemIndexState.value
-                            val offset = firstItemOffsetState.value
+                            val index: Int = firstItemIndexState.value.let { it as Int }
+                            val offset: Int = firstItemOffsetState.value.let { it as Int }
                             val parallaxProgress = if (index > 2) 1f else (offset.toFloat() / 500f)
                             
                             AnimatedEntrance(index = 1) {
