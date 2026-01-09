@@ -18,6 +18,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.callblockerpro.app.ui.theme.Red
+
+@Composable
+fun PremiumWarningCard(
+    title: String,
+    message: String,
+    buttonText: String,
+    onClick: () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
