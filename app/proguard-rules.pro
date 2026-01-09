@@ -30,6 +30,9 @@
 # Keep Navigation Compose routes (Serializable objects)
 -keep @kotlinx.serialization.Serializable class com.callblockerpro.app.ui.** { *; }
 
+# Keep MainActivity (Primary Launcher)
+-keep class com.callblockerpro.app.MainActivity { *; }
+
 # Compose - Rely on library consumer rules
 # -keep class androidx.compose.** { *; }
 # -dontwarn androidx.compose.**
