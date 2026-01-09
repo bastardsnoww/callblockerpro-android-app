@@ -47,123 +47,107 @@ fun AddScreen(
         }
     }
 
-    Scaffold(
-        containerColor = BackgroundDark,
-        topBar = {
-            TopAppBar(
-                title = { Text("Add Number", color = Color.White, fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
-            )
-        }
-    ) { paddingValues ->
-        PremiumBackground {
-            Box(Modifier.fillMaxSize()) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                        .padding(horizontal = 24.dp),
-                    verticalArrangement = Arrangement.spacedBy(24.dp)
-                ) {
-                    item {
-                        MetallicToggle(
-                            options = listOf("Whitelist", "Blocklist"),
-                            selectedIndex = if (targetList == 1) 1 else 0,
-                            onOptionSelected = { viewModel.onTargetListChanged(if (it == 0) 0 else 1) },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
+    Box(modifier = Modifier.fillMaxSize()) {
+        PremiumBackground { }
 
-                    item {
-                        GlassPanel(modifier = Modifier.fillMaxWidth()) {
-                            Column(Modifier.padding(24.dp)) {
-                                Text("PHONE NUMBER", style = MaterialTheme.typography.labelSmall, color = Color.Gray, modifier = Modifier.padding(bottom = 8.dp))
-                                OutlinedTextField(
-                                    value = number,
-                                    onValueChange = { viewModel.onNumberChanged(it) },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    leadingIcon = { Icon(Icons.Default.Phone, null, tint = Primary) },
-                                    placeholder = { Text("e.g. +1 555 123 4567", color = Color.Gray.copy(0.5f)) },
-                                    singleLine = true,
-                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        focusedTextColor = Color.White,
-                                        unfocusedTextColor = Color.White,
-                                        focusedBorderColor = Primary,
-                                        unfocusedBorderColor = Color.White.copy(0.1f),
-                                        focusedContainerColor = Color.Transparent,
-                                        unfocusedContainerColor = Color.Transparent
-                                    )
-                                )
-                            }
-                        }
-                    }
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 24.dp),
+            contentPadding = PaddingValues(bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            item { Spacer(modifier = Modifier.height(118.dp)) }
 
-                    item {
-                        GlassPanel(modifier = Modifier.fillMaxWidth()) {
-                            Column(Modifier.padding(24.dp)) {
-                                Text("NAME (OPTIONAL)", style = MaterialTheme.typography.labelSmall, color = Color.Gray, modifier = Modifier.padding(bottom = 8.dp))
-                                OutlinedTextField(
-                                    value = name,
-                                    onValueChange = { viewModel.onNameChanged(it) },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    leadingIcon = { Icon(Icons.Default.Person, null, tint = Primary) },
-                                    placeholder = { Text("e.g. John Doe", color = Color.Gray.copy(0.5f)) },
-                                    singleLine = true,
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        focusedTextColor = Color.White,
-                                        unfocusedTextColor = Color.White,
-                                        focusedBorderColor = Primary,
-                                        unfocusedBorderColor = Color.White.copy(0.1f),
-                                        focusedContainerColor = Color.Transparent,
-                                        unfocusedContainerColor = Color.Transparent
-                                    )
-                                )
-                            }
-                        }
-                    }
+            item {
+                MetallicToggle(
+                    options = listOf("Whitelist", "Blocklist"),
+                    selectedIndex = if (targetList == 1) 1 else 0,
+                    onOptionSelected = { viewModel.onTargetListChanged(if (it == 0) 0 else 1) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
 
-                    if (error != null) {
-                        item {
-                            Text(
-                                text = error ?: "",
-                                color = Color(0xFFEF4444),
-                                style = MaterialTheme.typography.bodyMedium
+            item {
+                GlassPanel(modifier = Modifier.fillMaxWidth()) {
+                    Column(Modifier.padding(24.dp)) {
+                        Text("PHONE NUMBER", style = MaterialTheme.typography.labelSmall, color = Color.Gray, modifier = Modifier.padding(bottom = 8.dp))
+                        OutlinedTextField(
+                            value = number,
+                            onValueChange = { viewModel.onNumberChanged(it) },
+                            modifier = Modifier.fillMaxWidth(),
+                            leadingIcon = { Icon(Icons.Default.Phone, null, tint = Primary) },
+                            placeholder = { Text("e.g. +1 555 123 4567", color = Color.Gray.copy(0.5f)) },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedTextColor = Color.White,
+                                unfocusedTextColor = Color.White,
+                                focusedBorderColor = Primary,
+                                unfocusedBorderColor = Color.White.copy(0.1f),
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent
                             )
-                        }
-                    }
-
-                    item {
-                        Button(
-                            onClick = { viewModel.saveEntry() },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = if (targetList == 1) Color(0xFFEF4444) else Emerald
-                            ),
-                            shape = RoundedCornerShape(16.dp),
-                            enabled = !isLoading
-                        ) {
-                            if (isLoading) {
-                                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
-                            } else {
-                                Icon(Icons.Default.Check, null)
-                                Spacer(Modifier.width(8.dp))
-                                Text(
-                                    if (targetList == 1) "BLOCK NUMBER" else "ALLOW NUMBER",
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
+                        )
                     }
                 }
             }
+
+            item {
+                GlassPanel(modifier = Modifier.fillMaxWidth()) {
+                    Column(Modifier.padding(24.dp)) {
+                        Text("NAME (OPTIONAL)", style = MaterialTheme.typography.labelSmall, color = Color.Gray, modifier = Modifier.padding(bottom = 8.dp))
+                        OutlinedTextField(
+                            value = name,
+                            onValueChange = { viewModel.onNameChanged(it) },
+                            modifier = Modifier.fillMaxWidth(),
+                            leadingIcon = { Icon(Icons.Default.Person, null, tint = Primary) },
+                            placeholder = { Text("e.g. John Doe", color = Color.Gray.copy(0.5f)) },
+                            singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedTextColor = Color.White,
+                                unfocusedTextColor = Color.White,
+                                focusedBorderColor = Primary,
+                                unfocusedBorderColor = Color.White.copy(0.1f),
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent
+                            )
+                        )
+                    }
+                }
+            }
+
+            if (error != null) {
+                item {
+                    Text(
+                        text = error ?: "",
+                        color = Color(0xFFEF4444),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+
+            item {
+                NeonButton(
+                    text = if (targetList == 1) "BLOCK NUMBER" else "ALLOW NUMBER",
+                    onClick = { viewModel.saveEntry() },
+                    modifier = Modifier.fillMaxWidth(),
+                    icon = Icons.Default.Check,
+                    color = if (targetList == 1) Color(0xFFEF4444) else Emerald,
+                    enabled = !isLoading,
+                    isLoading = isLoading
+                )
+            }
         }
+
+        // Floating Header
+        PremiumHeader(
+            title = "ADD NUMBER",
+            onBack = onNavigateBack,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 24.dp)
+                .padding(horizontal = 16.dp)
+        )
     }
 }

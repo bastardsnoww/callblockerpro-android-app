@@ -23,10 +23,10 @@ val Red = Color(0xFFF43F5E)     // Neon Rose/Red
 
 // Text - Crystal White
 val TextPrimaryDark = Color(0xFFF8FAFC)
-val TextSecondaryDark = Color(0xFF94A3B8)
+val TextSecondaryDark = Color.White.copy(alpha = 0.6f) // Pure crystal opacity
 
 val TextPrimaryLight = Color(0xFF0F172A)
-val TextSecondaryLight = Color(0xFF64748B)
+val TextSecondaryLight = Color.Black.copy(alpha = 0.6f)
 
 // Luxury Gradients - Updated for Neon Crystal
 val GlassGradientColors = listOf(

@@ -182,23 +182,15 @@ fun SettingsScreen(
                 }
 
                 // Floating Crystal Header
-                Box(
+                PremiumHeader(
+                    title = "Settings",
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp)
-                        .background(Brush.verticalGradient(listOf(BackgroundDark, Color.Transparent)))
-                        .padding(horizontal = 24.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    GlassPanel(modifier = Modifier.fillMaxWidth().height(64.dp), cornerRadius = 20.dp) {
-                        Row(Modifier.fillMaxSize().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                            Text("Security Settings", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Black, color = Color.White)
-                            IconButton(onClick = { /* Help */ }, modifier = Modifier.background(Color.White.copy(0.05f), CircleShape).size(40.dp)) {
-                                Icon(Icons.Default.OpenInNew, null, tint = Color.White, modifier = Modifier.size(18.dp))
-                            }
-                        }
-                    }
-                }
+                        .align(Alignment.TopCenter)
+                        .padding(top = 24.dp)
+                        .padding(horizontal = 16.dp),
+                    actionIcon = Icons.Default.OpenInNew,
+                    onAction = { /* Help */ }
+                )
             }
         }
     }

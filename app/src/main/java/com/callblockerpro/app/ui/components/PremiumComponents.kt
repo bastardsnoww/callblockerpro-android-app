@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.animation.core.*
 import com.callblockerpro.app.ui.theme.BackgroundDark
 import com.callblockerpro.app.ui.theme.Emerald
 import com.callblockerpro.app.ui.theme.Primary
@@ -315,4 +316,244 @@ fun PremiumSwitch(
             uncheckedBorderColor = Color.White.copy(alpha = 0.1f)
         )
     )
+}
+
+/**
+ * A glowing, glassy button for primary actions.
+ */
+@Composable
+fun NeonButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    icon: ImageVector? = null,
+    color: Color = Primary,
+    enabled: Boolean = true,
+    isLoading: Boolean = false
+) {
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+    var isPressed by remember { mutableStateOf(false) }
+    val scale by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = if (isPressed) 0.95f else 1f,
+        animationSpec = androidx.compose.animation.core.tween(durationMillis = 80),
+        label = "ButtonScale"
+    )
+
+    Box(
+        modifier = modifier
+            .height(56.dp)
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+                alpha = if (enabled) 1f else 0.5f
+            }
+            .pointerInput(enabled) {
+                if (enabled) {
+                    detectTapGestures(
+                        onPress = {
+                            isPressed = true
+                            tryAwaitRelease()
+                            isPressed = false
+                        },
+                        onTap = {
+                            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                            onClick()
+                        }
+                    )
+                }
+            }
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        color.copy(alpha = 0.8f),
+                        color.copy(alpha = 0.5f)
+                    )
+                ),
+                shape = RoundedCornerShape(16.dp)
+            )
+            .border(
+                width = 1.dp,
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color.White.copy(alpha = 0.5f),
+                        Color.White.copy(alpha = 0.1f)
+                    )
+                ),
+                shape = RoundedCornerShape(16.dp)
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        // Inner Glow
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.radialGradient(
+                        colors = listOf(
+                            Color.White.copy(alpha = 0.1f),
+                            Color.Transparent
+                        ),
+                        radius = 150f
+                    ),
+                    shape = RoundedCornerShape(16.dp)
+                )
+        )
+
+        if (isLoading) {
+            NeonLoader(modifier = Modifier.size(24.dp), color = Color.White)
+        } else {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                if (icon != null) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+                Text(
+                    text = text.uppercase(),
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Black,
+                    color = Color.White,
+                    letterSpacing = 1.sp
+                )
+            }
+        }
+    }
+}
+
+/**
+ * A custom pulsing crystal loader.
+ */
+@Composable
+fun NeonLoader(
+    modifier: Modifier = Modifier,
+    color: Color = Primary
+) {
+    val infiniteTransition = androidx.compose.animation.core.rememberInfiniteTransition(label = "Loader")
+    
+    val scale by infiniteTransition.animateFloat(
+        initialValue = 0.8f,
+        targetValue = 1.2f,
+        animationSpec = androidx.compose.animation.core.infiniteRepeatable(
+            animation = androidx.compose.animation.core.tween<Float>(800),
+            repeatMode = androidx.compose.animation.core.RepeatMode.Reverse
+        ),
+        label = "LoaderScale"
+    )
+    
+    val alpha by infiniteTransition.animateFloat(
+        initialValue = 0.5f,
+        targetValue = 0.0f,
+        animationSpec = androidx.compose.animation.core.infiniteRepeatable(
+            animation = androidx.compose.animation.core.tween<Float>(800),
+            repeatMode = androidx.compose.animation.core.RepeatMode.Restart
+        ),
+        label = "LoaderAlpha"
+    )
+
+    Box(modifier = modifier, contentAlignment = Alignment.Center) {
+        // Outer Ripple
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                    this.alpha = alpha
+                }
+                .background(color, CircleShape)
+        )
+        // Core
+        Box(
+            modifier = Modifier
+                .fillMaxSize(0.5f)
+                .background(color, CircleShape)
+                .border(1.dp, Color.White.copy(alpha = 0.8f), CircleShape)
+        )
+    }
+}
+
+/**
+ * Standardized Floating Crystal Header.
+ */
+@Composable
+fun PremiumHeader(
+    title: String,
+    modifier: Modifier = Modifier,
+    subtitle: String? = null,
+    onBack: (() -> Unit)? = null,
+    actionIcon: ImageVector? = null,
+    onAction: (() -> Unit)? = null
+) {
+    GlassPanel(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(80.dp),
+        cornerRadius = 100.dp 
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 24.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (onBack != null) {
+                IconButton(
+                    onClick = onBack,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(Color.White.copy(0.1f), CircleShape)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ChevronRight, // Should be ArrowBack usually, but ChevronRight rotated 180 or just ArrowBack
+                        contentDescription = "Back",
+                        tint = Color.White,
+                        modifier = Modifier.graphicsLayer { rotationZ = 180f }
+                    )
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+            }
+
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = title.uppercase(),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Black,
+                    color = Color.White,
+                    letterSpacing = 1.sp
+                )
+                if (subtitle != null) {
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.Gray
+                    )
+                }
+            }
+
+            if (actionIcon != null && onAction != null) {
+                IconButton(
+                    onClick = onAction,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(Color.White.copy(0.1f), CircleShape)
+                ) {
+                    Icon(
+                        imageVector = actionIcon,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                }
+            }
+        }
+    }
 }

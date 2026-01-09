@@ -23,20 +23,20 @@ fun AppNavigation() {
         navController = navController, 
         startDestination = "splash",
         enterTransition = {
-            slideInHorizontally(initialOffsetX = { 1000 }, animationSpec = tween(700)) +
-                    fadeIn(animationSpec = tween(700))
+            scaleIn(initialScale = 0.95f, animationSpec = tween(400)) + 
+            fadeIn(animationSpec = tween(400))
         },
         exitTransition = {
-            slideOutHorizontally(targetOffsetX = { -1000 }, animationSpec = tween(700)) +
-                    fadeOut(animationSpec = tween(700))
+            scaleOut(targetScale = 1.05f, animationSpec = tween(400)) + 
+            fadeOut(animationSpec = tween(400))
         },
         popEnterTransition = {
-            slideInHorizontally(initialOffsetX = { -1000 }, animationSpec = tween(700)) +
-                    fadeIn(animationSpec = tween(700))
+            scaleIn(initialScale = 1.05f, animationSpec = tween(400)) + 
+            fadeIn(animationSpec = tween(400))
         },
         popExitTransition = {
-            slideOutHorizontally(targetOffsetX = { 1000 }, animationSpec = tween(700)) +
-                    fadeOut(animationSpec = tween(700))
+            scaleOut(targetScale = 0.95f, animationSpec = tween(400)) + 
+            fadeOut(animationSpec = tween(400))
         }
     ) {
         composable("splash") {
