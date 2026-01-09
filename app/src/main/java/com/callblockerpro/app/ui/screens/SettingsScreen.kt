@@ -139,7 +139,7 @@ fun SettingsScreen(
                                 icon = Icons.Default.Warning,
                                 iconColor = CrystalDesign.Colors.NeonGold,
                                 title = "Scam Protection",
-                                subtitle = "Aggressive filtering",
+                                subtitle = "Strict filtering",
                                 checked = scamProtection,
                                 onCheckedChange = { viewModel.toggleScamProtection() }
                             )

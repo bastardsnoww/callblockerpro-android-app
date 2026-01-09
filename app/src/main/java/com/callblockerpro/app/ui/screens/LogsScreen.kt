@@ -73,7 +73,7 @@ fun LogsScreen(onNavigate: (String) -> Unit) {
                             PremiumSearchBar(
                                 query = searchQuery,
                                 onQueryChange = { searchQuery = it },
-                                placeholder = "Search logs for threats...",
+                                placeholder = "Search activity...",
                                 onFilterClick = {}
                             )
                         }
@@ -85,7 +85,7 @@ fun LogsScreen(onNavigate: (String) -> Unit) {
                             Row(horizontalArrangement = Arrangement.spacedBy(CrystalDesign.Spacing.s)) {
                                 FilterChipItem("All Activity", true)
                                 FilterChipItem("Blocked", false)
-                                FilterChipItem("Whitelisted", false)
+                                FilterChipItem("Allowed", false)
                             }
                         }
                     }
@@ -288,7 +288,7 @@ fun LogActionDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = "Manage Number", style = MaterialTheme.typography.titleLarge) },
+        title = { Text(text = "Number Options", style = MaterialTheme.typography.titleLarge) },
         text = { 
             Column {
                 Text(log.number, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
