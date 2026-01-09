@@ -1,30 +1,10 @@
 {
-    "name": "Android",
-    "image": "mcr.microsoft.com/devcontainers/java:17",
-    "features": {
-        "ghcr.io/devcontainers/features/android:1": {
-            "version": "latest",
-            "installCmdLineTools": true,
-            "acceptSdkLicense": true
-        },
-        "ghcr.io/devcontainers/features/java:1": {
-            "version": "17",
-            "installGradle": true,
-            "installMaven": false
-        },
-        "ghcr.io/devcontainers/features/git:1": {}
-    },
-    "customizations": {
-        "vscode": {
-            "extensions": [
-                "fwcd.kotlin",
-                "vscjava.vscode-java-pack",
-                "mathiasfrohlich.Kotlin",
-                "vscjava.vscode-gradle",
-                "esbenp.prettier-vscode"
-            ]
-        }
-    },
-    "remoteUser": "vscode",
-    "postCreateCommand": "gradle --version && java -version"
+	"name": "Android",
+	"image": "mcr.microsoft.com/devcontainers/android:latest",
+	"features": {
+		"ghcr.io/devcontainers/features/java:1": {
+			"version": "17",
+			"jdkDistro": "ms"
+		}
+	}
 }
