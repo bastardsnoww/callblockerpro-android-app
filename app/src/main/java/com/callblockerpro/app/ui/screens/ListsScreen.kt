@@ -112,25 +112,29 @@ fun ListsScreen(
                     // Items
                     if (currentItems.isEmpty()) {
                         item {
-                            PremiumEmptyState(
-                                icon = Icons.Default.Shield,
-                                title = "List Empty",
-                                message = "Protect your peace.\nAdd your first number now.",
-                                actionLabel = "Add Number",
-                                onActionClick = { onNavigate("add") }
-                            )
+                            AnimatedEntrance(index = 3) {
+                                PremiumEmptyState(
+                                    icon = Icons.Default.Shield,
+                                    title = "List Empty",
+                                    message = "Protect your peace.\nAdd your first number now.",
+                                    actionLabel = "Add Number",
+                                    onActionClick = { onNavigate("add") }
+                                )
+                            }
                         }
                     } else {
-                        items(currentItems) {
-                            PremiumListItem(
-                                title = it.title,
-                                subtitle = it.subtitle,
-                                tag = if (listType == 1) "BLOCKED" else "ALLOWED",
-                                tagColor = it.color,
-                                icon = if (it.subtitle == "Business") Icons.Default.DomainDisabled else Icons.Default.PersonOff,
-                                iconColor = it.color,
-                                onClick = {}
-                            )
+                        itemsIndexed(currentItems) { index, it ->
+                            AnimatedEntrance(index = index + 3) {
+                                PremiumListItem(
+                                    title = it.title,
+                                    subtitle = it.subtitle,
+                                    tag = if (listType == 1) "BLOCKED" else "ALLOWED",
+                                    tagColor = it.color,
+                                    icon = if (it.subtitle == "Business") Icons.Default.DomainDisabled else Icons.Default.PersonOff,
+                                    iconColor = it.color,
+                                    onClick = {}
+                                )
+                            }
                         }
                     }
                 }
