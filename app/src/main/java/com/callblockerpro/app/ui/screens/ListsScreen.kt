@@ -125,7 +125,7 @@ fun ListsScreen(
                             }
                         }
                     } else {
-                        itemsIndexed(currentItems) { index, listItem ->
+                        itemsIndexed(currentItems) { index, listItem: ListItem ->
                             AnimatedEntrance(index = index + 3) {
                                 PremiumListItem(
                                     title = listItem.title,
