@@ -74,118 +74,126 @@ fun DashboardScreen(
                             .fillMaxSize()
                             .padding(paddingValues)
                             .padding(horizontal = CrystalDesign.Spacing.l),
-                        contentPadding = PaddingValues(top = 100.dp, bottom = 120.dp), // Removed side padding from contentPadding as it is now in Modifier
+                        contentPadding = PaddingValues(top = 100.dp, bottom = 120.dp),
                         verticalArrangement = Arrangement.spacedBy(CrystalDesign.Spacing.l) // 24dp
                     ) {
                         // Spacer for header
                         item { Spacer(Modifier.height(0.dp)) }
 
-                        // Mode Selector
+                        // Mode Selector (Index 0 for animation)
                         item {
-                            // ... (Warning Card logic remains same) ...
-                           if (!isRoleGranted) {
-                                PremiumWarningCard(
-                                    title = "System Role Required",
-                                    message = "Set as default blocker to enable protection.",
-                                    buttonText = "FIX",
-                                    onClick = {
-                                        com.callblockerpro.app.util.CallScreeningPermissions.createRoleRequestIntent(context)?.let {
-                                            roleLauncher.launch(it)
+                            AnimatedEntrance(index = 0) {
+                                if (!isRoleGranted) {
+                                    PremiumWarningCard(
+                                        title = "System Role Required",
+                                        message = "Set as default blocker to enable protection.",
+                                        buttonText = "FIX",
+                                        onClick = {
+                                            com.callblockerpro.app.util.CallScreeningPermissions.createRoleRequestIntent(context)?.let {
+                                                roleLauncher.launch(it)
+                                            }
                                         }
-                                    }
-                                )
-                                Spacer(modifier = Modifier.height(24.dp))
-                            }
+                                    )
+                                    Spacer(modifier = Modifier.height(24.dp))
+                                }
 
-                            MetallicToggle(
-                                options = listOf("Normal", "Whitelist", "Blocklist"),
-                                selectedIndex = selectedMode,
-                                onOptionSelected = { viewModel.onModeSelected(it) },
-                                modifier = Modifier.fillMaxWidth()
-                            )
+                                MetallicToggle(
+                                    options = listOf("Normal", "Whitelist", "Blocklist"),
+                                    selectedIndex = selectedMode,
+                                    onOptionSelected = { viewModel.onModeSelected(it) },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
                         }
 
-                        // Status Card (PARALLAX ENABLED)
+                        // Status Card (PARALLAX ENABLED) (Index 1)
                         item {
-                            // Calculate Parallax Progress: if index > 1 (card scrolled past), progress = 1f. Else calc offset / max.
+                            // Calculate Parallax Progress
                             val parallaxProgress = if (firstItemIndex > 2) 1f else (firstItemOffset.toFloat() / 500f)
                             
-                            HomeStatusCard(
-                                blockedCount = blockedToday,
-                                threatCount = totalThreats,
-                                modifier = Modifier.scrollParallax(parallaxProgress)
-                            )
+                            AnimatedEntrance(index = 1) {
+                                HomeStatusCard(
+                                    blockedCount = blockedToday,
+                                    threatCount = totalThreats,
+                                    modifier = Modifier.scrollParallax(parallaxProgress)
+                                )
+                            }
                         }
 
-                    // Weekly Insights
-                    item {
-                        Column {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text("Weekly Activity", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = FontWeight.Black)
-                                Text("FULL REPORT", style = MaterialTheme.typography.labelSmall, color = PrimaryLight, fontWeight = FontWeight.Bold, modifier = Modifier.clickable {})
+                        // Weekly Insights (Index 2)
+                        item {
+                            AnimatedEntrance(index = 2) {
+                                Column {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text("Weekly Activity", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = FontWeight.Black)
+                                        Text("FULL REPORT", style = MaterialTheme.typography.labelSmall, color = PrimaryLight, fontWeight = FontWeight.Bold, modifier = Modifier.clickable {})
+                                    }
+                                    Spacer(modifier = Modifier.height(20.dp))
+                                    GlassPanel(modifier = Modifier.fillMaxWidth()) {
+                                        Column(Modifier.padding(24.dp).fillMaxWidth()) {
+                                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(32.dp)) {
+                                                Column {
+                                                    Text("AVG. DAILY", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = FontWeight.Bold)
+                                                    Text("18 Calls", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = FontWeight.Black)
+                                                }
+                                                Column {
+                                                    Text("PEAK DAY", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = FontWeight.Bold)
+                                                    Text("Tuesday", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = FontWeight.Black)
+                                                }
+                                            }
+                                            Spacer(Modifier.height(24.dp))
+                                            Box(Modifier.fillMaxWidth().height(150.dp)) {
+                                                if (weeklyActivity.isNotEmpty()) {
+                                                    WeeklyActivityBarChart(data = weeklyActivity)
+                                                } else {
+                                                    WeeklyActivityBarChart()
+                                                }
+                                            }
+                                            Spacer(Modifier.height(16.dp))
+                                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                                listOf("M", "T", "W", "T", "F", "S", "S").forEach { 
+                                                    Text(it, style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.6f), modifier = Modifier.width(24.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center, fontWeight = FontWeight.Bold)
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
-                            Spacer(modifier = Modifier.height(20.dp))
-                            GlassPanel(modifier = Modifier.fillMaxWidth()) {
-                                Column(Modifier.padding(24.dp).fillMaxWidth()) {
-                                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(32.dp)) {
-                                         Column {
-                                             Text("AVG. DAILY", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = FontWeight.Bold)
-                                             Text("18 Calls", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = FontWeight.Black)
-                                         }
-                                         Column {
-                                             Text("PEAK DAY", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = FontWeight.Bold)
-                                             Text("Tuesday", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = FontWeight.Black)
-                                         }
-                                     }
-                                     Spacer(Modifier.height(24.dp))
-                                     Box(Modifier.fillMaxWidth().height(150.dp)) {
-                                         if (weeklyActivity.isNotEmpty()) {
-                                             WeeklyActivityBarChart(data = weeklyActivity)
-                                         } else {
-                                             WeeklyActivityBarChart()
-                                         }
-                                     }
-                                     Spacer(Modifier.height(16.dp))
-                                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                         listOf("M", "T", "W", "T", "F", "S", "S").forEach { 
-                                             Text(it, style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.6f), modifier = Modifier.width(24.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center, fontWeight = FontWeight.Bold)
-                                         }
-                                     }
+                        }
+
+                        // Recent Activity (Index 3)
+                        item {
+                            AnimatedEntrance(index = 3) {
+                                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                                    Text("Recent Activity", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = FontWeight.Black)
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    
+                                     PremiumListItem(
+                                            title = "+1 (555) 019-2834",
+                                            subtitle = "2m ago • Spam Risk",
+                                            tag = "BLOCKED",
+                                            tagColor = Red,
+                                            icon = Icons.Default.Block,
+                                            iconColor = Red,
+                                            onClick = {}
+                                        )
+                                     PremiumListItem(
+                                            title = "Mom Mobile",
+                                            subtitle = "1h ago • Whitelist",
+                                            tag = "ALLOWED",
+                                            tagColor = Emerald,
+                                            icon = Icons.Default.VerifiedUser,
+                                            iconColor = Emerald,
+                                            onClick = {}
+                                        )
                                 }
                             }
                         }
                     }
-
-                    // Recent Activity
-                    item {
-                        Text("Recent Activity", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = FontWeight.Black)
-                        Spacer(modifier = Modifier.height(20.dp))
-                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                             PremiumListItem(
-                                    title = "+1 (555) 019-2834",
-                                    subtitle = "2m ago • Spam Risk",
-                                    tag = "BLOCKED",
-                                    tagColor = Red,
-                                    icon = Icons.Default.Block,
-                                    iconColor = Red,
-                                    onClick = {}
-                                )
-                             PremiumListItem(
-                                    title = "Mom Mobile",
-                                    subtitle = "1h ago • Whitelist",
-                                    tag = "ALLOWED",
-                                    tagColor = Emerald,
-                                    icon = Icons.Default.VerifiedUser,
-                                    iconColor = Emerald,
-                                    onClick = {}
-                                )
-                        }
-                    }
-                }
 
                 // Floating Crystal Header
                 PremiumHeader(
