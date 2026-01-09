@@ -13,15 +13,18 @@ This workflow streams the APK binary directly from the remote Codespace to the c
 To avoid PowerShell string encoding corruption of the binary APK data, we use `cmd.exe` for the piping.
 
 ```powershell
-# Adjust Codespace name and APK path as needed
-$CodespaceName = "antigravitycore-pj5pvx479j9wfrq99"
+# Get Codespace name from environment or look it up
+$CodespaceName = $env:GH_CODESPACE_NAME
+if (-not $CodespaceName) {
+    $CodespaceName = (gh codespace list --json name,state --jq '.[] | select(.state=="Available") | .name' | Select-Object -First 1)
+}
 $RemoteApkPath = "/workspaces/callblockerpro-android-app/app/build/outputs/apk/debug/app-debug.apk"
 
 # Verify device is connected
 adb devices
 
 # Execute the stream installation
-Write-Host "Streaming APK from Codespace... (This functions like a download-and-install in memory)"
+Write-Host "Streaming APK from Codespace: $CodespaceName"
 cmd /c "gh codespace ssh -c $CodespaceName -- cat $RemoteApkPath | adb install -r -"
 ```
 
