@@ -1,0 +1,109 @@
+package com.example.callblockerpro.ui
+
+import androidx.compose.ui.test.*
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.callblockerpro.MainActivity
+import com.example.callblockerpro.R
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+
+@RunWith(AndroidJUnit4::class)
+class ListsScreenTest {
+
+    @get:Rule
+    val composeTestRule = createAndroidComposeRule<MainActivity>()
+
+    @Test
+    fun addNumberToBlocklist_verifiesEntryAppears() {
+        // Bypass Onboarding
+        val next = composeTestRule.activity.getString(R.string.btn_next)
+        val start = composeTestRule.activity.getString(R.string.btn_start_app)
+        val title = composeTestRule.activity.getString(R.string.onboarding_title_1)
+
+        if (composeTestRule.onAllNodesWithText(title).fetchSemanticsNodes().isNotEmpty()) {
+            repeat(3) {
+                 composeTestRule.onNodeWithText(next).performClick()
+                 composeTestRule.waitForIdle()
+            }
+            if (composeTestRule.onAllNodesWithText(start).fetchSemanticsNodes().isNotEmpty()) {
+                 composeTestRule.onNodeWithText(start).performClick()
+            }
+            composeTestRule.waitForIdle()
+        }
+
+        navigateToLists()
+        
+        // Add a unique number
+        val numberToAdd = "+15551234567"
+        addNumber(numberToAdd)
+
+        // Verify it appears
+        composeTestRule.onNodeWithText("+1 555-123-4567").assertExists() // Formatting Assumption
+    }
+    
+    @Test
+    fun deleteNumberFromBlocklist_verifiesEntryRemoved() {
+        navigateToLists()
+        
+        // Pre-condition: Ensure number exists or add it
+        val numberToDelete = "+15559876543"
+        addNumber(numberToDelete)
+        
+        // Find the specific list item. unique identification might need semantics
+        // Assuming a "Delete" icon button exists on the row
+        composeTestRule.onNodeWithText("+1 555-987-6543")
+            .onSibling() // Or finding the delete button within the row
+            .onChildren()
+            .filter(hasContentDescription(composeTestRule.activity.getString(R.string.desc_delete)))
+            .onFirst()
+            .performClick()
+            
+        // Confirm deletion (might be a dialog or immediate)
+        // composeTestRule.onNodeWithText("Confirm").performClick() // If dialog exists
+        
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("+1 555-987-6543").assertDoesNotExist()
+    }
+    
+    @Test
+    fun addDuplicateNumber_showsErrorOrIgnored() {
+        navigateToLists()
+        val number = "+15550000000"
+        
+        addNumber(number)
+        composeTestRule.waitForIdle()
+        
+        // 1. Click "Add Number"
+        // Button likely has text "Add Number", not just content description
+        // 1. Click "Add Number"
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.btn_add_number)).performClick()
+
+        // 2. Dialog appears. Enter details.
+        // Look for labels "Caller Name" and "Phone Number"
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.label_caller_name)).performTextInput("Spam Caller")
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.label_phone_number)).performTextInput("1234567890")
+
+        // 3. Confirm
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.btn_add_entry)).performClick()
+        
+        // Check for error snackbar or text
+        composeTestRule.onNodeWithText("Number already in list").assertExists() 
+    }
+
+    private fun navigateToLists() {
+        val listTab = composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.nav_lists))
+        if (listTab.isDisplayed()) {
+            listTab.performClick()
+        }
+    }
+    
+    private fun addNumber(number: String, callerName: String = "") {
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.btn_add_number)).performClick() 
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.label_caller_name)).performTextInput(callerName)
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.label_phone_number)).performTextInput(number)
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.btn_add_entry)).performClick() 
+    }
+}
+

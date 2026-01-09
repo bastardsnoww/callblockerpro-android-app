@@ -1,0 +1,50 @@
+package com.example.callblockerpro.ui
+
+import androidx.compose.ui.test.*
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.callblockerpro.MainActivity
+import com.example.callblockerpro.R
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+
+@RunWith(AndroidJUnit4::class)
+class NavigationTest {
+
+    @get:Rule
+    val composeTestRule = createAndroidComposeRule<MainActivity>()
+
+    @Test
+    fun appNavigation_fullGraphTraversal() {
+        // Bypass Onboarding if present
+        if (composeTestRule.onAllNodesWithText(composeTestRule.activity.getString(R.string.onboarding_title_1)).fetchSemanticsNodes().isNotEmpty()) {
+            // Click NEXT 3 times
+            repeat(3) {
+                 composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.btn_next)).performClick()
+                 composeTestRule.waitForIdle()
+            }
+            if (composeTestRule.onAllNodesWithText(composeTestRule.activity.getString(R.string.btn_start_app)).fetchSemanticsNodes().isNotEmpty()) {
+                 composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.btn_start_app)).performClick()
+            }
+            
+            // Wait for Home
+            composeTestRule.waitForIdle()
+        }
+        
+        // Ensure we are on Home
+        // composeTestRule.onNodeWithText("Protection Center").assertIsDisplayed()
+
+        // Go to Lists
+        composeTestRule.onNodeWithContentDescription(composeTestRule.activity.getString(R.string.nav_lists)).performClick()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.title_protection_lists)).assertIsDisplayed()
+
+        // Go to Settings
+        composeTestRule.onNodeWithContentDescription(composeTestRule.activity.getString(R.string.nav_settings)).performClick()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.title_settings)).assertIsDisplayed()
+
+        // Go to History (Logs)
+        composeTestRule.onNodeWithContentDescription(composeTestRule.activity.getString(R.string.nav_logs)).performClick()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.title_call_activity)).assertIsDisplayed()
+    }
+}

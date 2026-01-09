@@ -1,0 +1,85 @@
+package com.example.callblockerpro.ui
+
+import android.graphics.Bitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.test.*
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import com.example.callblockerpro.MainActivity
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import java.io.File
+import java.io.FileOutputStream
+
+@RunWith(AndroidJUnit4::class)
+class VisualSnapshotTest {
+
+    @get:Rule
+    val composeTestRule = createAndroidComposeRule<MainActivity>()
+
+    @Test
+    fun captureAllScreens_baseline() {
+        composeTestRule.waitForIdle()
+
+        // Bypass Onboarding
+        if (composeTestRule.onAllNodesWithText("Tactical Shield").fetchSemanticsNodes().isNotEmpty()) {
+            repeat(3) {
+                 composeTestRule.onNodeWithText("NEXT").performClick()
+                 composeTestRule.waitForIdle()
+            }
+            if (composeTestRule.onAllNodesWithText("START").fetchSemanticsNodes().isNotEmpty()) {
+                 composeTestRule.onNodeWithText("START").performClick()
+            }
+            composeTestRule.waitForIdle()
+        }
+        
+        // 1. Home Screen
+        captureScreen("home_screen_baseline")
+        
+        // 2. Logs Screen
+        composeTestRule.onNodeWithContentDescription("LOGS").performClick()
+        composeTestRule.waitForIdle()
+        captureScreen("history_screen_baseline")
+        
+        // 2. Lists Screen
+        composeTestRule.onNodeWithContentDescription("LISTS").performClick()
+        composeTestRule.waitForIdle()
+        captureScreen("lists_screen")
+
+        // 3. Add Dialog (on Lists)
+        composeTestRule.onNodeWithText("Add Number").performClick()
+        composeTestRule.waitForIdle()
+        captureScreen("add_number_dialog")
+        // Dismiss dialog to continue
+        composeTestRule.onNodeWithText("Cancel").performClick()
+
+        // 4. History (Logs)
+        composeTestRule.onNodeWithContentDescription("LOGS").performClick()
+        composeTestRule.waitForIdle()
+        captureScreen("history_screen")
+
+        // 5. Settings
+        composeTestRule.onNodeWithContentDescription("SETTINGS").performClick()
+        composeTestRule.waitForIdle()
+        captureScreen("settings_screen")
+    }
+
+    private fun captureScreen(filename: String) {
+        val bitmap = composeTestRule.onRoot().captureToImage().asAndroidBitmap()
+        saveBitmap(bitmap, filename)
+    }
+
+    private fun saveBitmap(bitmap: Bitmap, filename: String) {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        // Saving to app's cache directory to avoid permission issues, 
+        // or external storage if permissions granted. using filesDir is safest for now.
+        val path = context.filesDir.path
+        val file = File(path, "$filename.png")
+        FileOutputStream(file).use { out ->
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+        }
+        println("Saved screenshot to ${file.absolutePath}")
+    }
+}

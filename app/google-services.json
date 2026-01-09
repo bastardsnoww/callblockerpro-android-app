@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "725147145390",
+    "project_id": "callblockerpro-82f02",
+    "storage_bucket": "callblockerpro-82f02.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:725147145390:android:37dd85203611e36b22c93f",
+        "android_client_info": {
+          "package_name": "com.callblockerpro.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA4mmmSUhmLn4TCSxBYQNNRWzToNPg9ANI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

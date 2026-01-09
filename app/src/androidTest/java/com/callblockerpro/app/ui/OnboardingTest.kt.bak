@@ -1,0 +1,185 @@
+package com.example.callblockerpro.ui
+
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.rules.RuleChain
+import androidx.test.uiautomator.By
+import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.Until
+import java.util.regex.Pattern
+import androidx.test.uiautomator.UiObject2
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import org.junit.runner.RunWith
+import org.junit.Test
+import org.junit.Before
+import org.junit.Rule
+import androidx.compose.ui.test.*
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import com.example.callblockerpro.MainActivity
+import com.example.callblockerpro.R
+
+@HiltAndroidTest
+@RunWith(AndroidJUnit4::class)
+class OnboardingTest {
+
+    private val hiltRule = HiltAndroidRule(this)
+    private val composeTestRule = createAndroidComposeRule<MainActivity>()
+
+    @get:Rule
+    val rule: RuleChain = RuleChain.outerRule(hiltRule).around(composeTestRule)
+
+    private lateinit var device: UiDevice
+    private val packageName = "com.example.callblockerpro"
+
+    @Before
+    fun setup() {
+        hiltRule.inject()
+        device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        try {
+             device.pressHome()
+             device.wait(Until.hasObject(By.pkg(device.launcherPackageName).depth(0)), 3000)
+        } catch (e: Exception) {
+             // Ignore
+        }
+    }
+
+    @Test
+    fun testOnboardingWorkFlow_fullWalkthrough() {
+        // Ensure we are in the app (in case of previous failures)
+        device.wait(Until.hasObject(By.pkg(packageName).depth(0)), 10000)
+        
+        // CRITICAL FIX: Allow time for setContent to register the Compose View.
+        // "No compose hierarchies found" happens if we query before the view is attached.
+        Thread.sleep(5000)
+
+        // Verify Page 1: Tactical Shield
+        verifyPageContent(
+            titleRes = R.string.onboarding_title_1,
+            descRes = R.string.onboarding_desc_1,
+            btnTextRes = R.string.btn_next
+        )
+        composeTestRule.onNodeWithTag("onboarding_action_button").performClick()
+
+        // Verify Page 2: Smart Filter
+        verifyPageContent(
+            titleRes = R.string.onboarding_title_2,
+            descRes = R.string.onboarding_desc_2,
+            btnTextRes = R.string.btn_next
+        )
+        composeTestRule.onNodeWithTag("onboarding_action_button").performClick()
+
+        // Verify Page 3: History & Logs
+        verifyPageContent(
+            titleRes = R.string.onboarding_title_3,
+            descRes = R.string.onboarding_desc_3,
+            btnTextRes = R.string.btn_next
+        )
+        composeTestRule.onNodeWithTag("onboarding_action_button").performClick()
+
+        // Verify Page 4: Permissions (The tricky part)
+        // If permissions are NOT granted (fresh install), we see "GRANT PERMISSIONS"
+        // If they ARE, we see "NEXT"
+        val title4 = composeTestRule.activity.getString(R.string.onboarding_title_4).uppercase()
+        composeTestRule.waitUntil(30_000) {
+            composeTestRule.onAllNodesWithText(title4).fetchSemanticsNodes().isNotEmpty()
+        }
+
+        // Check if we need to grant permissions
+        // Note: btn_grant and btn_next are Uppercase in XML, so no need to .uppercase() them if they match strictly.
+        val grantContentBtn = composeTestRule.onNodeWithTag("onboarding_grant_permissions_button")
+        
+        if (grantContentBtn.isDisplayed()) {
+            grantContentBtn.performClick()
+            handleSystemPermissionDialogs()
+        } else {
+            composeTestRule.onNodeWithTag("onboarding_action_button").performClick()
+        }
+        
+        // Verify Page 5
+        verifyPageContent(
+            titleRes = R.string.onboarding_title_5,
+            descRes = R.string.onboarding_desc_5
+        )
+        
+        // Check for "Set Default" button
+        val setDefBtn = composeTestRule.onNodeWithTag("onboarding_set_default_button")
+        if (setDefBtn.isDisplayed()) {
+            setDefBtn.performClick()
+            handleDefaultAppDialog()
+        }
+        
+        // Final Action: Click START
+        composeTestRule.waitForIdle()
+        
+        composeTestRule.onNodeWithTag("onboarding_action_button").performClick()
+
+        // Verify Home Screen Reached
+        composeTestRule.waitUntil(30_000) {
+            composeTestRule.onAllNodesWithContentDescription(composeTestRule.activity.getString(R.string.nav_home)).fetchSemanticsNodes().isNotEmpty()
+        }
+    }
+
+    private fun verifyPageContent(titleRes: Int, descRes: Int, btnTextRes: Int? = null) {
+        // UI renders titles in UPPERCASE. strings.xml has them in Title Case.
+        // Must match what is on screen.
+        val title = composeTestRule.activity.getString(titleRes).uppercase()
+        val desc = composeTestRule.activity.getString(descRes) // Desc is NOT uppercased in UI
+
+        composeTestRule.waitUntil(30_000) {
+             composeTestRule.onAllNodesWithText(title).fetchSemanticsNodes().isNotEmpty()
+        }
+        
+        composeTestRule.onNodeWithText(title).assertIsDisplayed()
+        composeTestRule.onNodeWithText(desc).assertIsDisplayed()
+        
+        if (btnTextRes != null) {
+            // Button text is already Uppercase in XML (NEXT, GRANT, etc.), but UI doesn't force it generally unless themed
+            // However, OnboardingScreen uses Text(text = ..., style = labelLarge) inside Button.
+            val btnText = composeTestRule.activity.getString(btnTextRes) 
+            composeTestRule.onNodeWithTag("onboarding_action_button")
+                .assertIsDisplayed()
+        }
+        composeTestRule.waitForIdle()
+    }
+
+    private fun handleSystemPermissionDialogs() {
+        // Repeatedly click Allow while dialog exists
+        // Typical text: "Allow", "While using the app"
+        var handled = false
+        val maxAttempts = 5
+        var attempts = 0
+        val pattern = Pattern.compile("ALLOW|Allow|While using the app")
+        
+        while (attempts < maxAttempts) {
+            val allowBtn = device.findObject(By.text(pattern))
+            if (allowBtn != null) {
+                allowBtn.click()
+                handled = true
+                Thread.sleep(1000) // Wait for next dialog
+            } else {
+                if (handled) break // No more dialogs
+                Thread.sleep(500) // Wait for first dialog
+            }
+            attempts++
+        }
+    }
+
+    private fun handleDefaultAppDialog() {
+        // FIX: The app name in strings.xml is "Call Blocker Pro" (spaces). 
+        // Dialog will show this name.
+        val appName = "Call Blocker Pro"
+        val appOption = device.findObject(By.text(appName))
+        if (appOption != null) {
+            appOption.click()
+        }
+        
+        val pattern = Pattern.compile("Set as default|SET AS DEFAULT")
+        val setBtn = device.findObject(By.text(pattern))
+        if (setBtn != null) {
+            setBtn.click()
+            Thread.sleep(1000)
+        }
+    }
+}
+
