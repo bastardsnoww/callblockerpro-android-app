@@ -43,7 +43,8 @@ fun PremiumSearchBar(
     onQueryChange: (String) -> Unit,
     placeholder: String = "Search...",
     modifier: Modifier = Modifier,
-    onFilterClick: (() -> Unit)? = null
+    onFilterClick: (() -> Unit)? = null,
+    isLoading: Boolean = false
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -69,7 +70,7 @@ fun PremiumSearchBar(
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
-                    Box(contentAlignment = Alignment.CenterStart) {
+                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
                         if (query.isEmpty()) {
                             Text(
                                 text = placeholder,
@@ -89,6 +90,9 @@ fun PremiumSearchBar(
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true
                         )
+                    }
+                    if (isLoading) {
+                        NeonLoader(modifier = Modifier.size(20.dp))
                     }
                 }
             }

@@ -37,6 +37,13 @@ import com.callblockerpro.app.ui.theme.PrimaryLight
 fun LogsScreen(onNavigate: (String) -> Unit) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    var isLoading by remember { mutableStateOf(true) }
+
+    // Simulate initial data load
+    LaunchedEffect(Unit) {
+        kotlinx.coroutines.delay(1500) // Simulate 1.5s load
+        isLoading = false
+    }
 
     Scaffold(
         containerColor = CrystalDesign.Colors.BackgroundDeep,
@@ -67,9 +74,35 @@ fun LogsScreen(onNavigate: (String) -> Unit) {
                     contentPadding = PaddingValues(top = 100.dp, bottom = 120.dp, start = CrystalDesign.Spacing.l, end = CrystalDesign.Spacing.l),
                     verticalArrangement = Arrangement.spacedBy(CrystalDesign.Spacing.m)
                 ) {
-                    // Search (Index 0)
-                    item {
-                        AnimatedEntrance(index = 0) {
+                    if (isLoading) {
+                         // Search (Index 0) - Always visible or skeleton
+                        item {
+                            PremiumSearchBar(
+                                query = searchQuery,
+                                onQueryChange = { searchQuery = it },
+                                placeholder = "Search activity...",
+                                onFilterClick = {},
+                                isLoading = false // Input ready immediately
+                            )
+                        }
+                        
+                         // Filters (Index 1) - Skeleton or real? Real is fine for static filters
+                        item {
+                            Row(horizontalArrangement = Arrangement.spacedBy(CrystalDesign.Spacing.s)) {
+                                FilterChipItem("All Activity", true)
+                                FilterChipItem("Blocked", false)
+                                FilterChipItem("Allowed", false)
+                            }
+                        }
+
+                        // Skeleton List
+                        items(6) {
+                            LogListSkeleton()
+                        }
+                    } else {
+                        // Search (Index 0)
+                        item {
+                            AnimatedEntrance(index = 0) {
                             PremiumSearchBar(
                                 query = searchQuery,
                                 onQueryChange = { searchQuery = it },
@@ -140,6 +173,16 @@ fun LogsScreen(onNavigate: (String) -> Unit) {
                                 )
                             }
                         }
+                        itemsIndexed(yesterdayLogs, key = { _, item -> item.id }) { index, log ->
+                            AnimatedEntrance(index = 11 + index) {
+                                SwipeableLogItem(
+                                    log = log,
+                                    onDismiss = { yesterdayLogs.remove(log) },
+                                    onClick = { selectedLog = log }
+                                )
+                            }
+                        }
+                    }
                     }
                 }
 
@@ -319,4 +362,55 @@ fun LogActionDialog(
         titleContentColor = Color.White,
         textContentColor = Color.White
     )
+}
+
+@Composable
+fun LogListSkeleton() {
+    val shimmerColors = listOf(
+        Color.White.copy(alpha = 0.05f),
+        Color.White.copy(alpha = 0.1f),
+        Color.White.copy(alpha = 0.05f),
+    )
+    
+    val transition = rememberInfiniteTransition(label = "Skeleton")
+    val translateAnim by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1000f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1200, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "SkeletonTranslate"
+    )
+
+    val brush = Brush.linearGradient(
+        colors = shimmerColors,
+        start = androidx.compose.ui.geometry.Offset.Zero,
+        end = androidx.compose.ui.geometry.Offset(x = translateAnim, y = translateAnim)
+    )
+
+    GlassPanel(
+        modifier = Modifier.fillMaxWidth().height(80.dp),
+        cornerRadius = CrystalDesign.Glass.CornerRadius,
+        borderAlpha = 0.05f
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Icon Skeleton
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(brush)
+            )
+            Spacer(Modifier.width(16.dp))
+            Column(Modifier.weight(1f)) {
+                Box(Modifier.height(16.dp).fillMaxWidth(0.6f).clip(RoundedCornerShape(4.dp)).background(brush))
+                Spacer(Modifier.height(8.dp))
+                Box(Modifier.height(12.dp).fillMaxWidth(0.4f).clip(RoundedCornerShape(4.dp)).background(brush))
+            }
+        }
+    }
 }
