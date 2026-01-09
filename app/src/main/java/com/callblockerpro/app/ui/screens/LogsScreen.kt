@@ -12,6 +12,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudSync
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import kotlinx.coroutines.launch
@@ -40,6 +44,8 @@ fun LogsScreen(onNavigate: (String) -> Unit) {
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         var searchQuery by remember { mutableStateOf("") }
+        var selectedLog by remember { mutableStateOf<LogEntry?>(null) }
+        val clipboardManager = LocalClipboardManager.current
         
         // State for Logs
         val todayLogs = remember { mutableStateListOf(
@@ -107,13 +113,7 @@ fun LogsScreen(onNavigate: (String) -> Unit) {
                                         }
                                     },
                                     onClick = {
-                                        scope.launch {
-                                            snackbarHostState.showSnackbar(
-                                                message = "Number Selected",
-                                                actionLabel = "INFO",
-                                                duration = SnackbarDuration.Short
-                                            )
-                                        }
+                                        selectedLog = log
                                     }
                                 )
                             }
@@ -136,7 +136,7 @@ fun LogsScreen(onNavigate: (String) -> Unit) {
                                 SwipeableLogItem(
                                     log = log,
                                     onDismiss = { yesterdayLogs.remove(log) },
-                                    onClick = {}
+                                    onClick = { selectedLog = log }
                                 )
                             }
                         }
@@ -149,8 +149,31 @@ fun LogsScreen(onNavigate: (String) -> Unit) {
                     onBack = null,
                     modifier = Modifier.align(Alignment.TopCenter).padding(top = 24.dp, start = 16.dp, end = 16.dp),
                     actionIcon = Icons.Default.CloudSync,
-                    onAction = { /* Export */ }
                 )
+
+                if (selectedLog != null) {
+                    LogActionDialog(
+                        log = selectedLog!!,
+                        onDismiss = { selectedLog = null },
+                        onBlock = {
+                            // Toggle Block Status (Simulation)
+                            scope.launch {
+                                snackbarHostState.showSnackbar(
+                                    message = if(selectedLog!!.type == LogType.BLOCKED) "Number Unblocked" else "Number Blocked",
+                                    duration = SnackbarDuration.Short
+                                )
+                            }
+                            selectedLog = null
+                        },
+                        onCopy = {
+                            clipboardManager.setText(AnnotatedString(selectedLog!!.number))
+                            scope.launch {
+                                snackbarHostState.showSnackbar("Number Copied", duration = SnackbarDuration.Short)
+                            }
+                            selectedLog = null
+                        }
+                    )
+                }
             }
         }
     }
@@ -254,4 +277,46 @@ fun FilterChipItem(text: String, selected: Boolean) {
         
         Text(text.uppercase(), style = MaterialTheme.typography.labelSmall, fontWeight = CrystalDesign.Typography.WeightBlack, color = textColor, letterSpacing = 1.sp)
     }
+}
+
+@Composable
+fun LogActionDialog(
+    log: LogEntry,
+    onDismiss: () -> Unit,
+    onBlock: () -> Unit,
+    onCopy: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = "Manage Number", style = MaterialTheme.typography.titleLarge) },
+        text = { 
+            Column {
+                Text(log.number, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(log.label, style = MaterialTheme.typography.bodyMedium, color = CrystalDesign.Colors.TextSecondary)
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onBlock) {
+                Text(
+                    if (log.type == LogType.BLOCKED) "UNBLOCK" else "BLOCK",
+                    color = if (log.type == LogType.BLOCKED) CrystalDesign.Colors.NeonGreen else CrystalDesign.Colors.NeonRed,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        },
+        dismissButton = {
+            Row {
+                TextButton(onClick = onCopy) {
+                    Text("COPY", color = CrystalDesign.Colors.Primary)
+                }
+                TextButton(onClick = onDismiss) {
+                    Text("CANCEL", color = CrystalDesign.Colors.TextSecondary)
+                }
+            }
+        },
+        containerColor = CrystalDesign.Colors.BackgroundSurface,
+        titleContentColor = Color.White,
+        textContentColor = Color.White
+    )
 }
