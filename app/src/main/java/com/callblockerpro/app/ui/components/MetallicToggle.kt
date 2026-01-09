@@ -90,6 +90,9 @@ fun MetallicToggle(
                     brush = Brush.verticalGradient(MetallicGradientColors),
                     shape = RoundedCornerShape(8.dp)
                 )
+                .graphicsLayer {
+                    alpha = shimmerAlpha
+                }
         ) {
             // Refracting Light Overlay
             Box(
@@ -99,7 +102,7 @@ fun MetallicToggle(
                         brush = Brush.linearGradient(
                             colors = listOf(
                                 Color.White.copy(alpha = 0f),
-                                Color.White.copy(alpha = shimmerAlpha),
+                                Color.White.copy(alpha = 1f), // Max alpha, handled by graphicsLayer
                                 Color.White.copy(alpha = 0f)
                             )
                         )

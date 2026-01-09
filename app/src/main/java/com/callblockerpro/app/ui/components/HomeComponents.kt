@@ -112,9 +112,11 @@ fun HomeStatusCard(
                                 .size(8.dp)
                                 .background(statusColor, CircleShape)
                                 .graphicsLayer {
-                                    scaleX = pulseScale
-                                    scaleY = pulseScale
-                                    alpha = pulseAlpha
+                                    val scale = pulseScale
+                                    val alphaVal = pulseAlpha
+                                    scaleX = scale
+                                    scaleY = scale
+                                    alpha = alphaVal
                                 }
                         )
                         Text(
@@ -145,9 +147,11 @@ fun HomeStatusCard(
                         modifier = Modifier
                             .size(72.dp)
                             .graphicsLayer {
-                                scaleX = pulseScale
-                                scaleY = pulseScale
-                                alpha = pulseAlpha * 0.4f
+                                val scale = pulseScale
+                                val alphaVal = pulseAlpha
+                                scaleX = scale
+                                scaleY = scale
+                                alpha = alphaVal * 0.4f
                             }
                             .background(statusColor.copy(alpha = 0.3f), CircleShape)
                     )

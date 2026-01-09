@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -51,53 +52,46 @@ fun ScanningHorizon(
             .fillMaxWidth()
             .height(200.dp)
             .clip(MaterialTheme.shapes.extraLarge)
-            .background(Color.White.copy(alpha = 0.02f)),
-        contentAlignment = Alignment.Center
-    ) {
-        // Horizon Line
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .background(
-                    Brush.horizontalGradient(
+            .background(Color.White.copy(alpha = 0.02f))
+            .drawBehind {
+                val width = size.width
+                val height = size.height
+                
+                // 1. Horizon Line (Draw Phase)
+                drawRect(
+                    brush = Brush.horizontalGradient(
                         listOf(Color.Transparent, Emerald.copy(alpha = 0.5f), Color.Transparent)
-                    )
+                    ),
+                    topLeft = androidx.compose.ui.geometry.Offset(0f, height / 2),
+                    size = androidx.compose.ui.geometry.Size(width, 1.dp.toPx())
                 )
-        )
 
-        // Moving Scanner Beam
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .graphicsLayer {
-                    translationY = (scannerOffset - 0.5f) * 200.dp.toPx()
-                }
-                .background(
-                    Brush.verticalGradient(
+                // 2. Central Radar Pulse (Draw Phase) - Using glowAlpha
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        listOf(Emerald.copy(alpha = 0.2f * glowAlpha), Color.Transparent)
+                    ),
+                    radius = 60.dp.toPx(),
+                    center = center
+                )
+
+                // 3. Moving Scanner Beam (Draw Phase) - Using scannerOffset
+                val beamY = scannerOffset * height
+                drawRect(
+                    brush = Brush.verticalGradient(
                         listOf(
                             Color.Transparent,
                             Emerald.copy(alpha = 0.1f * (1f - scannerOffset)),
                             Emerald.copy(alpha = 0.3f),
                             Color.Transparent
                         )
-                    )
+                    ),
+                    topLeft = androidx.compose.ui.geometry.Offset(0f, beamY - 50.dp.toPx()),
+                    size = androidx.compose.ui.geometry.Size(width, 100.dp.toPx())
                 )
-        )
-
-        // Central Radar Pulse
-        Box(
-            modifier = Modifier
-                .size(120.dp)
-                .graphicsLayer {
-                    alpha = glowAlpha
-                }
-                .background(
-                    Brush.radialGradient(
-                        listOf(Emerald.copy(alpha = 0.2f), Color.Transparent)
-                    )
-                )
-        )
+            },
+        contentAlignment = Alignment.Center
+    ) {
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
