@@ -171,6 +171,7 @@ fun ScheduleScreen(currentRoute: String, onNavigate: (String) -> Unit) {
         }
     }
 }
+}
 
 @Composable
 fun ScheduleStatusCard(
