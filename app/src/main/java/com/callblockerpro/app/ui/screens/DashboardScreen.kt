@@ -65,8 +65,8 @@ fun DashboardScreen(
             Box(Modifier.fillMaxSize()) {
                     // Capture Scroll State
                     val listState = rememberLazyListState()
-                    val firstItemOffset by remember { derivedStateOf<Int> { listState.firstVisibleItemScrollOffset } }
-                    val firstItemIndex by remember { derivedStateOf<Int> { listState.firstVisibleItemIndex } }
+                    val firstItemOffsetState = remember { derivedStateOf { listState.firstVisibleItemScrollOffset } }
+                    val firstItemIndexState = remember { derivedStateOf { listState.firstVisibleItemIndex } }
 
                     LazyColumn(
                         state = listState,
@@ -109,7 +109,9 @@ fun DashboardScreen(
                         // Status Card (PARALLAX ENABLED) (Index 1)
                         item {
                             // Calculate Parallax Progress
-                            val parallaxProgress = if (firstItemIndex > 2) 1f else (firstItemOffset.toFloat() / 500f)
+                            val index = firstItemIndexState.value
+                            val offset = firstItemOffsetState.value
+                            val parallaxProgress = if (index > 2) 1f else (offset.toFloat() / 500f)
                             
                             AnimatedEntrance(index = 1) {
                                 HomeStatusCard(
