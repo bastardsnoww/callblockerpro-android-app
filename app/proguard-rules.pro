@@ -100,6 +100,18 @@
 # Fix for Missing ErrorProne annotations (referenced by Tink/Security-Crypto)
 -dontwarn com.google.errorprone.annotations.**
 
+# Tink / Security-Crypto rules (CRITICAL for EncryptedSharedPreferences)
+-keep class com.google.crypto.tink.** { *; }
+-keep class com.google.crypto.tink.shaded.protobuf.** { *; }
+-keepnames class com.google.crypto.tink.shaded.protobuf.** { *; }
+-dontwarn com.google.crypto.tink.shaded.protobuf.**
+
+# Add rules for androidx.security.crypto
+-keep class androidx.security.crypto.** { *; }
+
+# Lower optimization for stability in release
+-optimizationpasses 1
+
 # Uncomment for debugging ProGuard issues
 # -printconfiguration proguard-config.txt
 # -printmapping proguard-mapping.txt
