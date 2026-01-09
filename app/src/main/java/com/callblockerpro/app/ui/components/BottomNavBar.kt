@@ -76,26 +76,91 @@ fun BottomNavBar(
                 modifier = Modifier.weight(1f)
             )
 
-            // Central FAB
+            // Central FAB - Elite Upgrade
             Box(
                 modifier = Modifier.weight(1f),
                 contentAlignment = Alignment.Center
             ) {
-                 Box(
+                val infiniteTransition = rememberInfiniteTransition(label = "PulsingFAB")
+                val pulseScale by infiniteTransition.animateFloat(
+                    initialValue = 1f,
+                    targetValue = 1.1f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(2000, easing = LinearEasing),
+                        repeatMode = RepeatMode.Reverse
+                    ),
+                    label = "PulseScale"
+                )
+                
+                val haptic = LocalHapticFeedback.current
+                var fabPressed by remember { mutableStateOf(false) }
+                val fabScale by animateFloatAsState(
+                    targetValue = if (fabPressed) 0.9f else 1f,
+                    animationSpec = tween(100),
+                    label = "FABScale"
+                )
+
+                // Outer Glow
+                Box(
+                    modifier = Modifier
+                        .offset(y = (-24).dp)
+                        .size(72.dp)
+                        .graphicsLayer {
+                            scaleX = pulseScale
+                            scaleY = pulseScale
+                            alpha = 0.3f
+                        }
+                        .background(
+                            brush = Brush.radialGradient(
+                                colors = listOf(Primary, Color.Transparent)
+                            ),
+                            shape = CircleShape
+                        )
+                )
+
+                // Main FAB Button
+                Box(
                     modifier = Modifier
                         .offset(y = (-24).dp)
                         .size(64.dp)
+                        .graphicsLayer {
+                            scaleX = fabScale
+                            scaleY = fabScale
+                        }
+                        .shadow(elevation = 15.dp, shape = CircleShape, spotColor = Primary)
                         .clip(CircleShape)
                         .background(
                             brush = Brush.linearGradient(
                                 colors = listOf(Primary, PrimaryLight)
                             )
                         )
-                        .border(4.dp, BackgroundDark, CircleShape)
-                        .shadow(elevation = 10.dp, shape = CircleShape, spotColor = Primary)
-                        .clickable { onNavigate("add") },
+                        .border(1.dp, Color.White.copy(0.2f), CircleShape)
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onPress = {
+                                    fabPressed = true
+                                    tryAwaitRelease()
+                                    fabPressed = false
+                                },
+                                onTap = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    onNavigate("add")
+                                }
+                            )
+                        },
                     contentAlignment = Alignment.Center
                 ) {
+                    // Glassy Overlay for extra depth
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .background(
+                                brush = Brush.verticalGradient(
+                                    colors = listOf(Color.White.copy(alpha = 0.2f), Color.Transparent)
+                                )
+                            )
+                    )
+                    
                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = "Add",

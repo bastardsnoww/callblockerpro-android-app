@@ -34,6 +34,9 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.width
 
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+
 @Composable
 fun MetallicToggle(
     options: List<String>,
@@ -41,6 +44,8 @@ fun MetallicToggle(
     onOptionSelected: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val haptic = LocalHapticFeedback.current
+    
     BoxWithConstraints(
         modifier = modifier
             .height(56.dp)
@@ -70,9 +75,6 @@ fun MetallicToggle(
                 .width(itemWidth)
                 .fillMaxHeight()
                 .padding(2.dp)
-                .drawWithContent {
-                    drawContent()
-                }
                 .graphicsLayer {
                     translationX = indicatorOffset.toPx()
                 }
@@ -92,17 +94,19 @@ fun MetallicToggle(
                         .weight(1f)
                         .fillMaxHeight()
                         .clip(RoundedCornerShape(8.dp))
-                        .clickable { onOptionSelected(index) },
+                        .clickable { 
+                            if (!isSelected) {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                onOptionSelected(index)
+                            }
+                        },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = option,
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
-                        color = if (isSelected) Color(0xFF1a1a1a) else Color.Gray,
-                        modifier = Modifier.graphicsLayer {
-                            // Slight parallax or scale effect could go here
-                        }
+                        color = if (isSelected) Color(0xFF1a1a1a) else Color.Gray
                     )
                 }
             }
