@@ -56,10 +56,11 @@ fun BottomNavBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(bottom = 16.dp, start = 16.dp, end = 16.dp)
+            .padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
+        contentAlignment = Alignment.BottomCenter
     ) {
         GlassPanel(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.widthIn(max = 640.dp).fillMaxWidth(),
             cornerRadius = 32.dp
         ) {
             Row(
