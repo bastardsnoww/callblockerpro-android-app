@@ -97,14 +97,11 @@ fun GlassPanel(
                 .matchParentSize()
                 .border(
                     width = 1.dp,
-                    brush = Brush.linearGradient(
+                    brush = Brush.verticalGradient(
                         colors = listOf(
-                            Color.White.copy(alpha = borderAlpha),
-                            Color.White.copy(alpha = borderAlpha * 4f).copy(alpha = (borderAlpha * 4f).coerceAtMost(0.6f)), 
-                            Color.White.copy(alpha = borderAlpha)
-                        ),
-                        start = Offset(shimmerOffset, shimmerOffset),
-                        end = Offset(shimmerOffset + 150f, shimmerOffset + 150f)
+                            Color.White.copy(alpha = (borderAlpha * 3).coerceAtMost(0.5f)),
+                            Color.White.copy(alpha = borderAlpha * 0.5f)
+                        )
                     ),
                     shape = RoundedCornerShape(cornerRadius)
                 )

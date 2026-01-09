@@ -65,11 +65,10 @@ fun HomeStatusCard(
             )
             .border(
                 width = 1.dp,
-                brush = Brush.linearGradient(
+                brush = Brush.verticalGradient(
                     colors = listOf(
-                        Color.White.copy(alpha = 0.4f),
-                        Color.Transparent,
-                        Color.White.copy(alpha = 0.1f)
+                        Color.White.copy(alpha = 0.3f),
+                        Color.White.copy(alpha = 0.05f)
                     )
                 ),
                 shape = RoundedCornerShape(32.dp)
@@ -199,7 +198,16 @@ fun RowScope.HomeStatBadge(
             .weight(1f)
             .clip(RoundedCornerShape(20.dp))
             .background(Color.White.copy(alpha = 0.03f))
-            .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(20.dp))
+            .border(
+                width = 1.dp,
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color.White.copy(alpha = 0.2f),
+                        Color.White.copy(alpha = 0.05f)
+                    )
+                ),
+                shape = RoundedCornerShape(20.dp)
+            )
             .padding(16.dp)
     ) {
         Icon(
