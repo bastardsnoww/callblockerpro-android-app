@@ -18,6 +18,3 @@ annotation class AppVersion
 @Retention(AnnotationRetention.BINARY)
 annotation class ApiBaseUrl
 
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class FirebaseConfig

@@ -1,6 +1,6 @@
 package com.callblockerpro.app.di
 
-import com.callblockerpro.app.data.repository.FirebaseRemoteConfigRepository
+import com.callblockerpro.app.data.repository.PrivacyRemoteConfigRepository
 import com.callblockerpro.app.domain.repository.RemoteConfigRepository
 import dagger.Binds
 import dagger.Module
@@ -15,6 +15,6 @@ abstract class RemoteConfigModule {
     @Binds
     @Singleton
     abstract fun bindRemoteConfigRepository(
-        impl: FirebaseRemoteConfigRepository
+        impl: PrivacyRemoteConfigRepository
     ): RemoteConfigRepository
 }
