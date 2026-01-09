@@ -35,7 +35,6 @@ import com.callblockerpro.app.ui.theme.Primary
 import com.callblockerpro.app.ui.theme.PrimaryLight
 
 @Composable
-@Composable
 fun SettingsScreen(
     onNavigate: (String) -> Unit,
     viewModel: com.callblockerpro.app.ui.viewmodel.SettingsViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
