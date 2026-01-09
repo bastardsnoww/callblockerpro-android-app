@@ -89,16 +89,7 @@ fun BottomNavBar(
                 modifier = Modifier.weight(1f),
                 contentAlignment = Alignment.Center
             ) {
-                val infiniteTransition = rememberInfiniteTransition(label = "PulsingFAB")
-                val pulseScale by infiniteTransition.animateFloat(
-                    initialValue = 1f,
-                    targetValue = 1.1f,
-                    animationSpec = infiniteRepeatable(
-                        animation = tween(2000, easing = LinearEasing),
-                        repeatMode = RepeatMode.Reverse
-                    ),
-                    label = "PulseScale"
-                )
+                val pulseScale = 1f
                 
                 val haptic = LocalHapticFeedback.current
                 var fabPressed by remember { mutableStateOf(false) }

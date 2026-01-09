@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudSync
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,9 +30,13 @@ import com.callblockerpro.app.ui.theme.PrimaryLight
 
 @Composable
 fun LogsScreen(onNavigate: (String) -> Unit) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
     Scaffold(
         containerColor = CrystalDesign.Colors.BackgroundDeep,
-        bottomBar = { BottomNavBar(currentRoute = "logs", onNavigate = onNavigate) }
+        bottomBar = { BottomNavBar(currentRoute = "logs", onNavigate = onNavigate) },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         var searchQuery by remember { mutableStateOf("") }
         PremiumBackground {
@@ -82,7 +87,18 @@ fun LogsScreen(onNavigate: (String) -> Unit) {
                                 label = "Spam Risk",
                                 time = "10:42 AM",
                                 type = LogType.BLOCKED,
-                                onClick = {}
+                                onClick = {
+                                    scope.launch {
+                                        val result = snackbarHostState.showSnackbar(
+                                            message = "Number Blocked",
+                                            actionLabel = "UNDO",
+                                            duration = SnackbarDuration.Short
+                                        )
+                                        if (result == SnackbarResult.ActionPerformed) {
+                                            /* Handle Undo */
+                                        }
+                                    }
+                                }
                             )
                         }
                     }

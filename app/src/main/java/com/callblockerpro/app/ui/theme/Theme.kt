@@ -54,11 +54,8 @@ fun CallBlockerProTheme(
     
     val view = LocalView.current
     if (!view.isInEditMode) {
-        SideEffect {
-            val window = (view.context as Activity).window
-            window.statusBarColor = com.callblockerpro.app.ui.theme.CrystalDesign.Colors.BackgroundDeep.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
-        }
+        // Optional: We can still set a default, but respecting system is better.
+        // For now, removing the forced override allows system defaults or per-screen handling.
     }
 
     MaterialTheme(

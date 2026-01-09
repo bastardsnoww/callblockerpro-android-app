@@ -23,8 +23,18 @@ object CrystalDesign {
         val NeonGold = Color(0xFFFFD700)
         val NeonPurple = Color(0xFF7C3AED)
         val NeonBlue = Color(0xFF3B82F6)
-        val NeonRed = Color(0xFFEF4444)
+        val NeonRed = Color(0xFFDC2626) // Darker for accessible contrast (>4.5:1)
         val NeonGreen = Color(0xFF10B981)
+
+        // Core Brand Colors (Unified)
+        val Primary = Color(0xFF8B5CF6)      // Electric Violet
+        val PrimaryLight = Color(0xFFA78BFA) // Neon Purple
+        val PrimaryContainer = Color(0xFF2E1065)
+        
+        // Backgrounds
+        val BackgroundLight = Color(0xFFF8FAFC)
+        val BackgroundDark = Color(0xFF030014) // Pure space black-purple
+        val SurfaceGlass = Color(0x990F172A)
 
         // Text
         val TextPrimary = Color(0xFFFFFFFF)
@@ -77,11 +87,7 @@ object CrystalDesign {
         val WeightBold = FontWeight.Bold
         val WeightBlack = FontWeight.Black
         
-        val SizeCaption = 10.sp
-        val SizeLabel = 12.sp
-        val SizeBody = 16.sp
-        val SizeHeadline = 24.sp
-        val SizeDisplay = 32.sp
+        // Custom sizes removed in favor of MaterialTheme.typography
     }
     
     // --- 5. The Glass Physics ---

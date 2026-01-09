@@ -41,25 +41,8 @@ fun HomeStatusCard(
     val headlineText = if (isSystemActive) "System\nShielded" else "Shield\nInactive"
     val statusIcon = if (isSystemActive) Icons.Default.VerifiedUser else Icons.Default.Warning
 
-    val infiniteTransition = rememberInfiniteTransition(label = "PulsingGlow")
-    val pulseScale by infiniteTransition.animateFloat(
-        initialValue = 1f,
-        targetValue = 1.2f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2000, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "PulseScale"
-    )
-    val pulseAlpha by infiniteTransition.animateFloat(
-        initialValue = if (isSystemActive) 0.3f else 0.5f,
-        targetValue = if (isSystemActive) 0.6f else 0.9f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(if (isSystemActive) 2000 else 1000, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "PulseAlpha"
-    )
+    val pulseScale = 1f
+    val pulseAlpha = if (isSystemActive) 0.6f else 0.9f
 
     Box(
         modifier = modifier

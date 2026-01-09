@@ -30,11 +30,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.animation.core.*
-import com.callblockerpro.app.ui.theme.BackgroundDark
 import com.callblockerpro.app.ui.theme.CrystalDesign
-import com.callblockerpro.app.ui.theme.Emerald
-import com.callblockerpro.app.ui.theme.Primary
-import com.callblockerpro.app.ui.theme.PrimaryLight
 import com.callblockerpro.app.ui.theme.MetallicGradientColors
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 
@@ -69,7 +65,7 @@ fun PremiumSearchBar(
                     Icon(
                         imageVector = Icons.Default.Search,
                         contentDescription = null,
-                        tint = Color.Gray,
+                        tint = CrystalDesign.Colors.TextSecondary,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
@@ -78,7 +74,7 @@ fun PremiumSearchBar(
                             Text(
                                 text = placeholder,
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = Color.Gray
+                                color = CrystalDesign.Colors.TextSecondary
                             )
                         }
                         BasicTextField(
@@ -89,7 +85,7 @@ fun PremiumSearchBar(
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Medium
                             ),
-                            cursorBrush = SolidColor(Primary),
+                            cursorBrush = SolidColor(CrystalDesign.Colors.Primary),
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true
                         )
@@ -117,7 +113,7 @@ fun PremiumSearchBar(
                     Icon(
                         imageVector = Icons.Default.FilterList,
                         contentDescription = "Filter",
-                        tint = Color.Gray
+                        tint = CrystalDesign.Colors.TextSecondary
                     )
                 }
             }
@@ -136,8 +132,8 @@ fun PremiumListItem(
     iconColor: Color,
     modifier: Modifier = Modifier,
     tag: String? = null,
-    tagColor: Color = Color.Gray,
-    trailingContent: (@Composable () -> Unit)? = { Icon(Icons.Default.ChevronRight, null, tint = Color.Gray.copy(0.4f)) },
+    tagColor: Color = CrystalDesign.Colors.TextSecondary,
+    trailingContent: (@Composable () -> Unit)? = { Icon(Icons.Default.ChevronRight, null, tint = CrystalDesign.Colors.TextSecondary.copy(0.4f)) },
     onClick: () -> Unit
 ) {
     val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
@@ -155,18 +151,10 @@ fun PremiumListItem(
                 scaleX = scale
                 scaleY = scale
             }
-            .pointerInput(Unit) {
-                detectTapGestures(
-                    onPress = {
-                        isPressed = true
-                        tryAwaitRelease()
-                        isPressed = false
-                    },
-                    onTap = {
-                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove) // Selection/Light tap
-                        onClick()
-                    }
-                )
+            .clip(RoundedCornerShape(CrystalDesign.Glass.CornerRadius))
+            .clickable {
+                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                onClick()
             },
         cornerRadius = CrystalDesign.Glass.CornerRadius,
         borderAlpha = 0.12f
@@ -211,7 +199,7 @@ fun PremiumListItem(
                             text = tag.uppercase(),
                             style = MaterialTheme.typography.labelSmall,
                             color = tagColor,
-                            fontSize = CrystalDesign.Typography.SizeCaption,
+                            fontSize = 10.sp, // Explicit small caption override for tags if needed, or define in Type
                             fontWeight = CrystalDesign.Typography.WeightBlack
                         )
                     }
@@ -257,7 +245,7 @@ fun PremiumEmptyState(
                 .size(100.dp)
                 .background(
                     Brush.radialGradient(
-                        colors = listOf(Primary.copy(alpha = 0.2f), Color.Transparent)
+                        colors = listOf(CrystalDesign.Colors.Primary.copy(alpha = 0.2f), Color.Transparent)
                     )
                 ),
             contentAlignment = Alignment.Center
@@ -265,7 +253,7 @@ fun PremiumEmptyState(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = Primary.copy(alpha = 0.8f),
+                tint = CrystalDesign.Colors.Primary.copy(alpha = 0.8f),
                 modifier = Modifier.size(48.dp)
             )
         }
@@ -288,7 +276,7 @@ fun PremiumEmptyState(
             Spacer(modifier = Modifier.height(24.dp))
             Button(
                 onClick = onActionClick,
-                colors = ButtonDefaults.buttonColors(containerColor = Primary),
+                colors = ButtonDefaults.buttonColors(containerColor = CrystalDesign.Colors.Primary),
                 shape = RoundedCornerShape(50)
             ) {
                 Text(text = actionLabel, fontWeight = FontWeight.Bold)
@@ -307,7 +295,7 @@ fun PremiumSwitch(
     modifier: Modifier = Modifier
 ) {
     val thumbColor = if (checked) Color.White else Color.Gray
-    val trackColor = if (checked) Primary else Color(0xFF2d2a42)
+    val trackColor = if (checked) CrystalDesign.Colors.Primary else Color(0xFF2d2a42)
     
     // We can stick to standard Switch for now but with custom colors to ensure reliability,
     // or build a custom one. A customized standard switch is often safer for accessibility.
@@ -317,7 +305,7 @@ fun PremiumSwitch(
         modifier = modifier,
         colors = SwitchDefaults.colors(
             checkedThumbColor = Color.White,
-            checkedTrackColor = Primary,
+            checkedTrackColor = CrystalDesign.Colors.Primary,
             uncheckedThumbColor = Color(0xFF8b8ea5),
             uncheckedTrackColor = Color(0xFF1e1b2e),
             uncheckedBorderColor = Color.White.copy(alpha = 0.1f)
@@ -334,7 +322,7 @@ fun NeonButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     icon: ImageVector? = null,
-    color: Color = Primary,
+    color: Color = CrystalDesign.Colors.Primary,
     enabled: Boolean = true,
     isLoading: Boolean = false
 ) {
@@ -354,29 +342,21 @@ fun NeonButton(
                 scaleY = scale
                 alpha = if (enabled) 1f else 0.5f
             }
-            .pointerInput(enabled) {
-                if (enabled) {
-                    detectTapGestures(
-                        onPress = {
-                            isPressed = true
-                            tryAwaitRelease()
-                            isPressed = false
-                        },
-                        onTap = {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress) // Action/Medium bump
-                            onClick()
-                        }
-                    )
+            .clip(RoundedCornerShape(16.dp))
+            .clickable(
+                enabled = enabled,
+                onClick = {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    onClick()
                 }
-            }
+            )
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
                         color.copy(alpha = 0.8f),
                         color.copy(alpha = 0.5f)
                     )
-                ),
-                shape = RoundedCornerShape(16.dp)
+                )
             )
             .border(
                 width = 1.dp,
@@ -440,7 +420,7 @@ fun NeonButton(
 @Composable
 fun NeonLoader(
     modifier: Modifier = Modifier,
-    color: Color = Primary
+    color: Color = CrystalDesign.Colors.Primary
 ) {
     val infiniteTransition = androidx.compose.animation.core.rememberInfiniteTransition(label = "Loader")
     
@@ -492,6 +472,7 @@ fun NeonLoader(
 @Composable
 fun MetallicHeaderButton(
     icon: ImageVector,
+    contentDescription: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -532,7 +513,7 @@ fun MetallicHeaderButton(
         )
         Icon(
             imageVector = icon,
-            contentDescription = null,
+            contentDescription = contentDescription,
             tint = Color.White,
             modifier = Modifier.size(20.dp)
         )
@@ -586,7 +567,7 @@ fun PremiumHeader(
                     .graphicsLayer { alpha = edgeAlpha }
                     .background(
                         Brush.horizontalGradient(
-                            listOf(Color.Transparent, Emerald, Color.Transparent)
+                            listOf(Color.Transparent, CrystalDesign.Colors.NeonGreen, Color.Transparent)
                         )
                     )
             )
@@ -600,6 +581,7 @@ fun PremiumHeader(
                 if (onBack != null) {
                     MetallicHeaderButton(
                         icon = Icons.Default.ChevronRight,
+                        contentDescription = "Go Back",
                         onClick = onBack,
                         modifier = Modifier.graphicsLayer { rotationZ = 180f }
                     )
@@ -630,6 +612,7 @@ fun PremiumHeader(
                 if (actionIcon != null && onAction != null) {
                     MetallicHeaderButton(
                         icon = actionIcon,
+                        contentDescription = "Action",
                         onClick = onAction
                     )
                 }

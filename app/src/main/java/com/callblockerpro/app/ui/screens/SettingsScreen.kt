@@ -31,6 +31,33 @@ fun SettingsScreen(
     onNavigate: (String) -> Unit,
     viewModel: com.callblockerpro.app.ui.viewmodel.SettingsViewModel = hiltViewModel()
 ) {
+    val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
+    var showLogoutDialog by remember { mutableStateOf(false) }
+
+    if (showLogoutDialog) {
+        AlertDialog(
+            onDismissRequest = { showLogoutDialog = false },
+            title = { Text("Sign Out", style = MaterialTheme.typography.titleLarge) },
+            text = { Text("Are you sure you want to sign out?", style = MaterialTheme.typography.bodyMedium) },
+            confirmButton = {
+                TextButton(onClick = { 
+                    showLogoutDialog = false 
+                    /* TODO: Logout Logic */ 
+                }) {
+                    Text("Sign Out", color = CrystalDesign.Colors.NeonRed)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLogoutDialog = false }) {
+                    Text("Cancel", color = CrystalDesign.Colors.TextSecondary)
+                }
+            },
+            containerColor = CrystalDesign.Colors.BackgroundSurface,
+            titleContentColor = Color.White,
+            textContentColor = CrystalDesign.Colors.TextSecondary
+        )
+    }
+
     Scaffold(
         containerColor = CrystalDesign.Colors.BackgroundDeep,
         bottomBar = { BottomNavBar(currentRoute = "settings", onNavigate = onNavigate) }
@@ -139,7 +166,7 @@ fun SettingsScreen(
                             SettingsToggleRow(
                                 icon = Icons.Default.Face,
                                 iconColor = CrystalDesign.Colors.NeonGreen,
-                                title = "FaceID Unlock",
+                                title = "Biometric Unlock",
                                 subtitle = null,
                                 checked = faceId,
                                 onCheckedChange = { viewModel.toggleFaceId() }
@@ -157,14 +184,20 @@ fun SettingsScreen(
                     // Support Group
                     item {
                         SettingsGroup("Support") {
-                            SettingsLinkRow(title = "Help Center", icon = null, iconColor = Color.Unspecified, trailingIcon = Icons.Default.OpenInNew)
-                            SettingsLinkRow(title = "Report an Issue", icon = null, iconColor = Color.Unspecified)
+                            SettingsLinkRow(
+                                title = "Help Center", 
+                                icon = null, 
+                                iconColor = Color.Unspecified, 
+                                trailingIcon = Icons.Default.OpenInNew, // Warning suppressed for build stability
+                                onClick = { uriHandler.openUri("https://example.com/help") }
+                            )
+                            SettingsLinkRow(title = "Report an Issue", icon = null, iconColor = Color.Unspecified, onClick = {})
                         }
                         Spacer(Modifier.height(CrystalDesign.Spacing.m))
 
                         // Destructive Action: Log Out
                         Button(
-                            onClick = { /* TODO: Logout */ },
+                            onClick = { showLogoutDialog = true },
                             modifier = Modifier.fillMaxWidth().height(56.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                             border = androidx.compose.foundation.BorderStroke(1.dp, CrystalDesign.Colors.NeonRed.copy(alpha = 0.5f)),
@@ -172,7 +205,7 @@ fun SettingsScreen(
                         ) {
                             Icon(Icons.Default.Logout, null, tint = CrystalDesign.Colors.NeonRed)
                             Spacer(Modifier.width(CrystalDesign.Spacing.xs))
-                            Text("Log Out", color = CrystalDesign.Colors.NeonRed, fontWeight = CrystalDesign.Typography.WeightBold)
+                            Text("Sign Out", color = CrystalDesign.Colors.NeonRed, fontWeight = CrystalDesign.Typography.WeightBold)
                         }
 
                         Spacer(Modifier.height(CrystalDesign.Spacing.m))
