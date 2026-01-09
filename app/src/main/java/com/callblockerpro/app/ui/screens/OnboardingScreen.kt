@@ -49,18 +49,32 @@ fun OnboardingScreen(
     val pagerState = rememberPagerState(pageCount = { 3 })
     val scope = rememberCoroutineScope()
     
-    // Standard Android Activity Result Launcher for Permissions
-    // This is more stable than third-party libraries for core system interactions
+    // Launcher for Permissions
     val launcher = rememberLauncherForActivityResult(
         contract = androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions(),
         onResult = { permissions ->
-            // Check if all requested permissions are granted
             val allGranted = permissions.entries.all { it.value }
             if (allGranted) {
-                // If granted, complete onboarding automatically
-                 viewModel.completeOnboarding()
-                 onOnboardingFinished()
+                 // After permissions, we still need to check for the Role
+                 val roleIntent = com.callblockerpro.app.util.CallScreeningPermissions.createRoleRequestIntent(context)
+                 if (roleIntent != null && !com.callblockerpro.app.util.CallScreeningPermissions.isCallScreeningRoleGranted(context)) {
+                     roleLauncher.launch(roleIntent)
+                 } else {
+                     viewModel.completeOnboarding()
+                     onOnboardingFinished()
+                 }
             }
+        }
+    )
+
+    // Launcher for Role Request
+    val roleLauncher = rememberLauncherForActivityResult(
+        contract = androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(),
+        onResult = { _ ->
+            // Even if they cancel the role request, we finish onboarding
+            // The Dashboard can show a warning later
+            viewModel.completeOnboarding()
+            onOnboardingFinished()
         }
     )
 
@@ -153,7 +167,13 @@ fun OnboardingScreen(
                             }
                         } else {
                             if (checkPermissions()) {
-                                completeOnboarding()
+                                // Already have permissions, check Role
+                                val roleIntent = com.callblockerpro.app.util.CallScreeningPermissions.createRoleRequestIntent(context)
+                                if (roleIntent != null && !com.callblockerpro.app.util.CallScreeningPermissions.isCallScreeningRoleGranted(context)) {
+                                    roleLauncher.launch(roleIntent)
+                                } else {
+                                    completeOnboarding()
+                                }
                             } else {
                                 try {
                                     launcher.launch(permissionsToRequest)

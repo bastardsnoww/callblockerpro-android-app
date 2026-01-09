@@ -8,10 +8,9 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.ktlint)
 
-    alias(libs.plugins.googleServices)
-    alias(libs.plugins.firebaseCrashlytics)
     alias(libs.plugins.composeCompiler)
 }
+
 
 android {
     namespace = "com.callblockerpro.app"
@@ -171,6 +170,5 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.7.6")
 
     // Firebase
-    implementation("com.google.firebase:firebase-config:21.6.3")
-    implementation("com.google.firebase:firebase-analytics:21.5.1")
 }
+

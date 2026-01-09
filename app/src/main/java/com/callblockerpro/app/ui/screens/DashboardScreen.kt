@@ -90,6 +90,55 @@ fun DashboardScreen(
             
             // Mode Selector
             item {
+                val context = androidx.compose.ui.platform.LocalContext.current
+                var isRoleGranted by remember { 
+                    mutableStateOf(com.callblockerpro.app.util.CallScreeningPermissions.isCallScreeningRoleGranted(context)) 
+                }
+                
+                // Refresh when screen is displayed
+                androidx.compose.runtime.DisposableEffect(Unit) {
+                    isRoleGranted = com.callblockerpro.app.util.CallScreeningPermissions.isCallScreeningRoleGranted(context)
+                    onDispose {}
+                }
+
+                if (!isRoleGranted) {
+                    val roleLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+                        contract = androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(),
+                        onResult = { isRoleGranted = com.callblockerpro.app.util.CallScreeningPermissions.isCallScreeningRoleGranted(context) }
+                    )
+
+                    GlassPanel(
+                        modifier = Modifier.fillMaxWidth(),
+                        backgroundGradient = Brush.linearGradient(listOf(Color(0xFFEF4444).copy(0.1f), Color(0xFFEF4444).copy(0.05f))),
+                        borderGradient = Brush.linearGradient(listOf(Color(0xFFEF4444).copy(0.5f), Color(0xFFEF4444).copy(0.2f)))
+                    ) {
+                        Row(
+                            Modifier.padding(20.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Icon(Icons.Default.Warning, null, tint = Color(0xFFEF4444))
+                            Column(Modifier.weight(1f)) {
+                                Text("System Role Required", style = MaterialTheme.typography.titleSmall, color = Color.White, fontWeight = FontWeight.Bold)
+                                Text("Set as default blocker to enable protection.", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(0.7f))
+                            }
+                            Button(
+                                onClick = { 
+                                    com.callblockerpro.app.util.CallScreeningPermissions.createRoleRequestIntent(context)?.let {
+                                        roleLauncher.launch(it)
+                                    }
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444)),
+                                shape = RoundedCornerShape(8.dp),
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                            ) {
+                                Text("FIX", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+
                 MetallicToggle(
                     options = listOf("Normal", "Whitelist", "Blocklist"),
                     selectedIndex = selectedMode,
