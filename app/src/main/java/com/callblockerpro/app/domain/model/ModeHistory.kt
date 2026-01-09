@@ -2,11 +2,7 @@ package com.callblockerpro.app.domain.model
 
 import java.time.Instant
 
-enum class ChangeSource {
-    MANUAL,
-    SCHEDULE,
-    SYSTEM // e.g. restore from backup
-}
+
 
 data class ModeHistory(
     val id: Long = 0,
