@@ -493,7 +493,7 @@ fun MetallicHeaderButton(
 
     Box(
         modifier = modifier
-            .size(44.dp)
+            .size(48.dp)
             .clip(CircleShape)
             .background(Brush.verticalGradient(MetallicGradientColors))
             .border(1.dp, Color.White.copy(0.15f), CircleShape)

@@ -39,6 +39,18 @@ fun LogsScreen(onNavigate: (String) -> Unit) {
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         var searchQuery by remember { mutableStateOf("") }
+        
+        // State for Logs
+        val todayLogs = remember { mutableStateListOf(
+            LogEntry(1, "+1 (555) 019-2834", "Spam Risk", "10:42 AM", LogType.BLOCKED),
+            LogEntry(2, "John Doe", "Known Contact", "9:15 AM", LogType.ALLOWED)
+        ) }
+        
+        val yesterdayLogs = remember { mutableStateListOf(
+             LogEntry(3, "Unknown Caller", "Potential Fraud", "Mon 4:32 PM", LogType.SPAM),
+             LogEntry(4, "Pizza Delivery", "Whitelisted Business", "Mon 12:01 PM", LogType.ALLOWED)
+        ) }
+
         PremiumBackground {
             Box(Modifier.fillMaxSize()) {
                 LazyColumn(
@@ -71,80 +83,61 @@ fun LogsScreen(onNavigate: (String) -> Unit) {
                         }
                     }
 
-                    item {
-                        AnimatedEntrance(index = 2) {
-                            Column {
-                                Spacer(Modifier.height(CrystalDesign.Spacing.xs))
-                                Text("TODAY", style = MaterialTheme.typography.labelSmall, color = CrystalDesign.Colors.TextSecondary, fontWeight = CrystalDesign.Typography.WeightBlack, letterSpacing = 2.sp)
+                    // TODAY Section
+                    if (todayLogs.isNotEmpty()) {
+                        item {
+                            AnimatedEntrance(index = 2) {
+                                Column {
+                                    Spacer(Modifier.height(CrystalDesign.Spacing.xs))
+                                    Text("TODAY", style = MaterialTheme.typography.labelSmall, color = CrystalDesign.Colors.TextSecondary, fontWeight = CrystalDesign.Typography.WeightBlack, letterSpacing = 2.sp)
+                                }
                             }
                         }
-                    }
 
-                    item {
-                        AnimatedEntrance(index = 3) {
-                            LogItem(
-                                number = "+1 (555) 019-2834",
-                                label = "Spam Risk",
-                                time = "10:42 AM",
-                                type = LogType.BLOCKED,
-                                onClick = {
-                                    scope.launch {
-                                        val result = snackbarHostState.showSnackbar(
-                                            message = "Number Blocked",
-                                            actionLabel = "UNDO",
-                                            duration = SnackbarDuration.Short
-                                        )
-                                        if (result == SnackbarResult.ActionPerformed) {
-                                            /* Handle Undo */
+                        itemsIndexed(todayLogs, key = { _, item -> item.id }) { index, log ->
+                            AnimatedEntrance(index = 3 + index) {
+                                SwipeableLogItem(
+                                    log = log,
+                                    onDismiss = { 
+                                        todayLogs.remove(log) 
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar("Log Deleted", "UNDO")
+                                               // In real app, re-add here on undo
+                                        }
+                                    },
+                                    onClick = {
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar(
+                                                message = "Number Selected",
+                                                actionLabel = "INFO",
+                                                duration = SnackbarDuration.Short
+                                            )
                                         }
                                     }
-                                }
-                            )
-                        }
-                    }
-
-                    item {
-                        AnimatedEntrance(index = 4) {
-                            LogItem(
-                                number = "John Doe",
-                                label = "Known Contact",
-                                time = "9:15 AM",
-                                type = LogType.ALLOWED,
-                                onClick = {}
-                            )
-                        }
-                    }
-
-                    item {
-                        AnimatedEntrance(index = 5) {
-                            Column {
-                                Spacer(Modifier.height(CrystalDesign.Spacing.xs))
-                                Text("YESTERDAY", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = CrystalDesign.Typography.WeightBlack, letterSpacing = 2.sp)
+                                )
                             }
                         }
                     }
 
-                    item {
-                        AnimatedEntrance(index = 6) {
-                            LogItem(
-                                number = "Unknown Caller",
-                                label = "Potential Fraud",
-                                time = "Mon 4:32 PM",
-                                type = LogType.SPAM,
-                                onClick = {}
-                            )
+                    // YESTERDAY Section
+                    if (yesterdayLogs.isNotEmpty()) {
+                        item {
+                            AnimatedEntrance(index = 10) { // Offset index
+                                Column {
+                                    Spacer(Modifier.height(CrystalDesign.Spacing.xs))
+                                    Text("YESTERDAY", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = CrystalDesign.Typography.WeightBlack, letterSpacing = 2.sp)
+                                }
+                            }
                         }
-                    }
 
-                    item {
-                        AnimatedEntrance(index = 7) {
-                            LogItem(
-                                number = "Pizza Delivery",
-                                label = "Whitelisted Business",
-                                time = "Mon 12:01 PM",
-                                type = LogType.ALLOWED,
-                                onClick = {}
-                            )
+                        itemsIndexed(yesterdayLogs, key = { _, item -> item.id }) { index, log ->
+                            AnimatedEntrance(index = 11 + index) {
+                                SwipeableLogItem(
+                                    log = log,
+                                    onDismiss = { yesterdayLogs.remove(log) },
+                                    onClick = {}
+                                )
+                            }
                         }
                     }
                 }
@@ -159,6 +152,63 @@ fun LogsScreen(onNavigate: (String) -> Unit) {
                 )
             }
         }
+    }
+}
+
+data class LogEntry(
+    val id: Int,
+    val number: String,
+    val label: String,
+    val time: String,
+    val type: LogType
+)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SwipeableLogItem(
+    log: LogEntry,
+    onDismiss: () -> Unit,
+    onClick: () -> Unit
+) {
+    val dismissState = rememberSwipeToDismissBoxState(
+        confirmValueChange = {
+            if (it == SwipeToDismissBoxValue.EndToStart) {
+                onDismiss()
+                true
+            } else false
+        }
+    )
+
+    SwipeToDismissBox(
+        state = dismissState,
+        backgroundContent = {
+            val color = if (dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart) 
+                CrystalDesign.Colors.NeonRed else Color.Transparent
+            
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(CrystalDesign.Glass.CornerRadius))
+                    .background(color)
+                    .padding(horizontal = 24.dp),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                Icon(
+                    imageVector = androidx.compose.material.icons.Icons.Default.Delete,
+                    contentDescription = "Delete",
+                    tint = Color.White
+                )
+            }
+        },
+        enableDismissFromStartToEnd = false
+    ) {
+        LogItem(
+            number = log.number,
+            label = log.label,
+            time = log.time,
+            type = log.type,
+            onClick = onClick
+        )
     }
 }
 
