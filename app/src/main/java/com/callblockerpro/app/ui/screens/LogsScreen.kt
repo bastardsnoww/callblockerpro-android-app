@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.callblockerpro.app.ui.components.*
+import com.callblockerpro.app.ui.theme.CrystalDesign
 import com.callblockerpro.app.ui.theme.BackgroundDark
 import com.callblockerpro.app.ui.theme.Primary
 import com.callblockerpro.app.ui.theme.PrimaryLight
