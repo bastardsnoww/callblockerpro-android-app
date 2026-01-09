@@ -9,6 +9,15 @@
 
 ---
 
+## 📸 Project Gallery
+
+<p align="center">
+  <img src="docs/assets/verify_bg_2.png" width="45%" alt="Home Screen Dashboard" />
+  <img src="docs/assets/verify_bg.png" width="45%" alt="Protection Lists" />
+</p>
+
+---
+
 ## ✨ Features
 
 - 📵 **Smart Call Blocking**: Three blocking modes (Neutral, Whitelist, Blocklist)

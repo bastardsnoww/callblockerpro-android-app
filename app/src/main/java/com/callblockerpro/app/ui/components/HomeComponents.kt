@@ -58,8 +58,8 @@ fun HomeStatusCard(
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFF1E1B4B), // Deep Indigo
-                        Color(0xFF030014)  // Space Black
+                        Color(0xFF131022), // Slightly Lighter Dark
+                        BackgroundDark     // Seamless blend
                     )
                 )
             )
@@ -125,33 +125,37 @@ fun HomeStatusCard(
                     )
                 }
 
-                // 3D Pulsing Shield Icon
-                Box(contentAlignment = Alignment.Center) {
+                // 3D Pulsing Shield Icon - Fixed Alignment
+                Box(
+                    modifier = Modifier.size(80.dp),
+                    contentAlignment = Alignment.Center
+                ) {
                     // Outer Glow
                     Box(
                         modifier = Modifier
-                            .size(64.dp)
+                            .size(72.dp)
                             .graphicsLayer {
                                 scaleX = pulseScale
                                 scaleY = pulseScale
-                                alpha = pulseAlpha * 0.5f
+                                alpha = pulseAlpha * 0.4f
                             }
-                            .background(Emerald.copy(alpha = 0.4f), CircleShape)
+                            .background(Emerald.copy(alpha = 0.3f), CircleShape)
                     )
                     
+                    // Glass Shield Container
                     Box(
                         modifier = Modifier
-                            .size(72.dp)
-                            .clip(RoundedCornerShape(20.dp))
+                            .matchParentSize()
+                            .clip(RoundedCornerShape(24.dp))
                             .background(
                                 Brush.linearGradient(
                                     listOf(
-                                        Color(0xFF10B981).copy(alpha = 0.2f),
-                                        Color(0xFF065F46).copy(alpha = 0.6f)
+                                        Color(0xFF10B981).copy(alpha = 0.15f),
+                                        Color(0xFF065F46).copy(alpha = 0.4f)
                                     )
                                 )
                             )
-                            .border(1.dp, Emerald.copy(alpha = 0.5f), RoundedCornerShape(20.dp)),
+                            .border(1.dp, Emerald.copy(alpha = 0.4f), RoundedCornerShape(24.dp)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(

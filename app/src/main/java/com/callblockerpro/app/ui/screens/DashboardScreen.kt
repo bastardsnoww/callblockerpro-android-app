@@ -75,38 +75,17 @@ fun DashboardScreen(
                     // Mode Selector
                     item {
                         if (!isRoleGranted) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(24.dp))
-                                    .background(Red.copy(0.1f))
-                                    .border(1.dp, Red.copy(0.3f), RoundedCornerShape(24.dp))
-                            ) {
-                                Row(
-                                    Modifier.padding(20.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                                ) {
-                                    Icon(Icons.Default.Warning, null, tint = Red)
-                                    Column(Modifier.weight(1f)) {
-                                        Text("System Role Required", style = MaterialTheme.typography.titleSmall, color = Color.White, fontWeight = FontWeight.Bold)
-                                        Text("Set as default blocker to enable protection.", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(0.7f))
-                                    }
-                                    Button(
-                                        onClick = { 
-                                            com.callblockerpro.app.util.CallScreeningPermissions.createRoleRequestIntent(context)?.let {
-                                                roleLauncher.launch(it)
-                                            }
-                                        },
-                                        colors = ButtonDefaults.buttonColors(containerColor = Red),
-                                        shape = RoundedCornerShape(12.dp),
-                                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
-                                    ) {
-                                        Text("FIX", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black)
+                            PremiumWarningCard(
+                                title = "System Role Required",
+                                message = "Set as default blocker to enable protection.",
+                                buttonText = "FIX",
+                                onClick = {
+                                    com.callblockerpro.app.util.CallScreeningPermissions.createRoleRequestIntent(context)?.let {
+                                        roleLauncher.launch(it)
                                     }
                                 }
-                            }
-                            Spacer(modifier = Modifier.height(16.dp))
+                            )
+                            Spacer(modifier = Modifier.height(24.dp))
                         }
 
                         MetallicToggle(
@@ -137,8 +116,8 @@ fun DashboardScreen(
                                 Text("FULL REPORT", style = MaterialTheme.typography.labelSmall, color = PrimaryLight, fontWeight = FontWeight.Bold, modifier = Modifier.clickable {})
                             }
                             Spacer(modifier = Modifier.height(20.dp))
-                            GlassPanel(modifier = Modifier.fillMaxWidth().height(260.dp)) {
-                                Column(Modifier.padding(24.dp).fillMaxSize()) {
+                            GlassPanel(modifier = Modifier.fillMaxWidth()) {
+                                Column(Modifier.padding(24.dp).fillMaxWidth()) {
                                      Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(32.dp)) {
                                          Column {
                                              Text("AVG. DAILY", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = FontWeight.Bold)
@@ -150,7 +129,7 @@ fun DashboardScreen(
                                          }
                                      }
                                      Spacer(Modifier.height(24.dp))
-                                     Box(Modifier.weight(1f).fillMaxWidth()) {
+                                     Box(Modifier.fillMaxWidth().height(150.dp)) {
                                          if (weeklyActivity.isNotEmpty()) {
                                              WeeklyActivityBarChart(data = weeklyActivity)
                                          } else {
@@ -160,7 +139,7 @@ fun DashboardScreen(
                                      Spacer(Modifier.height(16.dp))
                                      Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                                          listOf("M", "T", "W", "T", "F", "S", "S").forEach { 
-                                             Text(it, style = MaterialTheme.typography.labelSmall, color = Color.Gray.copy(alpha = 0.6f), modifier = Modifier.width(24.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center, fontWeight = FontWeight.Bold)
+                                             Text(it, style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.6f), modifier = Modifier.width(24.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center, fontWeight = FontWeight.Bold)
                                          }
                                      }
                                 }
@@ -196,59 +175,14 @@ fun DashboardScreen(
                 }
 
                 // Floating Crystal Header
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp)
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(BackgroundDark, Color.Transparent)
-                            )
-                        )
-                        .padding(horizontal = 24.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    GlassPanel(
-                        modifier = Modifier.fillMaxWidth().height(64.dp),
-                        cornerRadius = 20.dp
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column {
-                                Text(
-                                    text = "CallBlockerPro",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Black,
-                                    color = Color.White
-                                )
-                                Text(
-                                    text = "NEON CRYSTAL EVOLUTION",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontWeight = FontWeight.Bold,
-                                    color = PrimaryLight,
-                                    fontSize = 8.sp,
-                                    letterSpacing = 1.sp
-                                )
-                            }
-                            IconButton(
-                                onClick = { onNavigate("settings") },
-                                modifier = Modifier
-                                    .background(Color.White.copy(alpha = 0.05f), CircleShape)
-                                    .size(40.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Settings,
-                                    contentDescription = "Settings",
-                                    tint = Color.White,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            }
-                        }
-                    }
-                }
+                PremiumHeader(
+                    title = "CallBlockerPro",
+                    subtitle = "NEON CRYSTAL EVOLUTION",
+                    onBack = null,
+                    modifier = Modifier.align(Alignment.TopCenter).padding(top = 24.dp, start = 16.dp, end = 16.dp),
+                    actionIcon = Icons.Default.Settings,
+                    onAction = { onNavigate("settings") }
+                )
             }
         } // Closing PremiumBackground
     }

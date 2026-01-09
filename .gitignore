@@ -10,3 +10,10 @@ build/
 local.properties
 Logcat/
 *.log
+
+# Custom Ignores
+temp_*
+*.b64
+*.apk
+logs/
+releases/
