@@ -35,6 +35,7 @@ import com.callblockerpro.app.ui.theme.CrystalDesign
 import com.callblockerpro.app.ui.theme.Emerald
 import com.callblockerpro.app.ui.theme.Primary
 import com.callblockerpro.app.ui.theme.PrimaryLight
+import com.callblockerpro.app.ui.theme.MetallicGradientColors
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 
 /**
@@ -486,7 +487,60 @@ fun NeonLoader(
 }
 
 /**
- * Standardized Floating Crystal Header.
+ * Custom metallic button for the header.
+ */
+@Composable
+fun MetallicHeaderButton(
+    icon: ImageVector,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+    val shimmerTransition = rememberInfiniteTransition(label = "HeaderShimmer")
+    val shimmerAlpha by shimmerTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 0.4f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "HeaderShimmerAlpha"
+    )
+
+    Box(
+        modifier = modifier
+            .size(44.dp)
+            .clip(CircleShape)
+            .background(Brush.verticalGradient(MetallicGradientColors))
+            .border(1.dp, Color.White.copy(0.15f), CircleShape)
+            .clickable {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onClick()
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        // Shimmer Layer
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .graphicsLayer { alpha = shimmerAlpha }
+                .background(
+                    Brush.linearGradient(
+                        listOf(Color.White.copy(0f), Color.White.copy(0.3f), Color.White.copy(0f))
+                    )
+                )
+        )
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = Color.White,
+            modifier = Modifier.size(20.dp)
+        )
+    }
+}
+
+/**
+ * Standardized Floating Crystal Header - Redesigned (10/10).
  */
 @Composable
 fun PremiumHeader(
@@ -497,73 +551,83 @@ fun PremiumHeader(
     actionIcon: ImageVector? = null,
     onAction: (() -> Unit)? = null
 ) {
-    GlassPanel(
+    val infiniteTransition = rememberInfiniteTransition(label = "HeaderPulse")
+    val edgeAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.3f,
+        targetValue = 0.8f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "EdgeAlpha"
+    )
+
+    Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(80.dp),
-        cornerRadius = 100.dp 
+            .height(96.dp)
+            .padding(horizontal = CrystalDesign.Spacing.m, vertical = CrystalDesign.Spacing.xs)
     ) {
-        val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = CrystalDesign.Spacing.l),
-            verticalAlignment = Alignment.CenterVertically
+        // Main Glass Panel
+        GlassPanel(
+            modifier = Modifier.fillMaxSize(),
+            cornerRadius = 24.dp,
+            borderAlpha = 0.15f
         ) {
-            if (onBack != null) {
-                IconButton(
-                    onClick = {
-                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                        onBack()
-                    },
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(Color.White.copy(0.1f), CircleShape)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ChevronRight, // Should be ArrowBack usually, but ChevronRight rotated 180 or just ArrowBack
-                        contentDescription = "Back",
-                        tint = Color.White,
+            // Neon Bottom Edge
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth(0.6f)
+                    .height(2.dp)
+                    .graphicsLayer { alpha = edgeAlpha }
+                    .background(
+                        Brush.horizontalGradient(
+                            listOf(Color.Transparent, Emerald, Color.Transparent)
+                        )
+                    )
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (onBack != null) {
+                    MetallicHeaderButton(
+                        icon = Icons.Default.ChevronRight,
+                        onClick = onBack,
                         modifier = Modifier.graphicsLayer { rotationZ = 180f }
                     )
+                    Spacer(modifier = Modifier.width(16.dp))
                 }
-                Spacer(modifier = Modifier.width(16.dp))
-            }
 
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = title.uppercase(),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = CrystalDesign.Typography.WeightBlack,
-                    color = Color.White,
-                    letterSpacing = 1.sp
-                )
-                if (subtitle != null) {
-                    Text(
-                        text = subtitle,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color.Gray
-                    )
-                }
-            }
-
-            if (actionIcon != null && onAction != null) {
-                IconButton(
-                    onClick = {
-                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                        onAction()
-                    },
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(Color.White.copy(0.1f), CircleShape)
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    Icon(
-                        imageVector = actionIcon,
-                        contentDescription = null,
-                        tint = Color.White
+                    Text(
+                        text = title.uppercase(),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Black,
+                        color = Color.White,
+                        letterSpacing = 3.sp
+                    )
+                    if (subtitle != null) {
+                        Text(
+                            text = subtitle,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White.copy(alpha = 0.6f),
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+
+                if (actionIcon != null && onAction != null) {
+                    MetallicHeaderButton(
+                        icon = actionIcon,
+                        onClick = onAction
                     )
                 }
             }
