@@ -3,52 +3,52 @@ package com.callblockerpro.app.ui.theme
 import androidx.compose.ui.graphics.Color
 
 // Brand Colors
-val Primary = Color(0xFF5211d4)
-val PrimaryLight = Color(0xFF7a3ee6)
+// Brand Colors - Electric Neon
+val Primary = Color(0xFF8B5CF6)      // Electric Violet
+val PrimaryLight = Color(0xFFA78BFA) // Neon Purple
 val OnPrimary = Color.White
-val PrimaryContainer = Color(0xFFEADDFF)
-val OnPrimaryContainer = Color(0xFF21005D)
+val PrimaryContainer = Color(0xFF2E1065)
+val OnPrimaryContainer = Color(0xFFDDD6FE)
 
-// Backgrounds
-val BackgroundLight = Color(0xFFf6f6f8)
-val BackgroundDark = Color(0xFF161022)
-val SurfaceDark = Color(0xFF1f1c27)
-val SurfaceGlass = Color(0xB31F1C27) // rgba(31, 28, 39, 0.7)
+// Backgrounds - Deep Space
+val BackgroundLight = Color(0xFFF8FAFC)
+val BackgroundDark = Color(0xFF030014) // Pure space black-purple
+val SurfaceDark = Color(0xFF0F172A)
+val SurfaceGlass = Color(0x990F172A)
 
-// Status
-val Emerald = Color(0xFF34D399) // Success/Allowed
-val Amber = Color(0xFFFBBF24)   // Warning/Spam
-val Red = Color(0xFFEF4444)     // Error/Blocked
+// Status - High Contrast Neon
+val Emerald = Color(0xFF10B981) // Neon Emerald
+val Amber = Color(0xFFF59E0B)   // Vivid Amber
+val Red = Color(0xFFF43F5E)     // Neon Rose/Red
 
-// Text
-val TextPrimaryDark = Color.White
-val TextSecondaryDark = Color(0xFF94A3B8) // Slate 400
+// Text - Crystal White
+val TextPrimaryDark = Color(0xFFF8FAFC)
+val TextSecondaryDark = Color(0xFF94A3B8)
 
-val TextPrimaryLight = Color(0xFF0F172A) // Slate 900
-val TextSecondaryLight = Color(0xFF64748B) // Slate 500
+val TextPrimaryLight = Color(0xFF0F172A)
+val TextSecondaryLight = Color(0xFF64748B)
 
-// Luxury Gradients
-// Luxury Gradients - Updated for Crystal Clarity
+// Luxury Gradients - Updated for Neon Crystal
 val GlassGradientColors = listOf(
-    Color(0xFF352F44).copy(alpha = 0.5f), // More vibrant purple-gray
-    Color(0xFF1F1C27).copy(alpha = 0.3f)
+    Color(0xFF1E1B4B).copy(alpha = 0.6f), // Deep indigo
+    Color(0xFF0F172A).copy(alpha = 0.4f)
 )
 
 val GlassBorderColors = listOf(
-    Color.White.copy(alpha = 0.25f),
-    Color.White.copy(alpha = 0.05f)
+    Color.White.copy(alpha = 0.4f), // Brighter crystal edge
+    Color.White.copy(alpha = 0.1f)
 )
 
-// Crystal-Liquid Selection (formerly Metallic)
+// Crypto-Liquid Selection
 val MetallicGradientColors = listOf(
-    Color(0xFFFFFFFF), // Pure Shine
-    Color(0xFFE0E7FF), // Crystal Blue-ish
-    Color(0xFFC7D2FE), // Light Indigo
-    Color(0xFFE0E7FF),
+    Color(0xFFFFFFFF),
+    Color(0xFFDDD6FE),
+    Color(0xFFC4B5FD),
+    Color(0xFFDDD6FE),
     Color(0xFFFFFFFF)
 )
 
 val MetallicTrackColors = listOf(
-    Color(0xFF0F0A1A),
-    Color(0xFF1F1C27)
+    Color(0xFF030014),
+    Color(0xFF1E1B4B)
 )

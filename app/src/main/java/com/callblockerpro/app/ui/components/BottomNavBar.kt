@@ -11,14 +11,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -211,7 +204,8 @@ fun NavItem(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    val color = if (isSelected) Primary else Color.Gray
+    val iconColor = if (isSelected) Primary else Color.White.copy(alpha = 0.4f)
+    val textColor = if (isSelected) Color.White else Color.White.copy(alpha = 0.4f)
     
     Column(
         modifier = modifier
@@ -220,17 +214,29 @@ fun NavItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = label,
-            tint = color,
-            modifier = Modifier.size(24.dp)
-        )
+        Box(contentAlignment = Alignment.Center) {
+            if (isSelected) {
+                // Subtle glow behind icon
+                Box(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .background(Primary.copy(alpha = 0.2f), CircleShape)
+                )
+            }
+            Icon(
+                imageVector = icon,
+                contentDescription = label,
+                tint = iconColor,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+        Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = label,
-            fontSize = 10.sp,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-            color = color
+            fontSize = 11.sp,
+            fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Medium,
+            color = textColor,
+            letterSpacing = if (isSelected) 0.5.sp else 0.sp
         )
     }
 }

@@ -12,6 +12,9 @@ import com.callblockerpro.app.di.ServiceModule;
 import com.callblockerpro.app.scheduler.SchedulerWorker_HiltModule;
 import com.callblockerpro.app.service.AutoBackupWorker_HiltModule;
 import com.callblockerpro.app.service.CallBlockingService_GeneratedInjector;
+import com.callblockerpro.app.ui.viewmodel.AddViewModel_HiltModules;
+import com.callblockerpro.app.ui.viewmodel.DashboardViewModel_HiltModules;
+import com.callblockerpro.app.ui.viewmodel.ListsViewModel_HiltModules;
 import com.callblockerpro.app.ui.viewmodel.OnboardingViewModel_HiltModules;
 import com.callblockerpro.app.ui.viewmodel.SplashViewModel_HiltModules;
 import dagger.Binds;
@@ -176,10 +179,13 @@ public final class CallBlockerApplication_HiltComponents {
 
   @Subcomponent(
       modules = {
+          AddViewModel_HiltModules.KeyModule.class,
           ActivityCBuilderModule.class,
           ViewModelCBuilderModule.class,
+          DashboardViewModel_HiltModules.KeyModule.class,
           HiltWrapper_ActivityRetainedComponentManager_LifecycleModule.class,
           HiltWrapper_SavedStateHandleModule.class,
+          ListsViewModel_HiltModules.KeyModule.class,
           OnboardingViewModel_HiltModules.KeyModule.class,
           SplashViewModel_HiltModules.KeyModule.class
       }
@@ -217,7 +223,10 @@ public final class CallBlockerApplication_HiltComponents {
 
   @Subcomponent(
       modules = {
+          AddViewModel_HiltModules.BindsModule.class,
+          DashboardViewModel_HiltModules.BindsModule.class,
           HiltWrapper_HiltViewModelFactory_ViewModelModule.class,
+          ListsViewModel_HiltModules.BindsModule.class,
           OnboardingViewModel_HiltModules.BindsModule.class,
           SplashViewModel_HiltModules.BindsModule.class
       }

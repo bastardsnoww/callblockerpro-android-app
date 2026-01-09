@@ -26,6 +26,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.graphics.graphicsLayer
 import com.callblockerpro.app.ui.theme.BackgroundDark
 import com.callblockerpro.app.ui.theme.Emerald
 import com.callblockerpro.app.ui.theme.Primary
@@ -126,12 +129,39 @@ fun PremiumListItem(
     modifier: Modifier = Modifier,
     tag: String? = null,
     tagColor: Color = Color.Gray,
-    trailingContent: (@Composable () -> Unit)? = { Icon(Icons.Default.ChevronRight, null, tint = Color.Gray) },
+    trailingContent: (@Composable () -> Unit)? = { Icon(Icons.Default.ChevronRight, null, tint = Color.Gray.copy(0.4f)) },
     onClick: () -> Unit
 ) {
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+    var isPressed by remember { mutableStateOf(false) }
+    val scale by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = if (isPressed) 0.96f else 1f,
+        animationSpec = androidx.compose.animation.core.tween(durationMillis = 80),
+        label = "PressScale"
+    )
+
     GlassPanel(
-        modifier = modifier.fillMaxWidth().clickable(onClick = onClick),
-        cornerRadius = 20.dp
+        modifier = modifier
+            .fillMaxWidth()
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            }
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onPress = {
+                        isPressed = true
+                        tryAwaitRelease()
+                        isPressed = false
+                    },
+                    onTap = {
+                        haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                        onClick()
+                    }
+                )
+            },
+        cornerRadius = 24.dp,
+        borderAlpha = 0.12f
     ) {
         Row(
             modifier = Modifier

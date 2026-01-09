@@ -43,122 +43,116 @@ fun ListsScreen(
 ) {
     Scaffold(
         containerColor = BackgroundDark,
-        bottomBar = { BottomNavBar(currentRoute = "lists", onNavigate = onNavigate) },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { onNavigate("add") },
-                containerColor = Primary,
-                contentColor = Color.White,
-                shape = CircleShape
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Number")
-            }
-        }
+        bottomBar = { BottomNavBar(currentRoute = "lists", onNavigate = onNavigate) }
     ) { paddingValues ->
         val listType by viewModel.listType.collectAsState(initial = 1)
         val searchQuery by viewModel.searchQuery.collectAsState()
         val currentItems by viewModel.currentItems.collectAsState(initial = emptyList())
 
         PremiumBackground {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 24.dp),
-            contentPadding = PaddingValues(bottom = 100.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
-             // Toggle Header
-             item {
-                 Spacer(modifier = Modifier.height(24.dp))
-                 MetallicToggle(
-                     options = listOf("Whitelist", "Blocklist"),
-                     selectedIndex = listType,
-                     onOptionSelected = { viewModel.onListTypeChanged(it) },
-                     modifier = Modifier.fillMaxWidth()
-                 )
-             }
+            Box(Modifier.fillMaxSize()) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentPadding = PaddingValues(top = 100.dp, bottom = 120.dp, start = 24.dp, end = 24.dp),
+                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                ) {
+                    // Mode Selector
+                    item {
+                        MetallicToggle(
+                            options = listOf("Whitelist", "Blocklist"),
+                            selectedIndex = listType,
+                            onOptionSelected = { viewModel.onListTypeChanged(it) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
 
-             // Component: Premium Search Bar
-             item {
-                 PremiumSearchBar(
-                     query = searchQuery,
-                     onQueryChange = { viewModel.onSearchQueryChanged(it) },
-                     placeholder = if (listType == 1) "Search blocklist..." else "Search whitelist...",
-                     onFilterClick = {}
-                 )
-             }
+                    // Search
+                    item {
+                        PremiumSearchBar(
+                            query = searchQuery,
+                            onQueryChange = { viewModel.onSearchQueryChanged(it) },
+                            placeholder = if (listType == 1) "Search blocklist..." else "Search whitelist...",
+                            onFilterClick = {}
+                        )
+                    }
 
-             // Stats Cards
-             item {
-                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                     // Total Blocked
-                     GlassPanel(modifier = Modifier.weight(1f).height(100.dp)) {
-                         Box(Modifier.fillMaxSize()) {
-                             Icon(Icons.Default.Block, contentDescription = null, tint = Color.White.copy(alpha = 0.05f), modifier = Modifier.size(60.dp).align(Alignment.TopEnd).offset(8.dp, (-8).dp))
-                             Column(Modifier.padding(16.dp).align(Alignment.BottomStart)) {
-                                 Text("TOTAL BLOCKED", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
-                                 Row(verticalAlignment = Alignment.Bottom) {
-                                     Text("428", style = MaterialTheme.typography.headlineSmall, color = Color.White, fontWeight = FontWeight.Bold)
-                                     Spacer(Modifier.width(4.dp))
-                                     Text("+12", style = MaterialTheme.typography.labelSmall, color = Emerald, modifier = Modifier.background(Emerald.copy(0.1f), RoundedCornerShape(4.dp)).padding(horizontal = 4.dp))
-                                 }
-                             }
-                         }
-                     }
-                     
-                     // DB Version
-                     GlassPanel(modifier = Modifier.weight(1f).height(100.dp)) {
-                         Box(Modifier.fillMaxSize()) {
-                             Icon(Icons.Default.CloudSync, contentDescription = null, tint = Color.White.copy(alpha = 0.05f), modifier = Modifier.size(60.dp).align(Alignment.TopEnd).offset(8.dp, (-8).dp))
-                             Column(Modifier.padding(16.dp).align(Alignment.BottomStart)) {
-                                 Text("DATABASE VER.", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
-                                 Row(verticalAlignment = Alignment.Bottom) {
-                                     Text("v2.4", style = MaterialTheme.typography.headlineSmall, color = Color.White, fontWeight = FontWeight.Bold)
-                                     Spacer(Modifier.width(4.dp))
-                                     Text("Latest", style = MaterialTheme.typography.labelSmall, color = PrimaryLight)
-                                 }
-                             }
-                         }
-                     }
-                 }
-             }
+                    // Stats Section
+                    item {
+                        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                            GlassPanel(modifier = Modifier.weight(1f).height(110.dp)) {
+                                Column(Modifier.padding(20.dp).align(Alignment.BottomStart)) {
+                                    Text("PROTECTED", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = FontWeight.Bold)
+                                    Text("428", style = MaterialTheme.typography.headlineSmall, color = Color.White, fontWeight = FontWeight.Black)
+                                }
+                                Icon(Icons.Default.Shield, null, tint = Primary.copy(0.1f), modifier = Modifier.size(80.dp).align(Alignment.TopEnd).offset(20.dp, (-20).dp))
+                            }
+                            GlassPanel(modifier = Modifier.weight(1f).height(110.dp)) {
+                                Column(Modifier.padding(20.dp).align(Alignment.BottomStart)) {
+                                    Text("DATABASE", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = FontWeight.Bold)
+                                    Text("v2.4", style = MaterialTheme.typography.headlineSmall, color = Color.White, fontWeight = FontWeight.Black)
+                                }
+                                Icon(Icons.Default.CloudSync, null, tint = Primary.copy(0.1f), modifier = Modifier.size(80.dp).align(Alignment.TopEnd).offset(20.dp, (-20).dp))
+                            }
+                        }
+                    }
 
-             // Recently Added Header
-             if (currentItems.isNotEmpty()) {
-                 item {
-                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                         Text("RECENTLY ADDED", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = FontWeight.Bold)
-                         Text("Sort by Date", style = MaterialTheme.typography.labelSmall, color = Primary, fontWeight = FontWeight.Bold)
-                     }
-                 }
-             }
+                    // List Header
+                    if (currentItems.isNotEmpty()) {
+                        item {
+                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                                Text("NUMBERS", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = FontWeight.Black, letterSpacing = 2.sp)
+                                Text("SORT BY DATE", style = MaterialTheme.typography.labelSmall, color = PrimaryLight, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
 
-             // List Items or Empty State
-             if (currentItems.isEmpty()) {
-                 item {
-                     PremiumEmptyState(
-                         icon = Icons.Default.Shield,
-                         title = "No Numbers Found",
-                         message = "Your list is currently empty.\nAdd a number to start protection.",
-                         actionLabel = "Add Number",
-                         onActionClick = { onNavigate("add") }
-                     )
-                 }
-             } else {
-                 items(currentItems) {
-                     PremiumListItem(
-                         title = it.title,
-                         subtitle = it.subtitle, // "Added recently • Auto-detected" hardcoded previously, now mapped
-                         tag = if (listType == 1) "BLOCKED" else "ALLOWED", // Dynamic tag
-                         tagColor = it.color,
-                         icon = if (it.subtitle == "Business") Icons.Default.DomainDisabled else Icons.Default.PersonOff,
-                         iconColor = it.color,
-                         onClick = {}
-                     )
-                 }
-             }
+                    // Items
+                    if (currentItems.isEmpty()) {
+                        item {
+                            PremiumEmptyState(
+                                icon = Icons.Default.Shield,
+                                title = "List Empty",
+                                message = "Protect your peace.\nAdd your first number now.",
+                                actionLabel = "Add Number",
+                                onActionClick = { onNavigate("add") }
+                            )
+                        }
+                    } else {
+                        items(currentItems) {
+                            PremiumListItem(
+                                title = it.title,
+                                subtitle = it.subtitle,
+                                tag = if (listType == 1) "BLOCKED" else "ALLOWED",
+                                tagColor = it.color,
+                                icon = if (it.subtitle == "Business") Icons.Default.DomainDisabled else Icons.Default.PersonOff,
+                                iconColor = it.color,
+                                onClick = {}
+                            )
+                        }
+                    }
+                }
+
+                // Floating Crystal Header
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .background(Brush.verticalGradient(listOf(BackgroundDark, Color.Transparent)))
+                        .padding(horizontal = 24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    GlassPanel(modifier = Modifier.fillMaxWidth().height(64.dp), cornerRadius = 20.dp) {
+                        Row(Modifier.fillMaxSize().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                            Text("Protection Lists", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Black, color = Color.White)
+                            IconButton(onClick = { onNavigate("add") }, modifier = Modifier.background(Primary, CircleShape).size(40.dp)) {
+                                Icon(Icons.Default.Add, null, tint = Color.White, modifier = Modifier.size(24.dp))
+                            }
+                        }
+                    }
+                }
+            }
         }
-             }
-}
+    }
 }

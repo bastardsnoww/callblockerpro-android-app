@@ -12,8 +12,6 @@ import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModel;
 import androidx.work.ListenableWorker;
 import androidx.work.WorkerParameters;
-import com.callblockerpro.app.analytics.AnalyticsHelper;
-import com.callblockerpro.app.analytics.CrashlyticsHelper;
 import com.callblockerpro.app.data.local.AppDatabase;
 import com.callblockerpro.app.data.local.PreferenceManagerImpl;
 import com.callblockerpro.app.data.local.dao.BlocklistDao;
@@ -22,9 +20,9 @@ import com.callblockerpro.app.data.local.dao.ModeHistoryDao;
 import com.callblockerpro.app.data.local.dao.ScheduleDao;
 import com.callblockerpro.app.data.local.dao.WhitelistDao;
 import com.callblockerpro.app.data.repository.CallLogRepositoryImpl;
-import com.callblockerpro.app.data.repository.FirebaseRemoteConfigRepository;
 import com.callblockerpro.app.data.repository.ListRepositoryImpl;
 import com.callblockerpro.app.data.repository.ModeRepositoryImpl;
+import com.callblockerpro.app.data.repository.PrivacyRemoteConfigRepository;
 import com.callblockerpro.app.data.repository.ScheduleRepositoryImpl;
 import com.callblockerpro.app.data.repository.UserPreferencesRepository;
 import com.callblockerpro.app.di.DatabaseModule_ProvideAppDatabaseFactory;
@@ -47,13 +45,16 @@ import com.callblockerpro.app.service.AutoBackupWorker;
 import com.callblockerpro.app.service.AutoBackupWorker_AssistedFactory;
 import com.callblockerpro.app.service.CallBlockingService;
 import com.callblockerpro.app.service.CallBlockingService_MembersInjector;
+import com.callblockerpro.app.ui.viewmodel.AddViewModel;
+import com.callblockerpro.app.ui.viewmodel.AddViewModel_HiltModules_KeyModule_ProvideFactory;
+import com.callblockerpro.app.ui.viewmodel.DashboardViewModel;
+import com.callblockerpro.app.ui.viewmodel.DashboardViewModel_HiltModules_KeyModule_ProvideFactory;
+import com.callblockerpro.app.ui.viewmodel.ListsViewModel;
+import com.callblockerpro.app.ui.viewmodel.ListsViewModel_HiltModules_KeyModule_ProvideFactory;
 import com.callblockerpro.app.ui.viewmodel.OnboardingViewModel;
 import com.callblockerpro.app.ui.viewmodel.OnboardingViewModel_HiltModules_KeyModule_ProvideFactory;
 import com.callblockerpro.app.ui.viewmodel.SplashViewModel;
 import com.callblockerpro.app.ui.viewmodel.SplashViewModel_HiltModules_KeyModule_ProvideFactory;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import dagger.hilt.android.ActivityRetainedLifecycle;
 import dagger.hilt.android.ViewModelLifecycle;
 import dagger.hilt.android.internal.builders.ActivityComponentBuilder;
@@ -71,9 +72,12 @@ import dagger.hilt.android.internal.modules.ApplicationContextModule;
 import dagger.hilt.android.internal.modules.ApplicationContextModule_ProvideContextFactory;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.DoubleCheck;
+import dagger.internal.MapBuilder;
 import dagger.internal.Preconditions;
 import dagger.internal.Provider;
+import dagger.internal.SetBuilder;
 import dagger.internal.SingleCheck;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.processing.Generated;
@@ -410,7 +414,7 @@ public final class DaggerCallBlockerApplication_HiltComponents_SingletonC {
 
     @Override
     public Set<String> getViewModelKeys() {
-      return ImmutableSet.<String>of(OnboardingViewModel_HiltModules_KeyModule_ProvideFactory.provide(), SplashViewModel_HiltModules_KeyModule_ProvideFactory.provide());
+      return SetBuilder.<String>newSetBuilder(5).add(AddViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(DashboardViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(ListsViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(OnboardingViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(SplashViewModel_HiltModules_KeyModule_ProvideFactory.provide()).build();
     }
 
     @Override
@@ -428,7 +432,6 @@ public final class DaggerCallBlockerApplication_HiltComponents_SingletonC {
       return new ViewCBuilder(singletonCImpl, activityRetainedCImpl, activityCImpl);
     }
 
-    @CanIgnoreReturnValue
     private MainActivity injectMainActivity2(MainActivity instance) {
       MainActivity_MembersInjector.injectUserPreferencesRepository(instance, singletonCImpl.userPreferencesRepositoryProvider.get());
       return instance;
@@ -441,6 +444,12 @@ public final class DaggerCallBlockerApplication_HiltComponents_SingletonC {
     private final ActivityRetainedCImpl activityRetainedCImpl;
 
     private final ViewModelCImpl viewModelCImpl = this;
+
+    private Provider<AddViewModel> addViewModelProvider;
+
+    private Provider<DashboardViewModel> dashboardViewModelProvider;
+
+    private Provider<ListsViewModel> listsViewModelProvider;
 
     private Provider<OnboardingViewModel> onboardingViewModelProvider;
 
@@ -459,18 +468,21 @@ public final class DaggerCallBlockerApplication_HiltComponents_SingletonC {
     @SuppressWarnings("unchecked")
     private void initialize(final SavedStateHandle savedStateHandleParam,
         final ViewModelLifecycle viewModelLifecycleParam) {
-      this.onboardingViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 0);
-      this.splashViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 1);
+      this.addViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 0);
+      this.dashboardViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 1);
+      this.listsViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 2);
+      this.onboardingViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 3);
+      this.splashViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 4);
     }
 
     @Override
     public Map<String, javax.inject.Provider<ViewModel>> getHiltViewModelMap() {
-      return ImmutableMap.<String, javax.inject.Provider<ViewModel>>of("com.callblockerpro.app.ui.viewmodel.OnboardingViewModel", ((Provider) onboardingViewModelProvider), "com.callblockerpro.app.ui.viewmodel.SplashViewModel", ((Provider) splashViewModelProvider));
+      return MapBuilder.<String, javax.inject.Provider<ViewModel>>newMapBuilder(5).put("com.callblockerpro.app.ui.viewmodel.AddViewModel", ((Provider) addViewModelProvider)).put("com.callblockerpro.app.ui.viewmodel.DashboardViewModel", ((Provider) dashboardViewModelProvider)).put("com.callblockerpro.app.ui.viewmodel.ListsViewModel", ((Provider) listsViewModelProvider)).put("com.callblockerpro.app.ui.viewmodel.OnboardingViewModel", ((Provider) onboardingViewModelProvider)).put("com.callblockerpro.app.ui.viewmodel.SplashViewModel", ((Provider) splashViewModelProvider)).build();
     }
 
     @Override
     public Map<String, Object> getHiltViewModelAssistedMap() {
-      return ImmutableMap.<String, Object>of();
+      return Collections.<String, Object>emptyMap();
     }
 
     private static final class SwitchingProvider<T> implements Provider<T> {
@@ -494,10 +506,19 @@ public final class DaggerCallBlockerApplication_HiltComponents_SingletonC {
       @Override
       public T get() {
         switch (id) {
-          case 0: // com.callblockerpro.app.ui.viewmodel.OnboardingViewModel 
+          case 0: // com.callblockerpro.app.ui.viewmodel.AddViewModel 
+          return (T) new AddViewModel(singletonCImpl.listRepositoryImplProvider.get());
+
+          case 1: // com.callblockerpro.app.ui.viewmodel.DashboardViewModel 
+          return (T) new DashboardViewModel(singletonCImpl.bindModeRepositoryProvider.get(), singletonCImpl.bindCallLogRepositoryProvider.get());
+
+          case 2: // com.callblockerpro.app.ui.viewmodel.ListsViewModel 
+          return (T) new ListsViewModel(singletonCImpl.listRepositoryImplProvider.get());
+
+          case 3: // com.callblockerpro.app.ui.viewmodel.OnboardingViewModel 
           return (T) new OnboardingViewModel(singletonCImpl.userPreferencesRepositoryProvider.get());
 
-          case 1: // com.callblockerpro.app.ui.viewmodel.SplashViewModel 
+          case 4: // com.callblockerpro.app.ui.viewmodel.SplashViewModel 
           return (T) new SplashViewModel(singletonCImpl.userPreferencesRepositoryProvider.get());
 
           default: throw new AssertionError(id);
@@ -579,7 +600,6 @@ public final class DaggerCallBlockerApplication_HiltComponents_SingletonC {
       injectCallBlockingService2(callBlockingService);
     }
 
-    @CanIgnoreReturnValue
     private CallBlockingService injectCallBlockingService2(CallBlockingService instance) {
       CallBlockingService_MembersInjector.injectDecisionEngine(instance, singletonCImpl.provideCallDecisionEngineProvider.get());
       CallBlockingService_MembersInjector.injectListRepository(instance, singletonCImpl.listRepositoryImplProvider.get());
@@ -613,23 +633,19 @@ public final class DaggerCallBlockerApplication_HiltComponents_SingletonC {
 
     private Provider<SchedulerWorker_AssistedFactory> schedulerWorker_AssistedFactoryProvider;
 
-    private Provider<AnalyticsHelper> analyticsHelperProvider;
-
-    private Provider<CrashlyticsHelper> crashlyticsHelperProvider;
-
     private Provider<UserPreferencesRepository> userPreferencesRepositoryProvider;
 
-    private Provider<CallDecisionEngine> provideCallDecisionEngineProvider;
-
     private Provider<ListRepositoryImpl> listRepositoryImplProvider;
-
-    private Provider<FirebaseRemoteConfigRepository> firebaseRemoteConfigRepositoryProvider;
-
-    private Provider<EmergencyNumberValidator> emergencyNumberValidatorProvider;
 
     private Provider<CallLogRepositoryImpl> callLogRepositoryImplProvider;
 
     private Provider<CallLogRepository> bindCallLogRepositoryProvider;
+
+    private Provider<CallDecisionEngine> provideCallDecisionEngineProvider;
+
+    private Provider<PrivacyRemoteConfigRepository> privacyRemoteConfigRepositoryProvider;
+
+    private Provider<EmergencyNumberValidator> emergencyNumberValidatorProvider;
 
     private SingletonCImpl(ApplicationContextModule applicationContextModuleParam) {
       this.applicationContextModule = applicationContextModuleParam;
@@ -647,7 +663,7 @@ public final class DaggerCallBlockerApplication_HiltComponents_SingletonC {
 
     private Map<String, javax.inject.Provider<WorkerAssistedFactory<? extends ListenableWorker>>> mapOfStringAndProviderOfWorkerAssistedFactoryOf(
         ) {
-      return ImmutableMap.<String, javax.inject.Provider<WorkerAssistedFactory<? extends ListenableWorker>>>of("com.callblockerpro.app.service.AutoBackupWorker", ((Provider) autoBackupWorker_AssistedFactoryProvider), "com.callblockerpro.app.scheduler.SchedulerWorker", ((Provider) schedulerWorker_AssistedFactoryProvider));
+      return MapBuilder.<String, javax.inject.Provider<WorkerAssistedFactory<? extends ListenableWorker>>>newMapBuilder(2).put("com.callblockerpro.app.service.AutoBackupWorker", ((Provider) autoBackupWorker_AssistedFactoryProvider)).put("com.callblockerpro.app.scheduler.SchedulerWorker", ((Provider) schedulerWorker_AssistedFactoryProvider)).build();
     }
 
     private HiltWorkerFactory hiltWorkerFactory() {
@@ -677,15 +693,13 @@ public final class DaggerCallBlockerApplication_HiltComponents_SingletonC {
       this.bindModeRepositoryProvider = DoubleCheck.provider((Provider) modeRepositoryImplProvider);
       this.provideSchedulerManagerProvider = DoubleCheck.provider(new SwitchingProvider<SchedulerManager>(singletonCImpl, 6));
       this.schedulerWorker_AssistedFactoryProvider = SingleCheck.provider(new SwitchingProvider<SchedulerWorker_AssistedFactory>(singletonCImpl, 1));
-      this.analyticsHelperProvider = DoubleCheck.provider(new SwitchingProvider<AnalyticsHelper>(singletonCImpl, 7));
-      this.crashlyticsHelperProvider = DoubleCheck.provider(new SwitchingProvider<CrashlyticsHelper>(singletonCImpl, 8));
-      this.userPreferencesRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<UserPreferencesRepository>(singletonCImpl, 9));
-      this.provideCallDecisionEngineProvider = DoubleCheck.provider(new SwitchingProvider<CallDecisionEngine>(singletonCImpl, 10));
-      this.listRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<ListRepositoryImpl>(singletonCImpl, 11));
-      this.firebaseRemoteConfigRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<FirebaseRemoteConfigRepository>(singletonCImpl, 13));
-      this.emergencyNumberValidatorProvider = DoubleCheck.provider(new SwitchingProvider<EmergencyNumberValidator>(singletonCImpl, 12));
-      this.callLogRepositoryImplProvider = new SwitchingProvider<>(singletonCImpl, 14);
+      this.userPreferencesRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<UserPreferencesRepository>(singletonCImpl, 7));
+      this.listRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<ListRepositoryImpl>(singletonCImpl, 8));
+      this.callLogRepositoryImplProvider = new SwitchingProvider<>(singletonCImpl, 9);
       this.bindCallLogRepositoryProvider = DoubleCheck.provider((Provider) callLogRepositoryImplProvider);
+      this.provideCallDecisionEngineProvider = DoubleCheck.provider(new SwitchingProvider<CallDecisionEngine>(singletonCImpl, 10));
+      this.privacyRemoteConfigRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<PrivacyRemoteConfigRepository>(singletonCImpl, 12));
+      this.emergencyNumberValidatorProvider = DoubleCheck.provider(new SwitchingProvider<EmergencyNumberValidator>(singletonCImpl, 11));
     }
 
     @Override
@@ -695,7 +709,7 @@ public final class DaggerCallBlockerApplication_HiltComponents_SingletonC {
 
     @Override
     public Set<Boolean> getDisableFragmentGetContextFix() {
-      return ImmutableSet.<Boolean>of();
+      return Collections.<Boolean>emptySet();
     }
 
     @Override
@@ -708,11 +722,8 @@ public final class DaggerCallBlockerApplication_HiltComponents_SingletonC {
       return new ServiceCBuilder(singletonCImpl);
     }
 
-    @CanIgnoreReturnValue
     private CallBlockerApplication injectCallBlockerApplication2(CallBlockerApplication instance) {
       CallBlockerApplication_MembersInjector.injectWorkerFactory(instance, hiltWorkerFactory());
-      CallBlockerApplication_MembersInjector.injectAnalyticsHelper(instance, analyticsHelperProvider.get());
-      CallBlockerApplication_MembersInjector.injectCrashlyticsHelper(instance, crashlyticsHelperProvider.get());
       return instance;
     }
 
@@ -761,29 +772,23 @@ public final class DaggerCallBlockerApplication_HiltComponents_SingletonC {
           case 6: // com.callblockerpro.app.domain.scheduler.SchedulerManager 
           return (T) SchedulerModule_ProvideSchedulerManagerFactory.provideSchedulerManager();
 
-          case 7: // com.callblockerpro.app.analytics.AnalyticsHelper 
-          return (T) new AnalyticsHelper();
-
-          case 8: // com.callblockerpro.app.analytics.CrashlyticsHelper 
-          return (T) new CrashlyticsHelper();
-
-          case 9: // com.callblockerpro.app.data.repository.UserPreferencesRepository 
+          case 7: // com.callblockerpro.app.data.repository.UserPreferencesRepository 
           return (T) new UserPreferencesRepository(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+
+          case 8: // com.callblockerpro.app.data.repository.ListRepositoryImpl 
+          return (T) new ListRepositoryImpl(singletonCImpl.whitelistDao(), singletonCImpl.blocklistDao());
+
+          case 9: // com.callblockerpro.app.data.repository.CallLogRepositoryImpl 
+          return (T) new CallLogRepositoryImpl(singletonCImpl.callLogDao());
 
           case 10: // com.callblockerpro.app.domain.logic.CallDecisionEngine 
           return (T) DomainModule_ProvideCallDecisionEngineFactory.provideCallDecisionEngine();
 
-          case 11: // com.callblockerpro.app.data.repository.ListRepositoryImpl 
-          return (T) new ListRepositoryImpl(singletonCImpl.whitelistDao(), singletonCImpl.blocklistDao());
+          case 11: // com.callblockerpro.app.domain.logic.EmergencyNumberValidator 
+          return (T) new EmergencyNumberValidator(singletonCImpl.privacyRemoteConfigRepositoryProvider.get());
 
-          case 12: // com.callblockerpro.app.domain.logic.EmergencyNumberValidator 
-          return (T) new EmergencyNumberValidator(singletonCImpl.firebaseRemoteConfigRepositoryProvider.get());
-
-          case 13: // com.callblockerpro.app.data.repository.FirebaseRemoteConfigRepository 
-          return (T) new FirebaseRemoteConfigRepository();
-
-          case 14: // com.callblockerpro.app.data.repository.CallLogRepositoryImpl 
-          return (T) new CallLogRepositoryImpl(singletonCImpl.callLogDao());
+          case 12: // com.callblockerpro.app.data.repository.PrivacyRemoteConfigRepository 
+          return (T) new PrivacyRemoteConfigRepository();
 
           default: throw new AssertionError(id);
         }

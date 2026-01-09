@@ -24,16 +24,17 @@ fun SettingsGroup(title: String, content: @Composable ColumnScope.() -> Unit) {
             text = title,
             style = MaterialTheme.typography.labelSmall,
             color = Color.Gray,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.Black,
             letterSpacing = 2.sp,
-            modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
+            modifier = Modifier.padding(start = 4.dp, bottom = 12.dp)
         )
         GlassPanel(
             modifier = Modifier.fillMaxWidth(),
-            cornerRadius = 16.dp
+            cornerRadius = 24.dp,
+            borderAlpha = 0.1f
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
             ) {
                 content()
             }

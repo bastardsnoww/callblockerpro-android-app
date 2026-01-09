@@ -5,19 +5,10 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Block
-import androidx.compose.material.icons.filled.Call
-
-import androidx.compose.material.icons.filled.CallReceived
-
-import androidx.compose.material.icons.filled.PersonOff
-import androidx.compose.material.icons.filled.Search
-
-
+import androidx.compose.material.icons.filled.CloudSync
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -30,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.callblockerpro.app.ui.components.*
 import com.callblockerpro.app.ui.theme.BackgroundDark
-import com.callblockerpro.app.ui.theme.Emerald
 import com.callblockerpro.app.ui.theme.Primary
 import com.callblockerpro.app.ui.theme.PrimaryLight
 
@@ -42,114 +32,121 @@ fun LogsScreen(onNavigate: (String) -> Unit) {
     ) { paddingValues ->
         var searchQuery by remember { mutableStateOf("") }
         PremiumBackground {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(horizontal = 24.dp)
-            ) {
-                Text(
-                    text = "Call Logs",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color.White
-                )
+            Box(Modifier.fillMaxSize()) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentPadding = PaddingValues(top = 100.dp, bottom = 120.dp, start = 24.dp, end = 24.dp),
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                ) {
+                    // Search
+                    item {
+                        PremiumSearchBar(
+                            query = searchQuery,
+                            onQueryChange = { searchQuery = it },
+                            placeholder = "Search logs for threats...",
+                            onFilterClick = {}
+                        )
+                    }
+
+                    // Filters
+                    item {
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            FilterChipItem("All Activity", true)
+                            FilterChipItem("Blocked", false)
+                            FilterChipItem("Whitelisted", false)
+                        }
+                    }
+
+                    // Logs Section
+                    item {
+                        Spacer(Modifier.height(8.dp))
+                        Text("TODAY", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = FontWeight.Black, letterSpacing = 2.sp)
+                    }
+
+                    item {
+                        LogItem(
+                            number = "+1 (555) 019-2834",
+                            label = "Spam Risk",
+                            time = "10:42 AM",
+                            type = LogType.BLOCKED,
+                            onClick = {}
+                        )
+                    }
+
+                    item {
+                        LogItem(
+                            number = "John Doe",
+                            label = "Known Contact",
+                            time = "9:15 AM",
+                            type = LogType.ALLOWED,
+                            onClick = {}
+                        )
+                    }
+
+                    item {
+                        Spacer(Modifier.height(8.dp))
+                        Text("YESTERDAY", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = FontWeight.Black, letterSpacing = 2.sp)
+                    }
+
+                    item {
+                        LogItem(
+                            number = "Unknown Caller",
+                            label = "Potential Fraud",
+                            time = "Mon 4:32 PM",
+                            type = LogType.SPAM,
+                            onClick = {}
+                        )
+                    }
+
+                    item {
+                        LogItem(
+                            number = "Pizza Delivery",
+                            label = "Whitelisted Business",
+                            time = "Mon 12:01 PM",
+                            type = LogType.ALLOWED,
+                            onClick = {}
+                        )
+                    }
+                }
+
+                // Floating Crystal Header
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .background(Brush.verticalGradient(listOf(BackgroundDark, Color.Transparent)))
+                        .padding(horizontal = 24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    GlassPanel(modifier = Modifier.fillMaxWidth().height(64.dp), cornerRadius = 20.dp) {
+                        Row(Modifier.fillMaxSize().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                            Text("Security Logs", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Black, color = Color.White)
+                            IconButton(onClick = { /* Export */ }, modifier = Modifier.background(Color.White.copy(0.05f), CircleShape).size(40.dp)) {
+                                Icon(Icons.Default.CloudSync, null, tint = Color.White, modifier = Modifier.size(20.dp))
+                            }
+                        }
+                    }
+                }
             }
-            
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Premium Search Bar
-            PremiumSearchBar(
-                query = searchQuery,
-                onQueryChange = { searchQuery = it },
-                placeholder = "Search numbers, names...",
-                onFilterClick = { /* Filter Action */ }
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Filter Chips
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                FilterChipItem("All Logs", true)
-                FilterChipItem("Missed", false)
-                FilterChipItem("Blocked", false)
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Logs List
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(bottom = 100.dp)
-            ) {
-                item {
-                    Text("TODAY", style = MaterialTheme.typography.labelSmall, color = Color.Gray, letterSpacing = 2.sp)
-                }
-                
-                item {
-                    PremiumListItem(
-                        title = "+1 (555) 019-2834",
-                        subtitle = "10:42 AM • Spam Risk",
-                        icon = Icons.Default.Block,
-                        iconColor = Color(0xFFEF4444),
-                        tag = "BLOCKED",
-                        tagColor = Color(0xFFEF4444),
-                        onClick = {}
-                    )
-                }
-                
-                item {
-                    PremiumListItem(
-                        title = "John Doe",
-                        subtitle = "9:15 AM • Mobile • 5m 23s",
-                        icon = Icons.Default.CallReceived,
-                        iconColor = Primary,
-                        onClick = {}
-                    )
-                }
-
-                item {
-                    Text("YESTERDAY", style = MaterialTheme.typography.labelSmall, color = Color.Gray, letterSpacing = 2.sp, modifier = Modifier.padding(top = 8.dp))
-                }
-                
-                item {
-                    PremiumListItem(
-                        title = "Local Pizza",
-                        subtitle = "Mon • Business • 45s",
-                        icon = Icons.Default.Call,
-                        iconColor = Color.Gray,
-                        tag = "BUSINESS",
-                        tagColor = Color.Gray,
-                        onClick = {}
-                    )
-            }
-        }
         }
     }
 }
 
 @Composable
 fun FilterChipItem(text: String, selected: Boolean) {
-    if (selected) {
-        // Active State: Metallic Gradient
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(50))
-                .background(Brush.linearGradient(listOf(Primary, PrimaryLight)))
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .clickable { }
-        ) {
-            Text(text, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = Color.White)
-        }
-    } else {
-        // Inactive State: Glass
-        GlassPanel(
-            modifier = Modifier.clickable { },
-            cornerRadius = 50.dp
-        ) {
-            Box(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                Text(text, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = Color.Gray)
-            }
-        }
+    val bgColor = if (selected) Primary else Color.White.copy(0.05f)
+    val textColor = if (selected) Color.White else Color.Gray
+
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(bgColor)
+            .then(if (!selected) Modifier.border(1.dp, androidx.compose.ui.graphics.Color.White.copy(0.1f), RoundedCornerShape(12.dp)) else Modifier)
+            .clickable { }
+            .padding(horizontal = 16.dp, vertical = 10.dp)
+    ) {
+        Text(text, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black, color = textColor, letterSpacing = 0.5.sp)
     }
 }

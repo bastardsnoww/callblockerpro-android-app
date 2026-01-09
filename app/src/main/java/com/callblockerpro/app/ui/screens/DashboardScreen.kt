@@ -26,7 +26,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.callblockerpro.app.ui.components.*
 import com.callblockerpro.app.ui.theme.BackgroundDark
 import com.callblockerpro.app.ui.theme.Emerald
+import com.callblockerpro.app.ui.theme.Primary
 import com.callblockerpro.app.ui.theme.PrimaryLight
+import com.callblockerpro.app.ui.theme.Red
 
 @Composable
 fun DashboardScreen(
@@ -59,201 +61,195 @@ fun DashboardScreen(
         bottomBar = { BottomNavBar(currentRoute = "home", onNavigate = onNavigate) }
     ) { paddingValues ->
         PremiumBackground {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(horizontal = 24.dp),
-
-            contentPadding = PaddingValues(bottom = 100.dp),
-            verticalArrangement = Arrangement.spacedBy(32.dp)
-        ) {
-            // Header
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+            Box(Modifier.fillMaxSize()) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentPadding = PaddingValues(top = 100.dp, bottom = 120.dp, start = 24.dp, end = 24.dp),
+                    verticalArrangement = Arrangement.spacedBy(28.dp)
                 ) {
-                    Column {
-                        Text(
-                            text = "CallBlockerPro",
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color.White
-                        )
-                        Text(
-                            text = "PREMIUM PROTECTION",
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                            letterSpacing = 2.sp
+                    // Spacer for header
+                    item { Spacer(Modifier.height(0.dp)) }
+
+                    // Mode Selector
+                    item {
+                        if (!isRoleGranted) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(24.dp))
+                                    .background(Red.copy(0.1f))
+                                    .border(1.dp, Red.copy(0.3f), RoundedCornerShape(24.dp))
+                            ) {
+                                Row(
+                                    Modifier.padding(20.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                                ) {
+                                    Icon(Icons.Default.Warning, null, tint = Red)
+                                    Column(Modifier.weight(1f)) {
+                                        Text("System Role Required", style = MaterialTheme.typography.titleSmall, color = Color.White, fontWeight = FontWeight.Bold)
+                                        Text("Set as default blocker to enable protection.", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(0.7f))
+                                    }
+                                    Button(
+                                        onClick = { 
+                                            com.callblockerpro.app.util.CallScreeningPermissions.createRoleRequestIntent(context)?.let {
+                                                roleLauncher.launch(it)
+                                            }
+                                        },
+                                        colors = ButtonDefaults.buttonColors(containerColor = Red),
+                                        shape = RoundedCornerShape(12.dp),
+                                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                                    ) {
+                                        Text("FIX", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black)
+                                    }
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
+
+                        MetallicToggle(
+                            options = listOf("Normal", "Whitelist", "Blocklist"),
+                            selectedIndex = selectedMode,
+                            onOptionSelected = { viewModel.onModeSelected(it) },
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
-                    IconButton(
-                        onClick = { onNavigate("settings") },
-                        modifier = Modifier
-                            .background(Color.White.copy(alpha = 0.1f), CircleShape)
-                            .size(48.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = "Settings",
-                            tint = Color.White
+
+                    // Status Card
+                    item {
+                        HomeStatusCard(
+                            blockedCount = blockedToday,
+                            threatCount = totalThreats
                         )
+                    }
+
+                    // Weekly Insights
+                    item {
+                        Column {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text("Weekly Activity", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = FontWeight.Black)
+                                Text("FULL REPORT", style = MaterialTheme.typography.labelSmall, color = PrimaryLight, fontWeight = FontWeight.Bold, modifier = Modifier.clickable {})
+                            }
+                            Spacer(modifier = Modifier.height(20.dp))
+                            GlassPanel(modifier = Modifier.fillMaxWidth().height(260.dp)) {
+                                Column(Modifier.padding(24.dp).fillMaxSize()) {
+                                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(32.dp)) {
+                                         Column {
+                                             Text("AVG. DAILY", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = FontWeight.Bold)
+                                             Text("18 Calls", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = FontWeight.Black)
+                                         }
+                                         Column {
+                                             Text("PEAK DAY", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = FontWeight.Bold)
+                                             Text("Tuesday", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = FontWeight.Black)
+                                         }
+                                     }
+                                     Spacer(Modifier.height(24.dp))
+                                     Box(Modifier.weight(1f).fillMaxWidth()) {
+                                         if (weeklyActivity.isNotEmpty()) {
+                                             WeeklyActivityBarChart(data = weeklyActivity)
+                                         } else {
+                                             WeeklyActivityBarChart()
+                                         }
+                                     }
+                                     Spacer(Modifier.height(16.dp))
+                                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                         listOf("M", "T", "W", "T", "F", "S", "S").forEach { 
+                                             Text(it, style = MaterialTheme.typography.labelSmall, color = Color.Gray.copy(alpha = 0.6f), modifier = Modifier.width(24.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center, fontWeight = FontWeight.Bold)
+                                         }
+                                     }
+                                }
+                            }
+                        }
+                    }
+
+                    // Recent Activity
+                    item {
+                        Text("Recent Activity", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = FontWeight.Black)
+                        Spacer(modifier = Modifier.height(20.dp))
+                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                             PremiumListItem(
+                                    title = "+1 (555) 019-2834",
+                                    subtitle = "2m ago • Spam Risk",
+                                    tag = "BLOCKED",
+                                    tagColor = Red,
+                                    icon = Icons.Default.Block,
+                                    iconColor = Red,
+                                    onClick = {}
+                                )
+                             PremiumListItem(
+                                    title = "Mom Mobile",
+                                    subtitle = "1h ago • Whitelist",
+                                    tag = "ALLOWED",
+                                    tagColor = Emerald,
+                                    icon = Icons.Default.VerifiedUser,
+                                    iconColor = Emerald,
+                                    onClick = {}
+                                )
+                        }
                     }
                 }
-            }
-            
-            // Mode Selector
-            item {
-                if (!isRoleGranted) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(24.dp))
-                            .background(
-                                Brush.linearGradient(
-                                    listOf(
-                                        Color(0xFFEF4444).copy(0.1f),
-                                        Color(0xFFEF4444).copy(0.05f)
-                                    )
-                                )
+
+                // Floating Crystal Header
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(BackgroundDark, Color.Transparent)
                             )
-                            .border(
-                                1.dp,
-                                Brush.linearGradient(
-                                    listOf(
-                                        Color(0xFFEF4444).copy(0.5f),
-                                        Color(0xFFEF4444).copy(0.2f)
-                                    )
-                                ),
-                                RoundedCornerShape(24.dp)
-                            )
+                        )
+                        .padding(horizontal = 24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    GlassPanel(
+                        modifier = Modifier.fillMaxWidth().height(64.dp),
+                        cornerRadius = 20.dp
                     ) {
                         Row(
-                            Modifier.padding(20.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Default.Warning, null, tint = Color(0xFFEF4444))
-                            Column(Modifier.weight(1f)) {
-                                Text("System Role Required", style = MaterialTheme.typography.titleSmall, color = Color.White, fontWeight = FontWeight.Bold)
-                                Text("Set as default blocker to enable protection.", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(0.7f))
+                            Column {
+                                Text(
+                                    text = "CallBlockerPro",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Black,
+                                    color = Color.White
+                                )
+                                Text(
+                                    text = "NEON CRYSTAL EVOLUTION",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = PrimaryLight,
+                                    fontSize = 8.sp,
+                                    letterSpacing = 1.sp
+                                )
                             }
-                            Button(
-                                onClick = { 
-                                    com.callblockerpro.app.util.CallScreeningPermissions.createRoleRequestIntent(context)?.let {
-                                        roleLauncher.launch(it)
-                                    }
-                                },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444)),
-                                shape = RoundedCornerShape(8.dp),
-                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                            IconButton(
+                                onClick = { onNavigate("settings") },
+                                modifier = Modifier
+                                    .background(Color.White.copy(alpha = 0.05f), CircleShape)
+                                    .size(40.dp)
                             ) {
-                                Text("FIX", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                                Icon(
+                                    imageVector = Icons.Default.Settings,
+                                    contentDescription = "Settings",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(20.dp)
+                                )
                             }
                         }
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-
-                MetallicToggle(
-                    options = listOf("Normal", "Whitelist", "Blocklist"),
-                    selectedIndex = selectedMode,
-                    onOptionSelected = { viewModel.onModeSelected(it) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-
-            // Status Card (Variant 5 Style)
-            item {
-                HomeStatusCard(
-                    blockedCount = blockedToday,
-                    threatCount = totalThreats
-                )
-            }
-
-            // Weekly Insights
-            item {
-                Column {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text("Weekly Insights", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = FontWeight.Bold)
-                        Text("FULL REPORT", style = MaterialTheme.typography.labelSmall, color = PrimaryLight, fontWeight = FontWeight.Bold)
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-                    GlassPanel(modifier = Modifier.fillMaxWidth().height(240.dp)) {
-                        Column(Modifier.padding(24.dp).fillMaxSize()) {
-                             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(32.dp)) {
-                                 Column {
-                                     Text("AVG. DAILY", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
-                                     Text("18 Calls", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = FontWeight.Bold)
-                                 }
-                                 Column {
-                                     Text("PEAK DAY", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
-                                     Text("Tuesday", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = FontWeight.Bold)
-                                 }
-                             }
-                             Spacer(Modifier.height(24.dp))
-                             Box(Modifier.weight(1f).fillMaxWidth()) {
-                                 if (weeklyActivity.isNotEmpty()) {
-                                     WeeklyActivityBarChart(data = weeklyActivity)
-                                 } else {
-                                     WeeklyActivityBarChart()
-                                 }
-                             }
-                             Spacer(Modifier.height(12.dp))
-                             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                 listOf("M", "T", "W", "T", "F", "S", "S").forEach { 
-                                     Text(it, style = MaterialTheme.typography.labelSmall, color = Color.Gray, modifier = Modifier.width(20.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
-                                 }
-                             }
-                        }
-                    }
                 }
             }
-
-            // Recent Activity
-            item {
-                Text("Recent Activity", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.height(16.dp))
-                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                     PremiumListItem(
-                            title = "+1 (555) 019-2834",
-                            subtitle = "2m ago • Spam Risk",
-                            tag = "BLOCKED",
-                            tagColor = Color(0xFFEF4444),
-                            icon = Icons.Default.Block,
-                            iconColor = Color(0xFFEF4444),
-                            onClick = {}
-                        )
-                     PremiumListItem(
-                            title = "Mom Mobile",
-                            subtitle = "1h ago • Whitelist",
-                            tag = "ALLOWED",
-                            tagColor = Emerald,
-                            icon = Icons.Default.VerifiedUser,
-                            iconColor = Emerald,
-                            onClick = {}
-                        )
-                     PremiumListItem(
-                            title = "Unknown Caller",
-                            subtitle = "3h ago • Telemarketing",
-                            tag = "SPAM",
-                            tagColor = Color(0xFFF59E0B), // Amber for Spam
-                            icon = Icons.Default.Warning,
-                            iconColor = Color(0xFFF59E0B),
-                            onClick = {}
-                        )
-                }
-            }
-            
-            // Removed Spacer as contentPadding handles this now
-        }
         } // Closing PremiumBackground
     }
 }

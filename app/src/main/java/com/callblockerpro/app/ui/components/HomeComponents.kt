@@ -1,42 +1,94 @@
 package com.callblockerpro.app.ui.components
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.callblockerpro.app.ui.theme.BackgroundDark
 import com.callblockerpro.app.ui.theme.Emerald
+import com.callblockerpro.app.ui.theme.PrimaryLight
+import com.callblockerpro.app.ui.theme.Red
 
 @Composable
 fun HomeStatusCard(
     blockedCount: Int = 0,
     threatCount: Int = 0
 ) {
+    val infiniteTransition = rememberInfiniteTransition(label = "PulsingGlow")
+    val pulseScale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.2f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "PulseScale"
+    )
+    val pulseAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.3f,
+        targetValue = 0.6f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "PulseAlpha"
+    )
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(32.dp))
             .background(
-                brush = Brush.linearGradient(
-                    colors = listOf(Color(0xFF2d2a42), BackgroundDark)
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFF1E1B4B), // Deep Indigo
+                        Color(0xFF030014)  // Space Black
+                    )
                 )
             )
-            .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
+            .border(
+                width = 1.dp,
+                brush = Brush.linearGradient(
+                    colors = listOf(
+                        Color.White.copy(alpha = 0.4f),
+                        Color.Transparent,
+                        Color.White.copy(alpha = 0.1f)
+                    )
+                ),
+                shape = RoundedCornerShape(32.dp)
+            )
     ) {
-        Column(modifier = Modifier.padding(24.dp)) {
+        // Decor background glow
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .size(200.dp)
+                .offset(x = 40.dp, y = (-40).dp)
+                .background(
+                    brush = Brush.radialGradient(
+                        colors = listOf(Emerald.copy(alpha = 0.15f), Color.Transparent)
+                    )
+                )
+        )
+
+        Column(modifier = Modifier.padding(28.dp)) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
@@ -50,64 +102,85 @@ fun HomeStatusCard(
                             modifier = Modifier
                                 .size(8.dp)
                                 .background(Emerald, CircleShape)
+                                .graphicsLayer {
+                                    scaleX = pulseScale
+                                    scaleY = pulseScale
+                                    alpha = pulseAlpha
+                                }
                         )
                         Text(
-                            text = "SYSTEM ACTIVE",
+                            text = "SECURE & ACTIVE",
                             color = Emerald,
                             style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.ExtraBold,
+                            letterSpacing = 1.5.sp
                         )
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = "System\nProtected",
-                        style = MaterialTheme.typography.headlineMedium,
+                        text = "System\nShielded",
+                        style = MaterialTheme.typography.headlineLarge,
                         color = Color.White,
-                        fontWeight = FontWeight.ExtraBold,
-                        lineHeight = 32.sp
+                        fontWeight = FontWeight.Black,
+                        lineHeight = 36.sp
                     )
                 }
-                Box(
-                    modifier = Modifier
-                        .size(64.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(
-                            Brush.linearGradient(
-                                listOf(
-                                    Color(0xFF1c2e28),
-                                    Emerald.copy(alpha = 0.2f)
+
+                // 3D Pulsing Shield Icon
+                Box(contentAlignment = Alignment.Center) {
+                    // Outer Glow
+                    Box(
+                        modifier = Modifier
+                            .size(64.dp)
+                            .graphicsLayer {
+                                scaleX = pulseScale
+                                scaleY = pulseScale
+                                alpha = pulseAlpha * 0.5f
+                            }
+                            .background(Emerald.copy(alpha = 0.4f), CircleShape)
+                    )
+                    
+                    Box(
+                        modifier = Modifier
+                            .size(72.dp)
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(
+                                Brush.linearGradient(
+                                    listOf(
+                                        Color(0xFF10B981).copy(alpha = 0.2f),
+                                        Color(0xFF065F46).copy(alpha = 0.6f)
+                                    )
                                 )
                             )
+                            .border(1.dp, Emerald.copy(alpha = 0.5f), RoundedCornerShape(20.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.VerifiedUser,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(36.dp)
                         )
-                        .border(1.dp, Emerald.copy(alpha = 0.3f), RoundedCornerShape(16.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.VerifiedUser,
-                        contentDescription = null,
-                        tint = Emerald,
-                        modifier = Modifier.size(32.dp)
-                    )
+                    }
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(32.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                // Stats Column 1
                 HomeStatBadge(
                     label = "BLOCKED TODAY",
                     value = blockedCount.toString(),
-                    subValue = null, // Can add delta calculation later
-                    subValueColor = Emerald
+                    icon = Icons.Default.Block,
+                    valueColor = Red
                 )
-                // Stats Column 2
                 HomeStatBadge(
-                    label = "TOTAL THREATS",
+                    label = "TOTAL PROTECTED",
                     value = String.format("%,d", threatCount),
-                    subValue = null
+                    icon = Icons.Default.Shield,
+                    valueColor = PrimaryLight
                 )
             }
         }
@@ -118,35 +191,36 @@ fun HomeStatusCard(
 fun RowScope.HomeStatBadge(
     label: String,
     value: String,
-    subValue: String? = null,
-    subValueColor: Color = Color.Gray
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    valueColor: Color
 ) {
     Column(
         modifier = Modifier
             .weight(1f)
-            .background(Color.Black.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
-            .padding(12.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .background(Color.White.copy(alpha = 0.03f))
+            .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(20.dp))
+            .padding(16.dp)
     ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = valueColor.copy(alpha = 0.5f),
+            modifier = Modifier.size(20.dp)
+        )
+        Spacer(modifier = Modifier.height(12.dp))
         Text(
             text = label,
             style = MaterialTheme.typography.labelSmall,
-            color = Color.Gray
+            color = Color.Gray,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 1.sp
         )
-        Row(verticalAlignment = Alignment.Bottom) {
-            Text(
-                text = value,
-                style = MaterialTheme.typography.titleLarge,
-                color = Color.White,
-                fontWeight = FontWeight.Bold
-            )
-            if (subValue != null) {
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = subValue,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = subValueColor
-                )
-            }
-        }
+        Text(
+            text = value,
+            style = MaterialTheme.typography.headlineSmall,
+            color = Color.White,
+            fontWeight = FontWeight.Black
+        )
     }
 }

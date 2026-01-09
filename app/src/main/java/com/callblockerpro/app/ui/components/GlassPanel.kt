@@ -35,6 +35,7 @@ import com.callblockerpro.app.ui.theme.GlassGradientColors
 fun GlassPanel(
     modifier: Modifier = Modifier,
     cornerRadius: Dp = 24.dp,
+    borderAlpha: Float = 0.1f, // Added parameter
     content: @Composable BoxScope.() -> Unit
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "ShimmerTransition")
@@ -98,9 +99,9 @@ fun GlassPanel(
                     width = 1.dp,
                     brush = Brush.linearGradient(
                         colors = listOf(
-                            Color.White.copy(alpha = 0.1f),
-                            Color.White.copy(alpha = 0.4f), // Brighter highlight
-                            Color.White.copy(alpha = 0.1f)
+                            Color.White.copy(alpha = borderAlpha),
+                            Color.White.copy(alpha = borderAlpha * 4f).copy(alpha = (borderAlpha * 4f).coerceAtMost(0.6f)), 
+                            Color.White.copy(alpha = borderAlpha)
                         ),
                         start = Offset(shimmerOffset, shimmerOffset),
                         end = Offset(shimmerOffset + 150f, shimmerOffset + 150f)

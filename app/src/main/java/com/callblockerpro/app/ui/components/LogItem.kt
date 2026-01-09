@@ -11,15 +11,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -28,6 +20,8 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -89,7 +83,7 @@ fun LogItem(
         LogType.SPAM -> Triple(Icons.Default.Shield, Amber, Amber.copy(alpha = 0.15f))
     }
 
-    Row(
+    GlassPanel(
         modifier = modifier
             .fillMaxWidth()
             .graphicsLayer {
@@ -104,87 +98,72 @@ fun LogItem(
                         isPressed = false
                     },
                     onTap = {
-                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         onClick()
                     }
                 )
-            }
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
+            },
+        cornerRadius = 24.dp,
+        borderAlpha = 0.1f
     ) {
-        // Advanced Glassy Icon Badge
-        Box(
-            modifier = Modifier
-                .size(44.dp)
-                .clip(CircleShape)
-                .background(
-                    brush = Brush.radialGradient(
-                        colors = listOf(color.copy(alpha = 0.3f), bgTint),
-                        center = Offset(0f, 0f),
-                        radius = 200f
-                    )
-                )
-                .border(1.dp, color.copy(alpha = 0.3f), CircleShape),
-            contentAlignment = Alignment.Center
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Glow effect
+            // Advanced Glassy Icon Badge
             Box(
                 modifier = Modifier
-                    .matchParentSize()
-                    .graphicsLayer { alpha = 0.5f }
-                    .background(
-                        brush = Brush.radialGradient(
-                            colors = listOf(color, Color.Transparent),
-                            radius = 50f
-                        )
-                    )
-            )
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = color,
-                modifier = Modifier.size(22.dp)
-            )
-        }
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(color.copy(alpha = 0.1f))
+                    .border(1.dp, color.copy(alpha = 0.2f), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = color,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
 
-        Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(16.dp))
 
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = number,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color.White
-            )
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
-                        .background(color.copy(alpha = 0.1f), RoundedCornerShape(4.dp))
-                        .border(
-                            width = 1.dp,
-                            brush = Brush.linearGradient(
-                                colors = listOf(Color.Transparent, color.copy(alpha = 0.3f), Color.Transparent),
-                                start = Offset(shimmerOffset, 0f),
-                                end = Offset(shimmerOffset + 100f, 0f)
-                            ),
-                            shape = RoundedCornerShape(4.dp)
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = number,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Black,
+                    color = Color.White
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .background(color.copy(alpha = 0.15f), RoundedCornerShape(6.dp))
+                            .border(1.dp, color.copy(alpha = 0.2f), RoundedCornerShape(6.dp))
+                            .padding(horizontal = 8.dp, vertical = 2.dp)
+                    ) {
+                        Text(
+                            text = label.uppercase(),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Black,
+                            color = color,
+                            fontSize = 9.sp,
+                            letterSpacing = 1.sp
                         )
-                        .padding(horizontal = 6.dp, vertical = 2.dp)
-                ) {
-                    Text(
-                        text = label,
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = color
-                    )
+                    }
                 }
             }
-        }
 
-        Text(
-            text = time,
-            style = MaterialTheme.typography.labelSmall,
-            color = Color.White.copy(alpha = 0.4f)
-        )
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    text = time,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.White.copy(alpha = 0.5f),
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
     }
 }
