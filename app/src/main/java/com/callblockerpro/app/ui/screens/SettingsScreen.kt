@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -188,7 +189,7 @@ fun SettingsScreen(
                                 title = "Help Center", 
                                 icon = null, 
                                 iconColor = Color.Unspecified, 
-                                trailingIcon = Icons.Default.OpenInNew, // Warning suppressed for build stability
+                                trailingIcon = Icons.AutoMirrored.Filled.OpenInNew,
                                 onClick = { uriHandler.openUri("https://example.com/help") }
                             )
                             SettingsLinkRow(title = "Report an Issue", icon = null, iconColor = Color.Unspecified, onClick = {})
@@ -203,7 +204,7 @@ fun SettingsScreen(
                             border = androidx.compose.foundation.BorderStroke(1.dp, CrystalDesign.Colors.NeonRed.copy(alpha = 0.5f)),
                             shape = RoundedCornerShape(CrystalDesign.Glass.CornerRadiusSmall)
                         ) {
-                            Icon(Icons.Default.Logout, null, tint = CrystalDesign.Colors.NeonRed)
+                            Icon(Icons.AutoMirrored.Filled.Logout, null, tint = CrystalDesign.Colors.NeonRed)
                             Spacer(Modifier.width(CrystalDesign.Spacing.xs))
                             Text("Sign Out", color = CrystalDesign.Colors.NeonRed, fontWeight = CrystalDesign.Typography.WeightBold)
                         }
@@ -222,7 +223,7 @@ fun SettingsScreen(
                         .align(Alignment.TopCenter)
                         .padding(top = 24.dp)
                         .padding(horizontal = 16.dp),
-                    actionIcon = Icons.Default.OpenInNew,
+                    actionIcon = Icons.AutoMirrored.Filled.OpenInNew,
                     onAction = { /* Help */ }
                 )
             }
