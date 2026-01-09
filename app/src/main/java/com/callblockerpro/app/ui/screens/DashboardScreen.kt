@@ -32,10 +32,26 @@ fun DashboardScreen(
     onNavigate: (String) -> Unit,
     viewModel: com.callblockerpro.app.ui.viewmodel.DashboardViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     val selectedMode by viewModel.selectedMode.collectAsState()
     val blockedToday by viewModel.blockedToday.collectAsState()
     val totalThreats by viewModel.totalThreats.collectAsState()
     val weeklyActivity by viewModel.weeklyActivity.collectAsState()
+
+    var isRoleGranted by remember { 
+        mutableStateOf(com.callblockerpro.app.util.CallScreeningPermissions.isCallScreeningRoleGranted(context)) 
+    }
+    
+    val roleLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        contract = androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(),
+        onResult = { isRoleGranted = com.callblockerpro.app.util.CallScreeningPermissions.isCallScreeningRoleGranted(context) }
+    )
+
+    // Refresh when screen is displayed
+    androidx.compose.runtime.DisposableEffect(Unit) {
+        isRoleGranted = com.callblockerpro.app.util.CallScreeningPermissions.isCallScreeningRoleGranted(context)
+        onDispose {}
+    }
 
     Scaffold(
         containerColor = BackgroundDark,
@@ -90,27 +106,29 @@ fun DashboardScreen(
             
             // Mode Selector
             item {
-                val context = androidx.compose.ui.platform.LocalContext.current
-                var isRoleGranted by remember { 
-                    mutableStateOf(com.callblockerpro.app.util.CallScreeningPermissions.isCallScreeningRoleGranted(context)) 
-                }
-                
-                // Refresh when screen is displayed
-                androidx.compose.runtime.DisposableEffect(Unit) {
-                    isRoleGranted = com.callblockerpro.app.util.CallScreeningPermissions.isCallScreeningRoleGranted(context)
-                    onDispose {}
-                }
-
                 if (!isRoleGranted) {
-                    val roleLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
-                        contract = androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(),
-                        onResult = { isRoleGranted = com.callblockerpro.app.util.CallScreeningPermissions.isCallScreeningRoleGranted(context) }
-                    )
-
-                    GlassPanel(
-                        modifier = Modifier.fillMaxWidth(),
-                        backgroundGradient = Brush.linearGradient(listOf(Color(0xFFEF4444).copy(0.1f), Color(0xFFEF4444).copy(0.05f))),
-                        borderGradient = Brush.linearGradient(listOf(Color(0xFFEF4444).copy(0.5f), Color(0xFFEF4444).copy(0.2f)))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(24.dp))
+                            .background(
+                                Brush.linearGradient(
+                                    listOf(
+                                        Color(0xFFEF4444).copy(0.1f),
+                                        Color(0xFFEF4444).copy(0.05f)
+                                    )
+                                )
+                            )
+                            .border(
+                                1.dp,
+                                Brush.linearGradient(
+                                    listOf(
+                                        Color(0xFFEF4444).copy(0.5f),
+                                        Color(0xFFEF4444).copy(0.2f)
+                                    )
+                                ),
+                                RoundedCornerShape(24.dp)
+                            )
                     ) {
                         Row(
                             Modifier.padding(20.dp),
