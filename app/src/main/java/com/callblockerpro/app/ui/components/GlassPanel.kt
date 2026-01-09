@@ -54,14 +54,14 @@ fun GlassPanel(
             modifier = Modifier
                 .matchParentSize()
                 .graphicsLayer {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        val blurEffect = RenderEffect.createBlurEffect(
-                            10f, // Reduced for clarity
-                            10f,
-                            Shader.TileMode.MIRROR
-                        )
-                        renderEffect = blurEffect.asComposeRenderEffect()
-                    }
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+//                        val blurEffect = RenderEffect.createBlurEffect(
+//                            10f,
+//                            10f,
+//                            Shader.TileMode.MIRROR
+//                        )
+//                        renderEffect = blurEffect.asComposeRenderEffect()
+//                    }
                     alpha = 0.6f // More transparent
                 }
                 .clip(RoundedCornerShape(cornerRadius))
