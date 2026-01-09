@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.callblockerpro.app.ui.components.*
+import com.callblockerpro.app.ui.viewmodel.ListItem
 import com.callblockerpro.app.ui.theme.CrystalDesign
 import com.callblockerpro.app.ui.theme.BackgroundDark
 import com.callblockerpro.app.ui.theme.Emerald
@@ -124,15 +125,15 @@ fun ListsScreen(
                             }
                         }
                     } else {
-                        itemsIndexed(currentItems) { index, it ->
+                        itemsIndexed(currentItems) { index, listItem ->
                             AnimatedEntrance(index = index + 3) {
                                 PremiumListItem(
-                                    title = it.title,
-                                    subtitle = it.subtitle,
+                                    title = listItem.title,
+                                    subtitle = listItem.subtitle,
                                     tag = if (listType == 1) "BLOCKED" else "ALLOWED",
-                                    tagColor = it.color,
-                                    icon = if (it.subtitle == "Business") Icons.Default.DomainDisabled else Icons.Default.PersonOff,
-                                    iconColor = it.color,
+                                    tagColor = listItem.color,
+                                    icon = if (listItem.subtitle == "Business") Icons.Default.DomainDisabled else Icons.Default.PersonOff,
+                                    iconColor = listItem.color,
                                     onClick = {}
                                 )
                             }
