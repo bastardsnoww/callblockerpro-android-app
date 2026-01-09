@@ -112,7 +112,7 @@ fun adaptiveCardRadius(): Dp = when (rememberScreenSize()) {
  */
 @Composable
 fun adaptiveHeaderHeight(): Dp = when (rememberScreenSize()) {
-    ScreenSize.COMPACT -> 96.dp
+    ScreenSize.COMPACT -> 80.dp
     ScreenSize.MEDIUM -> 104.dp
     ScreenSize.EXPANDED -> 112.dp
 }
