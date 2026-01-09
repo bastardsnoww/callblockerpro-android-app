@@ -64,7 +64,7 @@ fun PremiumSearchBar(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = Icons.Default.Search,
-                        contentDescription = null,
+                        contentDescription = "Search",
                         tint = CrystalDesign.Colors.TextSecondary,
                         modifier = Modifier.size(20.dp)
                     )
@@ -424,9 +424,11 @@ fun NeonLoader(
 ) {
     val infiniteTransition = androidx.compose.animation.core.rememberInfiniteTransition(label = "Loader")
     
+    val isReducedMotion = com.callblockerpro.app.ui.theme.isReducedMotionEnabled()
+    
     val scale by infiniteTransition.animateFloat(
         initialValue = 0.8f,
-        targetValue = 1.2f,
+        targetValue = if (isReducedMotion) 0.8f else 1.2f,
         animationSpec = androidx.compose.animation.core.infiniteRepeatable(
             animation = androidx.compose.animation.core.tween<Float>(800),
             repeatMode = androidx.compose.animation.core.RepeatMode.Reverse
@@ -435,9 +437,9 @@ fun NeonLoader(
     )
     
     val alpha by infiniteTransition.animateFloat(
-        initialValue = 0.5f,
-        targetValue = 0.0f,
-        animationSpec = androidx.compose.animation.core.infiniteRepeatable(
+        initialValue = if (isReducedMotion) 1f else 0.5f,
+        targetValue = if (isReducedMotion) 1f else 0.0f,
+        animationSpec = androidx.compose.animation.core.infiniteRepeatable( // Keeping spec to avoid composition errors but values are static
             animation = androidx.compose.animation.core.tween<Float>(800),
             repeatMode = androidx.compose.animation.core.RepeatMode.Restart
         ),
@@ -478,9 +480,10 @@ fun MetallicHeaderButton(
 ) {
     val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     val shimmerTransition = rememberInfiniteTransition(label = "HeaderShimmer")
+    val isReducedMotion = com.callblockerpro.app.ui.theme.isReducedMotionEnabled()
     val shimmerAlpha by shimmerTransition.animateFloat(
         initialValue = 0f,
-        targetValue = 0.4f,
+        targetValue = if (isReducedMotion) 0f else 0.4f,
         animationSpec = infiniteRepeatable(
             animation = tween(2000, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse
@@ -533,9 +536,10 @@ fun PremiumHeader(
     onAction: (() -> Unit)? = null
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "HeaderPulse")
+    val isReducedMotion = com.callblockerpro.app.ui.theme.isReducedMotionEnabled()
     val edgeAlpha by infiniteTransition.animateFloat(
         initialValue = 0.3f,
-        targetValue = 0.8f,
+        targetValue = if (isReducedMotion) 0.3f else 0.8f,
         animationSpec = infiniteRepeatable(
             animation = tween(2000, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse

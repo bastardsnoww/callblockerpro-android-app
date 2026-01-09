@@ -5,6 +5,8 @@ import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import android.provider.Settings
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -135,4 +137,18 @@ fun adaptiveGridColumns(): Int = when (rememberScreenSize()) {
     ScreenSize.COMPACT -> 1
     ScreenSize.MEDIUM -> 2
     ScreenSize.EXPANDED -> 3
+}
+
+/**
+ * Helper to check if system Reduced Motion (Animator Duration 0x) is enabled.
+ */
+@Composable
+fun isReducedMotionEnabled(): Boolean {
+    val context = LocalContext.current
+    val scale = Settings.Global.getFloat(
+        context.contentResolver,
+        Settings.Global.ANIMATOR_DURATION_SCALE,
+        1f
+    )
+    return scale == 0f
 }
