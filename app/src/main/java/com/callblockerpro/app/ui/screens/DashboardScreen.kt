@@ -65,8 +65,8 @@ fun DashboardScreen(
             Box(Modifier.fillMaxSize()) {
                     // Capture Scroll State
                     val listState = rememberLazyListState()
-                    val firstItemOffsetState = remember { derivedStateOf { listState.firstVisibleItemScrollOffset } }
-                    val firstItemIndexState = remember { derivedStateOf { listState.firstVisibleItemIndex } }
+                    val firstItemOffsetState = remember { derivedStateOf<Int> { listState.firstVisibleItemScrollOffset } }
+                    val firstItemIndexState = remember { derivedStateOf<Int> { listState.firstVisibleItemIndex } }
 
                     LazyColumn(
                         state = listState,
