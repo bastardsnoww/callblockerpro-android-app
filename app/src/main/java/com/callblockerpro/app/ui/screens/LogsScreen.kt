@@ -27,7 +27,7 @@ import com.callblockerpro.app.ui.theme.PrimaryLight
 @Composable
 fun LogsScreen(onNavigate: (String) -> Unit) {
     Scaffold(
-        containerColor = BackgroundDark,
+        containerColor = CrystalDesign.Colors.BackgroundDeep,
         bottomBar = { BottomNavBar(currentRoute = "logs", onNavigate = onNavigate) }
     ) { paddingValues ->
         var searchQuery by remember { mutableStateOf("") }
@@ -62,7 +62,7 @@ fun LogsScreen(onNavigate: (String) -> Unit) {
                     // Logs Section
                     item {
                         Spacer(Modifier.height(8.dp))
-                        Text("TODAY", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = FontWeight.Black, letterSpacing = 2.sp)
+                        Text("TODAY", style = MaterialTheme.typography.labelSmall, color = CrystalDesign.Colors.TextSecondary, fontWeight = FontWeight.Black, letterSpacing = 2.sp)
                     }
 
                     item {
@@ -126,9 +126,9 @@ fun LogsScreen(onNavigate: (String) -> Unit) {
 
 @Composable
 fun FilterChipItem(text: String, selected: Boolean) {
-    val bgColor = if (selected) Primary.copy(alpha = 0.8f) else Color.White.copy(0.05f)
-    val borderColor = if (selected) Primary else Color.White.copy(0.1f)
-    val textColor = if (selected) Color.White else Color.Gray
+    val bgColor = if (selected) CrystalDesign.Colors.NeonPurple.copy(alpha = 0.8f) else Color.White.copy(0.05f)
+    val borderColor = if (selected) CrystalDesign.Colors.NeonPurple else Color.White.copy(0.1f)
+    val textColor = if (selected) Color.White else CrystalDesign.Colors.TextSecondary
 
     Box(
         modifier = Modifier

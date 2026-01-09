@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.callblockerpro.app.ui.components.*
+import com.callblockerpro.app.ui.theme.CrystalDesign
 import com.callblockerpro.app.ui.theme.BackgroundDark
 import com.callblockerpro.app.ui.theme.Emerald
 import com.callblockerpro.app.ui.theme.Primary
@@ -37,7 +38,7 @@ import com.callblockerpro.app.ui.theme.PrimaryLight
 @Composable
 fun ScheduleScreen(currentRoute: String, onNavigate: (String) -> Unit) {
     Scaffold(
-        containerColor = BackgroundDark,
+        containerColor = CrystalDesign.Colors.BackgroundDeep,
         bottomBar = { BottomNavBar(currentRoute = currentRoute, onNavigate = onNavigate) }
     ) { paddingValues ->
         PremiumBackground {

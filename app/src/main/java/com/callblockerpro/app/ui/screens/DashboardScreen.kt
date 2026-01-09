@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.callblockerpro.app.ui.components.*
+import com.callblockerpro.app.ui.theme.CrystalDesign
 import com.callblockerpro.app.ui.theme.BackgroundDark
 import com.callblockerpro.app.ui.theme.Emerald
 import com.callblockerpro.app.ui.theme.Primary
@@ -57,7 +58,7 @@ fun DashboardScreen(
     }
 
     Scaffold(
-        containerColor = BackgroundDark,
+        containerColor = CrystalDesign.Colors.BackgroundDeep,
         bottomBar = { BottomNavBar(currentRoute = "home", onNavigate = onNavigate) }
     ) { paddingValues ->
         PremiumBackground {

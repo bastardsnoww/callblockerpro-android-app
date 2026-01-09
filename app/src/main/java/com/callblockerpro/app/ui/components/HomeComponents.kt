@@ -21,7 +21,9 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.sp
 import com.callblockerpro.app.ui.theme.BackgroundDark
+import com.callblockerpro.app.ui.theme.CrystalDesign
 import com.callblockerpro.app.ui.theme.Emerald
 import com.callblockerpro.app.ui.theme.PrimaryLight
 import com.callblockerpro.app.ui.theme.Red
@@ -58,8 +60,8 @@ fun HomeStatusCard(
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFF131022), // Slightly Lighter Dark
-                        BackgroundDark     // Seamless blend
+                        CrystalDesign.Colors.BackgroundSurface,
+                        CrystalDesign.Colors.BackgroundDeep
                     )
                 )
             )
