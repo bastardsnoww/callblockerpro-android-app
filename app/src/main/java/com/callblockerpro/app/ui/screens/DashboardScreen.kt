@@ -67,14 +67,25 @@ fun DashboardScreen(
                     // Capture Scroll State
                     val listState = rememberLazyListState()
 
+                    val maxWidth = com.callblockerpro.app.ui.theme.maxContentWidth()
+                    val contentPadding = com.callblockerpro.app.ui.theme.adaptiveContentPadding()
+                    
                     LazyColumn(
                         state = listState,
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(paddingValues)
-                            .padding(horizontal = CrystalDesign.Spacing.l),
-                        contentPadding = PaddingValues(top = 100.dp, bottom = 120.dp),
-                        verticalArrangement = Arrangement.spacedBy(CrystalDesign.Spacing.l) // 24dp
+                            .then(
+                                if (maxWidth != androidx.compose.ui.unit.Dp.Unspecified) {
+                                    Modifier.widthIn(max = maxWidth).align(Alignment.TopCenter)
+                                } else Modifier
+                            )
+                            .padding(horizontal = contentPadding),
+                        contentPadding = PaddingValues(
+                            top = com.callblockerpro.app.ui.theme.adaptiveHeaderHeight() + 8.dp,
+                            bottom = 120.dp
+                        ),
+                        verticalArrangement = Arrangement.spacedBy(com.callblockerpro.app.ui.theme.AdaptiveSpacing.large())
                     ) {
                         // Spacer for header
                         item { Spacer(Modifier.height(0.dp)) }

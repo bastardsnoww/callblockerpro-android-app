@@ -540,7 +540,7 @@ fun MetallicHeaderButton(
 }
 
 /**
- * Standardized Floating Crystal Header - Redesigned (10/10).
+ * Standardized Floating Crystal Header - Redesigned (10/10) with Adaptive Sizing.
  */
 @Composable
 fun PremiumHeader(
@@ -565,13 +565,16 @@ fun PremiumHeader(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(96.dp)
-            .padding(horizontal = CrystalDesign.Spacing.m, vertical = CrystalDesign.Spacing.xs)
+            .height(com.callblockerpro.app.ui.theme.adaptiveHeaderHeight())
+            .padding(
+                horizontal = com.callblockerpro.app.ui.theme.adaptiveContentPadding(),
+                vertical = CrystalDesign.Spacing.xs
+            )
     ) {
         // Main Glass Panel
         GlassPanel(
             modifier = Modifier.fillMaxSize(),
-            cornerRadius = 24.dp,
+            cornerRadius = com.callblockerpro.app.ui.theme.adaptiveCardRadius(),
             borderAlpha = 0.15f
         ) {
             // Neon Bottom Edge
@@ -591,7 +594,7 @@ fun PremiumHeader(
             Row(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp),
+                    .padding(horizontal = com.callblockerpro.app.ui.theme.AdaptiveSpacing.medium()),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (onBack != null) {
@@ -600,7 +603,7 @@ fun PremiumHeader(
                         onClick = onBack,
                         modifier = Modifier.graphicsLayer { rotationZ = 180f }
                     )
-                    Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.width(com.callblockerpro.app.ui.theme.AdaptiveSpacing.medium()))
                 }
 
                 Column(
