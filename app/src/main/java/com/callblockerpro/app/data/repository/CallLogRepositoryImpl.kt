@@ -106,13 +106,38 @@ class CallLogRepositoryImpl @Inject constructor(
     }
 
     override fun getStatsFlow(): Flow<com.callblockerpro.app.domain.model.DashboardStats> {
+        // Calculate 7 days ago
+        val sevenDaysAgo = java.time.Instant.now().minus(7, java.time.temporal.ChronoUnit.DAYS)
+
         return combine(
             callLogDao.getCountFlow(),
             callLogDao.getBlockedCountFlow(),
-            callLogDao.getAllowedCountFlow()
-        ) { total, blocked, allowed ->
-            // Simulate weekly activity data
-            val weeklyData = listOf(0.4f, 0.6f, 0.3f, 0.8f, 0.5f, 0.9f, 0.7f) 
+            callLogDao.getAllowedCountFlow(),
+            callLogDao.getLogsSince(sevenDaysAgo)
+        ) { total, blocked, allowed, logs ->
+            // Aggregate logs by day for the last 7 days
+            val dailyCounts = IntArray(7) { 0 }
+            val now = java.time.LocalDate.now()
+            
+            logs.forEach { log ->
+                val logDate = log.timestamp.atZone(java.time.ZoneId.systemDefault()).toLocalDate()
+                val daysDiff = java.time.temporal.ChronoUnit.DAYS.between(logDate, now).toInt()
+                if (daysDiff in 0..6) {
+                    // Map daysDiff (0=Today, 6=7 days ago) to array index
+                    // We want index 6 to be Today, index 0 to be 7 days ago for the chart (Left to Right)
+                    // So: index = 6 - daysDiff
+                    val index = 6 - daysDiff
+                    if (index in 0..6) {
+                        dailyCounts[index]++
+                    }
+                }
+            }
+
+            // Normalize to 0f..1f for the chart
+            val maxCount = dailyCounts.maxOrNull() ?: 1
+            val max = if (maxCount == 0) 1 else maxCount
+            val weeklyData = dailyCounts.map { it.toFloat() / max.toFloat() }
+
             com.callblockerpro.app.domain.model.DashboardStats(total, blocked, allowed, weeklyData)
         }
     }

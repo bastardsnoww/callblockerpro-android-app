@@ -19,6 +19,9 @@ interface CallLogDao {
     @Query("SELECT * FROM call_log ORDER BY timestamp DESC LIMIT :limit")
     fun getRecentLogs(limit: Int): Flow<List<CallLogEntity>>
 
+    @Query("SELECT * FROM call_log WHERE timestamp >= :timestamp")
+    fun getLogsSince(timestamp: java.time.Instant): Flow<List<CallLogEntity>>
+
     @Query("SELECT * FROM call_log ORDER BY timestamp DESC")
     suspend fun getAllList(): List<CallLogEntity>
 
