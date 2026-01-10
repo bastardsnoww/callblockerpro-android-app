@@ -57,88 +57,100 @@ fun BottomNavBar(
     // Fixed / Full-Width Navigation Bar (Tailwind Match)
     // HTML: fixed bottom-0 left-0 right-0 z-50 bg-[#0f0e17]/90 backdrop-blur-xl border-t border-white/5
     
-    androidx.compose.material3.Surface(
+    // [FIX] Use a Box to allow FAB to float ABOVE the Surface without clipping to bounds
+    Box(
         modifier = modifier.fillMaxWidth(),
-        color = CrystalDesign.Colors.BackgroundDeep.copy(alpha = 0.9f), // #0f0e17 / 90%
-        tonalElevation = 0.dp,
-        shadowElevation = 10.dp,
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
+        contentAlignment = Alignment.BottomCenter
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 12.dp)
-                .navigationBarsPadding(), // Handle system insets
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Bottom
+        // 1. The Bar Background and Icons
+        androidx.compose.material3.Surface(
+            modifier = Modifier.fillMaxWidth(),
+            color = CrystalDesign.Colors.BackgroundDeep.copy(alpha = 0.9f), // #0f0e17 / 90%
+            tonalElevation = 0.dp,
+            shadowElevation = 10.dp,
+            border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
         ) {
-            // Left Group
-            NavIconItem(
-                icon = Icons.Default.Dashboard,
-                label = "Home",
-                isSelected = currentRoute == "home",
-                onClick = { onNavigate("home") }
-            )
-            
-            NavIconItem(
-                icon = androidx.compose.material.icons.Icons.AutoMirrored.Filled.ListAlt,
-                label = "Logs",
-                isSelected = currentRoute == "logs",
-                onClick = { onNavigate("logs") }
-            )
-
-            // Center FAB - Raised
-            // HTML: h-16 w-16 ... rounded-full bg-gradient ... shadow ring-8 ring-[#0f0e17]
-            Box(
-                modifier = Modifier.offset(y = (-24).dp),
-                contentAlignment = Alignment.Center
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 12.dp)
+                    .navigationBarsPadding(), // Handle system insets
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
             ) {
-                 val haptic = LocalHapticFeedback.current
-                 Box(
-                    modifier = Modifier
-                        .size(64.dp)
-                        .shadow(
-                            elevation = 10.dp, 
-                            shape = CircleShape,
-                            spotColor = CrystalDesign.Colors.ShadowGlow
-                        )
-                        .background(CrystalDesign.Colors.BackgroundDeep, CircleShape) // Ring effect
-                        .padding(6.dp) // The "ring-8" gap
-                        .clip(CircleShape)
-                        .background(
-                             brush = Brush.linearGradient(
-                                colors = listOf(CrystalDesign.Colors.Primary, CrystalDesign.Colors.PrimaryLight)
-                             )
-                        )
-                        .clickable {                                     
-                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                             onNavigate("add") 
-                        },
-                    contentAlignment = Alignment.Center
-                 ) {
-                     Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Add",
-                        tint = Color.White,
-                        modifier = Modifier.size(32.dp)
-                    )
-                 }
-            }
+                // Left Group
+                NavIconItem(
+                    icon = Icons.Default.Dashboard,
+                    label = "Home",
+                    isSelected = currentRoute == "home",
+                    onClick = { onNavigate("home") }
+                )
+                
+                NavIconItem(
+                    icon = androidx.compose.material.icons.Icons.AutoMirrored.Filled.ListAlt,
+                    label = "Logs",
+                    isSelected = currentRoute == "logs",
+                    onClick = { onNavigate("logs") }
+                )
 
-            // Right Group
-             NavIconItem(
-                icon = androidx.compose.material.icons.Icons.Default.VerifiedUser, // Whitelist placeholder
-                label = "Whitelist",
-                isSelected = currentRoute == "lists", // Mapping Lists to Whitelist for now
-                onClick = { onNavigate("lists") }
-            )
-            
-            NavIconItem(
-                icon = Icons.Default.Settings,
-                label = "Settings",
-                isSelected = currentRoute == "settings",
-                onClick = { onNavigate("settings") }
-            )
+                // Center Spacer (Where FAB floats above)
+                Spacer(modifier = Modifier.size(64.dp))
+
+                // Right Group
+                 NavIconItem(
+                    icon = androidx.compose.material.icons.Icons.Default.VerifiedUser, // Whitelist placeholder
+                    label = "Whitelist",
+                    isSelected = currentRoute == "lists", // Mapping Lists to Whitelist for now
+                    onClick = { onNavigate("lists") }
+                )
+                
+                NavIconItem(
+                    icon = Icons.Default.Settings,
+                    label = "Settings",
+                    isSelected = currentRoute == "settings",
+                    onClick = { onNavigate("settings") }
+                )
+            }
+        }
+
+        // 2. The FAB (Floating Above)
+        // HTML: h-16 w-16 ... rounded-full bg-gradient ... shadow ring-8 ring-[#0f0e17]
+        Box(
+            modifier = Modifier
+                .padding(bottom = 28.dp) // Lift it up slightly above the bar baseline
+                .navigationBarsPadding(), // Respect insets
+            contentAlignment = Alignment.Center
+        ) {
+             val haptic = LocalHapticFeedback.current
+             Box(
+                modifier = Modifier
+                    .size(64.dp)
+                    .shadow(
+                        elevation = 10.dp, 
+                        shape = CircleShape,
+                        spotColor = CrystalDesign.Colors.ShadowGlow
+                    )
+                    .background(CrystalDesign.Colors.BackgroundDeep, CircleShape) // Ring effect
+                    .padding(6.dp) // The "ring-8" gap
+                    .clip(CircleShape)
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(CrystalDesign.Colors.Primary, CrystalDesign.Colors.PrimaryLight)
+                        )
+                    )
+                    .clickable {                                     
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onNavigate("add") 
+                    },
+                contentAlignment = Alignment.Center
+             ) {
+                 Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add",
+                    tint = Color.White,
+                    modifier = Modifier.size(32.dp)
+                )
+             }
         }
     }
 }
@@ -171,5 +183,4 @@ fun NavIconItem(
             fontWeight = FontWeight.Bold
         )
     }
-
-
+}

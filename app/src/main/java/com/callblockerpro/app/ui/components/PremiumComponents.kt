@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -527,6 +528,7 @@ fun MetallicHeaderButton(
     }
 }
 
+
 /**
  * Standardized Floating Crystal Header - Redesigned (10/10) with Adaptive Sizing.
  */
@@ -570,21 +572,47 @@ fun PremiumHeader(
                 )
             }
             Spacer(modifier = Modifier.width(16.dp))
+        } else {
+             // [NEW] Shield Icon Box for Home Screen (matches HTML)
+             // HTML: flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary-light text-white shadow-glow ring-1 ring-white/10
+             Box(
+                modifier = Modifier
+                    .size(40.dp) // h-10 w-10
+                    .clip(RoundedCornerShape(12.dp)) // rounded-xl
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                com.callblockerpro.app.ui.theme.CrystalDesign.Colors.Primary,
+                                com.callblockerpro.app.ui.theme.CrystalDesign.Colors.PrimaryLight
+                            )
+                        )
+                    )
+                    .border(1.dp, Color.White.copy(alpha = 0.1f), RoundedCornerShape(12.dp)),
+                contentAlignment = Alignment.Center
+             ) {
+                 Icon(
+                     imageVector = androidx.compose.material.icons.Icons.Default.VerifiedUser, // shield_lock approx
+                     contentDescription = "Shield",
+                     tint = Color.White,
+                     modifier = Modifier.size(24.dp)
+                 )
+             }
+             Spacer(modifier = Modifier.width(12.dp))
         }
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = title.uppercase(),
-                style = MaterialTheme.typography.titleLarge, // Larger, cleaner
-                fontWeight = FontWeight.Black,
+                text = title, // Capitalization handled by caller or string
+                style = MaterialTheme.typography.titleLarge, 
+                fontWeight = FontWeight.ExtraBold, // font-extrabold
                 color = Color.White,
-                letterSpacing = (-0.5).sp // Tighter, modern spacing
+                lineHeight = 20.sp // leading-none
             )
             if (subtitle != null) {
                 Text(
-                    text = subtitle,
+                    text = subtitle.uppercase(),
                     style = MaterialTheme.typography.labelSmall,
-                    color = CrystalDesign.Colors.Primary, // Neon accent
+                    color = CrystalDesign.Colors.TextTertiary, // slate-500
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp
                 )
@@ -592,6 +620,8 @@ fun PremiumHeader(
         }
 
         if (actionIcon != null && onAction != null) {
+             // Settings Button (matches HTML)
+             // HTML: h-10 w-10 ... rounded-full bg-white/5
             Box(
                 modifier = Modifier
                     .size(40.dp)
@@ -601,13 +631,14 @@ fun PremiumHeader(
                         onAction() 
                     }
                     .background(Color.White.copy(0.05f))
-                    .border(1.dp, Color.White.copy(0.1f), CircleShape),
+                    // .border(1.dp, Color.White.copy(0.1f), CircleShape) // HTML doesn't have border on settings btn
+                ,
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = actionIcon,
                     contentDescription = "Action",
-                    tint = Color.White,
+                    tint = CrystalDesign.Colors.TextSecondary, // slate-400
                     modifier = Modifier.size(20.dp)
                 )
             }
