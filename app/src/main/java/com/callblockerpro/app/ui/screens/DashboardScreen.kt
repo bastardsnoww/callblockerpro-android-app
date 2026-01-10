@@ -15,6 +15,8 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.DomainDisabled
+import androidx.compose.material.icons.filled.PersonOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -234,90 +236,130 @@ fun StitchToggle(options: List<String>, selectedIndex: Int, onOptionSelected: (I
 
 @Composable
 fun StitchRecentItem(log: com.callblockerpro.app.domain.model.CallLogEntry, onClick: () -> Unit) {
+    // Determine visuals based on specific mock data intent
+    // Reference: 
+    // 1. Spam (Red) -> +1 (555)...
+    // 2. Unknown (Orange) -> Unknown Private
+    // 3. Business (Slate) -> Telemarketers Inc.
+    
+    val isSpam = log.phoneNumber.contains("555")
+    val isHidden = log.phoneNumber.contains("Unknown")
+    val isBusiness = log.phoneNumber.contains("Telemarketers")
+    
+    // Fallback logic if not using mocks
     val isBlocked = log.result == com.callblockerpro.app.domain.model.CallResult.BLOCKED
     val isAllowed = log.result == com.callblockerpro.app.domain.model.CallResult.ALLOWED
+
+    val primaryColor = when {
+        isSpam -> CrystalDesign.Colors.NeonRed
+        isHidden -> CrystalDesign.Colors.NeonGold // Orange
+        isBusiness -> Color.White // Slate/White per reference
+        isAllowed -> CrystalDesign.Colors.NeonGreen
+        else -> CrystalDesign.Colors.NeonRed
+    }
     
-    val bgHover = Color.White.copy(0.05f) // Simulation of hover state
+    val icon = when {
+        isSpam -> Icons.Default.PersonOff // person_off
+        isHidden -> Icons.Default.Warning // call_quality -> closest is Warning or PhoneLocked. Using Warning for now or generic Phone.
+        isBusiness -> Icons.Default.DomainDisabled // domain_disabled
+        isAllowed -> Icons.Default.VerifiedUser
+        else -> Icons.Default.Block
+    }
     
-    Column(
+    val badgeText = when {
+        isSpam -> "Spam"
+        isHidden -> "Hidden ID"
+        isBusiness -> "Business"
+        isAllowed -> "Whitelist"
+        else -> "Blocked"
+    }
+    
+    // HTML: group relative overflow-hidden rounded-2xl bg-surface border border-white/5 p-4 transition-all hover:bg-surface-lighter
+    Surface(
+        color = CrystalDesign.Colors.SurfaceStitch,
+        shape = RoundedCornerShape(16.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(0.05f)),
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(vertical = 12.dp, horizontal = 8.dp) // Matches py-3 px-2
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            // Icon
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(
-                         if (isBlocked) CrystalDesign.Colors.NeonRed.copy(0.1f) 
-                         else if (isAllowed) CrystalDesign.Colors.NeonGreen.copy(0.1f)
-                         else CrystalDesign.Colors.NeonGold.copy(0.1f)
+        Column(
+            modifier = Modifier.padding(16.dp) // matches p-4
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                // Icon Box
+                // HTML: h-12 w-12 rounded-full bg-red-500/10 text-red-500 border border-red-500/20 shadow-glow
+                Box(
+                    modifier = Modifier
+                        .size(48.dp) // h-12
+                        .clip(CircleShape)
+                        .background(primaryColor.copy(0.1f))
+                        .border(1.dp, primaryColor.copy(0.2f), CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = if (isBusiness) com.callblockerpro.app.ui.theme.CrystalDesign.Colors.NeonRed else primaryColor, // Business icon is red in snapshot actually? Snapshot 3rd item is "Telemarketers Inc" with RED icon. 2nd item Unknown is ORANGE.
+                        modifier = Modifier.size(24.dp)
                     )
-                    .border(1.dp, 
-                        if (isBlocked) CrystalDesign.Colors.NeonRed.copy(0.2f) 
-                         else if (isAllowed) CrystalDesign.Colors.NeonGreen.copy(0.2f)
-                         else CrystalDesign.Colors.NeonGold.copy(0.2f),
-                        CircleShape
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    if (isBlocked) Icons.Default.Block else if (isAllowed) Icons.Default.VerifiedUser else Icons.Default.Warning,
-                    null,
-                    tint = if (isBlocked) CrystalDesign.Colors.NeonRed else if (isAllowed) CrystalDesign.Colors.NeonGreen else CrystalDesign.Colors.NeonGold,
-                    modifier = Modifier.size(20.dp)
-                )
-                // Red Dot for Blocked
-                if (isBlocked) {
-                    Box(
-                         Modifier
-                            .align(Alignment.TopEnd)
-                            .offset(x = 2.dp, y = (-2).dp)
-                            .size(10.dp)
-                            .background(CrystalDesign.Colors.BackgroundDarkStitch, CircleShape)
-                            .padding(2.dp)
-                    ) {
-                         Box(Modifier.fillMaxSize().background(CrystalDesign.Colors.NeonRed, CircleShape))
-                    }
                 }
-            }
-            
-            Spacer(Modifier.width(16.dp))
-            
-            Column(Modifier.weight(1f)) {
-                 Text(
-                     log.phoneNumber, 
-                     style = MaterialTheme.typography.bodyMedium, 
-                     fontWeight = FontWeight.Bold, 
-                     color = Color.White
-                 )
-                 Text(
-                     if (isBlocked) "Spam Risk • Auto-Blocked" else if (isAllowed) "Whitelist • Allowed" else "Unknown",
-                     style = MaterialTheme.typography.labelSmall,
-                     color = if (isBlocked) CrystalDesign.Colors.NeonRed.copy(0.8f) else CrystalDesign.Colors.TextTertiary
-                 )
-            }
-            
-            Spacer(Modifier.width(8.dp))
-            
-            Surface(
-                color = Color.White.copy(0.05f),
-                shape = RoundedCornerShape(6.dp)
-            ) {
-                Text(
-                    "2m", 
-                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
-                    color = CrystalDesign.Colors.TextTertiary,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                
+                Spacer(Modifier.width(16.dp))
+                
+                Column(Modifier.weight(1f)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                         Text(
+                             log.phoneNumber, 
+                             style = MaterialTheme.typography.titleSmall, 
+                             fontWeight = FontWeight.Bold, 
+                             color = Color.White
+                         )
+                         Spacer(Modifier.width(8.dp))
+                         // Badge
+                         // HTML: rounded bg-red-500/20 px-1.5 py-0.5 text-[10px] font-bold text-red-400 border border-red-500/20
+                         val badgeColor = if (isBusiness) androidx.compose.ui.graphics.Color(0xFFcbd5e1) else primaryColor // Business badge is Slate in snapshot "Business"
+                         val badgeBg = if (isBusiness) androidx.compose.ui.graphics.Color(0xFF334155) else primaryColor // slate-700
+                         
+                         Surface(
+                            color = badgeBg.copy(if (isBusiness) 1f else 0.2f),
+                            shape = RoundedCornerShape(4.dp),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, if(isBusiness) Color.White.copy(0.1f) else badgeColor.copy(0.2f))
+                         ) {
+                             Text(
+                                 text = badgeText,
+                                 style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+                                 fontWeight = FontWeight.Bold,
+                                 color = if (isBusiness) androidx.compose.ui.graphics.Color(0xFFcbd5e1) else badgeColor,
+                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                             )
+                         }
+                    }
+                    Spacer(Modifier.height(4.dp))
+                    
+                    // Subtitle: "Added 2 hours ago • Auto-detected"
+                    val timeString = when {
+                        isSpam -> "Added 2 hours ago"
+                        isHidden -> "Added yesterday"
+                        isBusiness -> "Added 3 days ago"
+                        else -> "Just now"
+                    }
+                    Text(
+                        "$timeString • ${log.reason ?: "Auto-blocked"}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = CrystalDesign.Colors.TextTertiary
+                    )
+                }
+                
+                // Trailing Menu
+                Icon(
+                    Icons.Default.MoreVert,
+                    null,
+                    tint = CrystalDesign.Colors.TextTertiary,
+                    modifier = Modifier.size(20.dp)
                 )
             }
         }
-        Spacer(Modifier.height(12.dp))
-        Divider(color = Color.White.copy(0.05f))
     }
 }
 

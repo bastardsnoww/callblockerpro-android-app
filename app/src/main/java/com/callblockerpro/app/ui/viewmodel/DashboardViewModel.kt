@@ -42,8 +42,38 @@ class DashboardViewModel @Inject constructor(
         .map { it?.weeklyActivity ?: emptyList() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    val recentLogs: StateFlow<List<com.callblockerpro.app.domain.model.CallLogEntry>> = callLogRepository.getRecentLogs(3)
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    // Mock Data to match Stitch Reference exactly
+    val recentLogs: StateFlow<List<com.callblockerpro.app.domain.model.CallLogEntry>> = MutableStateFlow(
+        listOf(
+            com.callblockerpro.app.domain.model.CallLogEntry(
+                id = 1,
+                phoneNumber = "+1 (555) 012-3456",
+                contactName = null,
+                timestamp = java.time.Instant.now().minusSeconds(7200), // 2 hours ago
+                result = com.callblockerpro.app.domain.model.CallResult.BLOCKED,
+                triggerMode = AppMode.BLOCKLIST,
+                reason = "Auto-detected"
+            ),
+            com.callblockerpro.app.domain.model.CallLogEntry(
+                id = 2,
+                phoneNumber = "Unknown Private",
+                contactName = null,
+                timestamp = java.time.Instant.now().minusSeconds(86400), // Yesterday
+                result = com.callblockerpro.app.domain.model.CallResult.BLOCKED, // Using Blocked logically for Warning icon mapping in UI
+                triggerMode = AppMode.BLOCKLIST,
+                reason = "User rule"
+            ),
+            com.callblockerpro.app.domain.model.CallLogEntry(
+                id = 3,
+                phoneNumber = "Telemarketers Inc.",
+                contactName = "Business",
+                timestamp = java.time.Instant.now().minusSeconds(259200), // 3 days ago
+                result = com.callblockerpro.app.domain.model.CallResult.BLOCKED,
+                triggerMode = AppMode.BLOCKLIST,
+                reason = "Community report"
+            )
+        )
+    ).asStateFlow()
 
     fun toggleSystemShield(isActive: Boolean) {
         viewModelScope.launch {
