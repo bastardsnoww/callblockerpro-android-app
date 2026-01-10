@@ -573,13 +573,21 @@ fun PremiumHeader(
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         onAction() 
                     }
-                    .background(Color.White.copy(0.05f)),
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                com.callblockerpro.app.ui.theme.CrystalDesign.Colors.PrimaryStitch,
+                                com.callblockerpro.app.ui.theme.CrystalDesign.Colors.PrimaryLightStitch
+                            )
+                        )
+                    )
+                    .border(1.dp, Color.White.copy(0.1f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = actionIcon,
                     contentDescription = "Action",
-                    tint = CrystalDesign.Colors.TextTertiary, // slate-400
+                    tint = Color.White,
                     modifier = Modifier.size(20.dp)
                 )
             }

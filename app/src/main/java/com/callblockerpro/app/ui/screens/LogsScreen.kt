@@ -116,10 +116,21 @@ fun LogsScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     StitchFilterChip("All Logs", activeFilter == null) { viewModel.onFilterSelected(null) }
-                    StitchFilterChip("Missed", false) {}
-                    StitchFilterChip("Blocked", activeFilter == CallResult.BLOCKED, isRed = true) { viewModel.onFilterSelected(CallResult.BLOCKED) }
-                    StitchFilterChip("Outgoing", false) {}
-                    StitchFilterChip("Incoming", activeFilter == CallResult.ALLOWED) { viewModel.onFilterSelected(CallResult.ALLOWED) }
+                    
+                    // Allowed (Green)
+                    StitchFilterChip(
+                        text = "Allowed", 
+                        selected = activeFilter == CallResult.ALLOWED, 
+                        isRed = false,
+                        isGreen = true 
+                    ) { viewModel.onFilterSelected(CallResult.ALLOWED) }
+
+                    // Blocked (Red)
+                    StitchFilterChip(
+                        text = "Blocked", 
+                        selected = activeFilter == CallResult.BLOCKED, 
+                        isRed = true 
+                    ) { viewModel.onFilterSelected(CallResult.BLOCKED) }
                 }
                 
                 Spacer(Modifier.height(24.dp))
@@ -143,9 +154,13 @@ fun LogsScreen(
 }
 
 @Composable
-fun StitchFilterChip(text: String, selected: Boolean, isRed: Boolean = false, onClick: () -> Unit) {
+fun StitchFilterChip(text: String, selected: Boolean, isRed: Boolean = false, isGreen: Boolean = false, onClick: () -> Unit) {
     val bgColor = if (selected) {
-        if (isRed) CrystalDesign.Colors.NeonRed else CrystalDesign.Colors.PrimaryStitch
+        when {
+            isRed -> CrystalDesign.Colors.NeonRed
+            isGreen -> com.callblockerpro.app.ui.theme.Emerald
+            else -> CrystalDesign.Colors.PrimaryStitch
+        }
     } else CrystalDesign.Colors.SurfaceStitch
     
     val textColor = if (selected) Color.White else CrystalDesign.Colors.TextTertiary
@@ -158,7 +173,7 @@ fun StitchFilterChip(text: String, selected: Boolean, isRed: Boolean = false, on
         modifier = Modifier.clickable { onClick() }
     ) {
         Row(Modifier.padding(horizontal = 20.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            if (isRed && selected) {
+            if ((isRed || isGreen) && selected) {
                 Box(Modifier.size(6.dp).clip(CircleShape).background(Color.White))
                 Spacer(Modifier.width(6.dp))
             }
