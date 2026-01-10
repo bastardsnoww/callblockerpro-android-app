@@ -35,7 +35,21 @@ class LogsViewModel @Inject constructor(
     // Re-implementing correctly:
     
     val uiState = combine(
-        callLogRepository.getRecentLogs(200),
+        // Mock Logs Data
+        MutableStateFlow(
+            listOf(
+                CallLogEntry(1, "+1 (555) 012-3456", null, java.time.Instant.now().minusSeconds(120), CallResult.BLOCKED, AppMode.BLOCKLIST, "Spam Risk"),
+                CallLogEntry(2, "Mom", "Contact", java.time.Instant.now().minusSeconds(3600), CallResult.ALLOWED, AppMode.BLOCKLIST, "Whitelist"),
+                CallLogEntry(3, "Unknown Private", null, java.time.Instant.now().minusSeconds(7200), CallResult.BLOCKED, AppMode.BLOCKLIST, "Hidden ID"),
+                CallLogEntry(4, "+1 (800) 123-4567", "Bank", java.time.Instant.now().minusSeconds(18000), CallResult.ALLOWED, AppMode.NEUTRAL, "Normal Mode"),
+                CallLogEntry(5, "Telemarketers Inc.", "Business", java.time.Instant.now().minusSeconds(86400), CallResult.BLOCKED, AppMode.BLOCKLIST, "Community Report"),
+                CallLogEntry(6, "+44 7700 900077", null, java.time.Instant.now().minusSeconds(90000), CallResult.BLOCKED, AppMode.BLOCKLIST, "International Spam"),
+                CallLogEntry(7, "Pizza Delivery", "Verified Business", java.time.Instant.now().minusSeconds(100000), CallResult.ALLOWED, AppMode.WHITELIST, "Whitelist Mode"),
+                CallLogEntry(8, "+1 (555) 999-8888", null, java.time.Instant.now().minusSeconds(150000), CallResult.BLOCKED, AppMode.BLOCKLIST, "User Block"),
+                CallLogEntry(9, "Emergency Service", "System", java.time.Instant.now().minusSeconds(200000), CallResult.ALLOWED, AppMode.BLOCKLIST, "Emergency"),
+                CallLogEntry(10, "Political Survey", null, java.time.Instant.now().minusSeconds(250000), CallResult.BLOCKED, AppMode.BLOCKLIST, "Robocall")
+            )
+        ),
         _searchQuery,
         _filter
     ) { logs, query, filterType ->

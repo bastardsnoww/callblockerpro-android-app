@@ -38,9 +38,10 @@ class DashboardViewModel @Inject constructor(
         .map { it?.callsScreened ?: 0 } // Using screened count as proxy for activity
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
 
-    val weeklyActivity: StateFlow<List<Float>> = statsFlow
-        .map { it?.weeklyActivity ?: emptyList() }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    // Mock Weekly Activity Data (7 days)
+    val weeklyActivity: StateFlow<List<Float>> = MutableStateFlow(
+        listOf(12f, 45f, 28f, 65f, 15f, 8f, 50f)
+    ).asStateFlow()
 
     // Mock Data to match Stitch Reference exactly
     val recentLogs: StateFlow<List<com.callblockerpro.app.domain.model.CallLogEntry>> = MutableStateFlow(

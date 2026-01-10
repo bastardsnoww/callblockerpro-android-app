@@ -29,30 +29,27 @@ class ListsViewModel @Inject constructor(
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
-    // Real Data Streams
-    private val _blocklistFlow = listRepository.getBlocklist().map { entries ->
-        entries.map { entry ->
-            ListItem(
-                id = entry.id,
-                title = entry.phoneNumber,
-                subtitle = entry.reason ?: "No reason provided",
-                color = Color(0xFFEF4444), // Red for Blocked
-                isBlocked = true
-            )
-        }
-    }
+    // Mock Data for UI Verification
+    private val _blocklistFlow = MutableStateFlow(
+        listOf(
+            ListItem(1, "+1 (555) 012-3456", "Spam Risk", Color(0xFFEF4444), true),
+            ListItem(2, "Unknown Private", "Hidden ID", Color(0xFFEF4444), true),
+            ListItem(3, "Telemarketers Inc.", "Community Reported", Color(0xFFEF4444), true),
+            ListItem(4, "+44 20 7946 0123", "Robocall", Color(0xFFEF4444), true),
+            ListItem(5, "Ping Call", "Wangiri Fraud", Color(0xFFEF4444), true),
+            ListItem(6, "+1 (800) 555-0199", "Fake Tech Support", Color(0xFFEF4444), true)
+        )
+    )
 
-    private val _whitelistFlow = listRepository.getWhitelist().map { entries ->
-        entries.map { entry ->
-            ListItem(
-                id = entry.id,
-                title = entry.phoneNumber,
-                subtitle = entry.name ?: "Trusted Contact",
-                color = Emerald, // Green for Allowed
-                isBlocked = false
-            )
-        }
-    }
+    private val _whitelistFlow = MutableStateFlow(
+        listOf(
+            ListItem(10, "Mom", "My Contacts", Emerald, false),
+            ListItem(11, "Office Main Line", "Work", Emerald, false),
+            ListItem(12, "+1 (555) 012-9999", "Doctor's Office", Emerald, false),
+            ListItem(13, "Alice Smith", "VIP", Emerald, false),
+            ListItem(14, "Bob Jones", "Symphony Tickets", Emerald, false)
+        )
+    )
 
     // Derived State
     val currentItems = combine(
