@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PersonOff
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -63,11 +64,9 @@ fun ListsScreen(
                 ) {
                     // Mode Selector
                     item {
-                        MetallicToggle(
-                            options = listOf("Whitelist", "Blocklist"),
+                        StitchListToggle(
                             selectedIndex = listType,
-                            onOptionSelected = { viewModel.onListTypeChanged(it) },
-                            modifier = Modifier.fillMaxWidth()
+                            onOptionSelected = { viewModel.onListTypeChanged(it) }
                         )
                     }
 
@@ -126,6 +125,7 @@ fun ListsScreen(
                         }
                     } else {
                         itemsIndexed(currentItems) { index, listItem: ListItem ->
+                             // Ensure compatibility with ViewModel items
                             AnimatedEntrance(index = index + 3) {
                                 PremiumListItem(
                                     title = listItem.title,
@@ -149,6 +149,87 @@ fun ListsScreen(
                     actionIcon = Icons.Default.Add,
                     onAction = { onNavigate("add") }
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun StitchListToggle(selectedIndex: Int, onOptionSelected: (Int) -> Unit) {
+    // HTML ref: p-1.5 rounded-2xl bg-surface border border-white/5 shadow-inner
+    Surface(
+        color = CrystalDesign.Colors.SurfaceStitch,
+        shape = RoundedCornerShape(16.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(0.05f)),
+        modifier = Modifier.fillMaxWidth().height(56.dp)
+    ) {
+        Box(Modifier.padding(6.dp)) { // p-1.5 -> 6.dp
+            Row(Modifier.fillMaxSize()) {
+                // Option 0: Whitelist (Code uses 0 for whitelist? No, ViewModel defaults to 1. 
+                // Let's check ViewModel usage: 0=Whitelist, 1=Blocklist usually? 
+                // Wait, in ListsViewModel: listType 1=Blocklist usually.
+                // Let's look at previous call: options = listOf("Whitelist", "Blocklist") -> index 0=Whitelist, 1=Blocklist.
+                // Reference HTML: Blocklist is first input checked. "value=blocklist".
+                // I will maintain the existing ViewModel logic: 0 -> Whitelist, 1 -> Blocklist (based on previous listOf order).
+                // BUT, if I want to match the visual order of the snapshot (Blocklist | Whitelist), I might need to swap them visually but keep logic.
+                // However, user said "ins whitelist tab...".
+                // I'll stick to the text labels "Whitelist" and "Blocklist" and use the icons.
+                
+                // Blocklist (Index 1)
+                val isBlocklist = selectedIndex == 1
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .clip(RoundedCornerShape(12.dp))
+                        .clickable { onOptionSelected(1) } // Select Blocklist
+                        .background(if (isBlocklist) CrystalDesign.Colors.PrimaryStitch else Color.Transparent),
+                    contentAlignment = Alignment.Center
+                ) {
+                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+                        Icon(
+                            Icons.Default.Block, 
+                            null, 
+                            tint = if (isBlocklist) Color.White else CrystalDesign.Colors.TextTertiary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = "Blocklist",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isBlocklist) Color.White else CrystalDesign.Colors.TextTertiary
+                        )
+                    }
+                }
+
+                // Whitelist (Index 0)
+                val isWhitelist = selectedIndex == 0
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .clip(RoundedCornerShape(12.dp))
+                        .clickable { onOptionSelected(0) } // Select Whitelist
+                        .background(if (isWhitelist) CrystalDesign.Colors.PrimaryStitch else Color.Transparent),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+                        Icon(
+                            Icons.Default.VerifiedUser, 
+                            null, 
+                            tint = if (isWhitelist) Color.White else CrystalDesign.Colors.TextTertiary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = "Whitelist", // Or "Allowlist" if preferred, but keeping "Whitelist"
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isWhitelist) Color.White else CrystalDesign.Colors.TextTertiary
+                        )
+                    }
+                }
             }
         }
     }
