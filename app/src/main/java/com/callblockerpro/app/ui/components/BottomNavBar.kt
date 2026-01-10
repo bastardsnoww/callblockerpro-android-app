@@ -19,9 +19,11 @@ import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.automirrored.filled.ListAlt
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,188 +54,122 @@ fun BottomNavBar(
     modifier: Modifier = Modifier,
     onNavigate: (String) -> Unit = {}
 ) {
-    // Glass Navigation Bar
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
-        contentAlignment = Alignment.BottomCenter
+    // Fixed / Full-Width Navigation Bar (Tailwind Match)
+    // HTML: fixed bottom-0 left-0 right-0 z-50 bg-[#0f0e17]/90 backdrop-blur-xl border-t border-white/5
+    
+    androidx.compose.material3.Surface(
+        modifier = modifier.fillMaxWidth(),
+        color = CrystalDesign.Colors.BackgroundDeep.copy(alpha = 0.9f), // #0f0e17 / 90%
+        tonalElevation = 0.dp,
+        shadowElevation = 10.dp,
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
     ) {
-        GlassPanel(
-            modifier = Modifier.widthIn(max = 640.dp).fillMaxWidth(),
-            cornerRadius = 32.dp
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp, vertical = 12.dp)
+                .navigationBarsPadding(), // Handle system insets
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Bottom
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-            NavItem(
+            // Left Group
+            NavIconItem(
                 icon = Icons.Default.Dashboard,
                 label = "Home",
                 isSelected = currentRoute == "home",
-                onClick = { onNavigate("home") },
-                modifier = Modifier.weight(1f)
+                onClick = { onNavigate("home") }
             )
-            NavItem(
+            
+            NavIconItem(
                 icon = androidx.compose.material.icons.Icons.AutoMirrored.Filled.ListAlt,
-                label = "Lists",
-                isSelected = currentRoute == "lists",
-                onClick = { onNavigate("lists") },
-                modifier = Modifier.weight(1f)
+                label = "Logs",
+                isSelected = currentRoute == "logs",
+                onClick = { onNavigate("logs") }
             )
 
-            // Central FAB - Elite Upgrade
+            // Center FAB - Raised
+            // HTML: h-16 w-16 ... rounded-full bg-gradient ... shadow ring-8 ring-[#0f0e17]
             Box(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.offset(y = (-24).dp),
                 contentAlignment = Alignment.Center
             ) {
-                val pulseScale = 1f
-                
-                val haptic = LocalHapticFeedback.current
-                var fabPressed by remember { mutableStateOf(false) }
-                val fabScale by animateFloatAsState(
-                    targetValue = if (fabPressed) 0.9f else 1f,
-                    animationSpec = tween(100),
-                    label = "FABScale"
-                )
-
-                // Outer Glow
-                Box(
+                 val haptic = LocalHapticFeedback.current
+                 Box(
                     modifier = Modifier
-                        .offset(y = (-24).dp)
-                        .size(72.dp)
-                        .graphicsLayer {
-                            scaleX = pulseScale
-                            scaleY = pulseScale
-                            alpha = 0.3f
-                        }
-                        .background(
-                            brush = Brush.radialGradient(
-                                colors = listOf(Primary, Color.Transparent)
-                            ),
-                            shape = CircleShape
-                        )
-                )
-
-                // Main FAB Button
-                Box(
-                    modifier = Modifier
-                        .offset(y = (-24).dp)
                         .size(64.dp)
-                        .graphicsLayer {
-                            scaleX = fabScale
-                            scaleY = fabScale
-                        }
-                        .shadow(elevation = 15.dp, shape = CircleShape, spotColor = Primary)
+                        .shadow(
+                            elevation = 10.dp, 
+                            shape = CircleShape,
+                            spotColor = CrystalDesign.Colors.ShadowGlow
+                        )
+                        .background(CrystalDesign.Colors.BackgroundDeep, CircleShape) // Ring effect
+                        .padding(6.dp) // The "ring-8" gap
                         .clip(CircleShape)
                         .background(
-                            brush = Brush.linearGradient(
-                                colors = listOf(Primary, PrimaryLight)
-                            )
+                             brush = Brush.linearGradient(
+                                colors = listOf(CrystalDesign.Colors.Primary, CrystalDesign.Colors.PrimaryLight)
+                             )
                         )
-                        .border(1.dp, Color.White.copy(0.2f), CircleShape)
-                        .pointerInput(Unit) {
-                            detectTapGestures(
-                                onPress = {
-                                    fabPressed = true
-                                    tryAwaitRelease()
-                                    fabPressed = false
-                                },
-                                onTap = {
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    onNavigate("add")
-                                }
-                            )
+                        .clickable {                                     
+                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                             onNavigate("add") 
                         },
                     contentAlignment = Alignment.Center
-                ) {
-                    // Glassy Overlay for extra depth
-                    Box(
-                        modifier = Modifier
-                            .matchParentSize()
-                            .background(
-                                brush = Brush.verticalGradient(
-                                    colors = listOf(Color.White.copy(alpha = 0.2f), Color.Transparent)
-                                )
-                            )
-                    )
-                    
-                    Icon(
+                 ) {
+                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = "Add",
                         tint = Color.White,
                         modifier = Modifier.size(32.dp)
                     )
-                }
+                 }
             }
 
-            NavItem(
-                icon = Icons.Default.Phone,
-                label = "Logs",
-                isSelected = currentRoute == "logs",
-                onClick = { onNavigate("logs") },
-                modifier = Modifier.weight(1f)
+            // Right Group
+             NavIconItem(
+                icon = androidx.compose.material.icons.Icons.Default.VerifiedUser, // Whitelist placeholder
+                label = "Whitelist",
+                isSelected = currentRoute == "lists", // Mapping Lists to Whitelist for now
+                onClick = { onNavigate("lists") }
             )
-            NavItem(
+            
+            NavIconItem(
                 icon = Icons.Default.Settings,
                 label = "Settings",
                 isSelected = currentRoute == "settings",
-                onClick = { onNavigate("settings") },
-                modifier = Modifier.weight(1f)
+                onClick = { onNavigate("settings") }
             )
-        }
         }
     }
 }
 
 @Composable
-fun NavItem(
+fun NavIconItem(
     icon: ImageVector,
     label: String,
     isSelected: Boolean,
-    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    val iconColor = if (isSelected) Primary else Color.White.copy(alpha = 0.4f)
-    val textColor = if (isSelected) Color.White else Color.White.copy(alpha = 0.4f)
+    val color = if (isSelected) CrystalDesign.Colors.Primary else CrystalDesign.Colors.TextTertiary
     
-    val hapticNav = androidx.compose.ui.platform.LocalHapticFeedback.current
     Column(
-        modifier = modifier
-            .clickable { 
-                hapticNav.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
-                onClick() 
-            }
-            .padding(CrystalDesign.Spacing.xs),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.clickable(onClick = onClick).padding(8.dp)
     ) {
-        Box(contentAlignment = Alignment.Center) {
-            if (isSelected) {
-                // Subtle glow behind icon
-                Box(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .background(Primary.copy(alpha = 0.2f), CircleShape)
-                )
-            }
-            Icon(
-                imageVector = icon,
-                contentDescription = label,
-                tint = iconColor,
-                modifier = Modifier.size(24.dp)
-            )
-        }
+        Icon(
+            imageVector = icon,
+            contentDescription = label,
+            tint = color,
+            modifier = Modifier.size(26.dp)
+        )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = label,
-            fontSize = 11.sp,
-            fontWeight = if (isSelected) CrystalDesign.Typography.WeightBlack else CrystalDesign.Typography.WeightMedium,
-            color = textColor,
-            letterSpacing = if (isSelected) 0.5.sp else 0.sp
+            style = androidx.compose.material3.MaterialTheme.typography.labelSmall,
+            color = if(isSelected) Color.White else CrystalDesign.Colors.TextTertiary,
+            fontWeight = FontWeight.Bold
         )
     }
-}
+
+

@@ -14,46 +14,36 @@ import androidx.compose.ui.unit.sp
  */
 object CrystalDesign {
     
-    // --- 1. The Palette (Neon Crystal) ---
+    // --- 1. The Palette (Tailwind Match) ---
     object Colors {
-        val BackgroundDeep = Color(0xFF050505) // Pure Void
-        val BackgroundSurface = Color(0xFF0F0F11) // Card Surface
+        val BackgroundDeep = com.callblockerpro.app.ui.theme.BackgroundDark // #0F0E17
+        val BackgroundSurface = com.callblockerpro.app.ui.theme.SurfaceDark // #1E1B2E
         
-        // Primary Accents (Electric)
+        // Primary Accents
         val NeonGold = Color(0xFFFFD700)
-        val NeonPurple = Color(0xFF7C3AED)
+        val NeonPurple = com.callblockerpro.app.ui.theme.Primary // #5211D4
         val NeonBlue = Color(0xFF3B82F6)
-        val NeonRed = Color(0xFFDC2626) // Darker for accessible contrast (>4.5:1)
-        val NeonGreen = Color(0xFF10B981)
+        val NeonRed = Color(0xFFDC2626)
+        val NeonGreen = com.callblockerpro.app.ui.theme.Emerald // #10B981
 
-        // Core Brand Colors (Unified)
-        val Primary = Color(0xFF8B5CF6)      // Electric Violet
-        val PrimaryLight = Color(0xFFA78BFA) // Neon Purple
-        val PrimaryContainer = Color(0xFF2E1065)
+        // Core Brand Colors
+        val Primary = com.callblockerpro.app.ui.theme.Primary
+        val PrimaryLight = com.callblockerpro.app.ui.theme.PrimaryLight
+        val PrimaryContainer = com.callblockerpro.app.ui.theme.PrimaryContainer
         
         // Backgrounds
-        val BackgroundLight = Color(0xFFF8FAFC)
-        val BackgroundDark = Color(0xFF030014) // Pure space black-purple
-        val SurfaceGlass = Color(0x990F172A)
+        val BackgroundLight = com.callblockerpro.app.ui.theme.BackgroundLight
+        val BackgroundDark = com.callblockerpro.app.ui.theme.BackgroundDark
+        val SurfaceGlass = com.callblockerpro.app.ui.theme.SurfaceGlass
 
         // Text
         val TextPrimary = Color(0xFFFFFFFF)
-        val TextSecondary = Color(0xD9FFFFFF) // 85% White (Improved from 70%)
-        val TextTertiary = Color(0x99FFFFFF) // 60% White (Improved from 40%)
+        val TextSecondary = Color(0xFF94A3B8) // Slate-400 equivalent
+        val TextTertiary = Color(0xFF64748B) // Slate-500
         
-        // Gradients
-        val GradientPrimary = Brush.linearGradient(
-            listOf(NeonPurple, NeonBlue)
-        )
-        val GradientGold = Brush.linearGradient(
-            listOf(Color(0xFFFFD700), Color(0xFFFDB931))
-        )
-        val GradientGlass = Brush.verticalGradient(
-            listOf(
-                Color.White.copy(alpha = 0.08f),
-                Color.White.copy(alpha = 0.02f)
-            )
-        )
+        // Shadows (Tailwind Translations)
+        val ShadowGlow = Color(0x805211D4) // rgba(82, 17, 212, 0.5)
+        val ShadowGlowGreen = Color(0x6610B981) // rgba(16, 185, 129, 0.4)
     }
 
     // --- 2. The Spacing (8pt Grid) ---
