@@ -12,6 +12,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material3.*
@@ -516,7 +517,7 @@ fun PremiumHeader(
                 contentAlignment = Alignment.Center
              ) {
                  Icon(
-                     imageVector = androidx.compose.material.icons.Icons.Default.VerifiedUser, // shield_lock
+                     imageVector = androidx.compose.material.icons.Icons.Default.Lock, // shield_lock -> Lock closely matches the 'lock' description
                      contentDescription = "Shield",
                      tint = Color.White,
                      modifier = Modifier.size(24.dp)
