@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.VerifiedUser
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -156,29 +157,54 @@ fun DashboardScreen(
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Text("Weekly Activity", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = CrystalDesign.Typography.WeightBlack)
                                         Text(
-                                            "FULL REPORT", 
-                                            style = MaterialTheme.typography.labelSmall, 
-                                            color = PrimaryLight, 
-                                            fontWeight = CrystalDesign.Typography.WeightBold, 
-                                            modifier = Modifier.clickable {
-                                                haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
-                                                onNavigate("logs") // Navigate to logs for full report
-                                            }
+                                            "Weekly Activity", 
+                                            style = MaterialTheme.typography.titleMedium, // text-lg
+                                            color = Color.White, 
+                                            fontWeight = FontWeight.Bold
                                         )
+                                        // HTML uses a More button, not text link
+                                        IconButton(onClick = { onNavigate("logs") }) {
+                                            Icon(
+                                                imageVector = androidx.compose.material.icons.Icons.Default.MoreVert,
+                                                contentDescription = "Options",
+                                                tint = CrystalDesign.Colors.TextTertiary
+                                            )
+                                        }
                                     }
                                     Spacer(modifier = Modifier.height(20.dp))
                                     GlassPanel(modifier = Modifier.fillMaxWidth()) {
                                         Column(Modifier.padding(24.dp).fillMaxWidth()) {
                                             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(32.dp)) {
                                                 Column {
-                                                    Text("AVG. DAILY", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = CrystalDesign.Typography.WeightBold)
-                                                    Text("18 Calls", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = CrystalDesign.Typography.WeightBlack)
+                                                    Text(
+                                                        "AVG. DAILY", 
+                                                        style = MaterialTheme.typography.labelSmall, 
+                                                        color = CrystalDesign.Colors.TextTertiary, // slate-400
+                                                        fontWeight = FontWeight.Bold,
+                                                        letterSpacing = 0.5.sp
+                                                    )
+                                                    Text(
+                                                        "18 Calls", 
+                                                        style = MaterialTheme.typography.headlineSmall, // text-2xl
+                                                        color = Color.White, 
+                                                        fontWeight = FontWeight.Bold
+                                                    )
                                                 }
                                                 Column {
-                                                    Text("PEAK DAY", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = CrystalDesign.Typography.WeightBold)
-                                                    Text("Tuesday", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = CrystalDesign.Typography.WeightBlack)
+                                                    Text(
+                                                        "PEAK DAY", 
+                                                        style = MaterialTheme.typography.labelSmall, 
+                                                        color = CrystalDesign.Colors.TextTertiary, // slate-400
+                                                        fontWeight = FontWeight.Bold,
+                                                        letterSpacing = 0.5.sp
+                                                    )
+                                                    Text(
+                                                        "Tuesday", 
+                                                        style = MaterialTheme.typography.headlineSmall, // text-2xl
+                                                        color = Color.White, 
+                                                        fontWeight = FontWeight.Bold
+                                                    )
                                                 }
                                             }
                                             Spacer(Modifier.height(24.dp))
@@ -193,7 +219,14 @@ fun DashboardScreen(
                                             Spacer(Modifier.height(16.dp))
                                             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                                                 listOf("M", "T", "W", "T", "F", "S", "S").forEach { 
-                                                    Text(it, style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.6f), modifier = Modifier.width(CrystalDesign.Spacing.l), textAlign = androidx.compose.ui.text.style.TextAlign.Center, fontWeight = CrystalDesign.Typography.WeightBold)
+                                                    Text(
+                                                        it, 
+                                                        style = MaterialTheme.typography.labelSmall, 
+                                                        color = CrystalDesign.Colors.TextSecondary, // slate-400/500
+                                                        modifier = Modifier.width(CrystalDesign.Spacing.l), 
+                                                        textAlign = androidx.compose.ui.text.style.TextAlign.Center, 
+                                                        fontWeight = FontWeight.Bold
+                                                    )
                                                 }
                                             }
                                         }

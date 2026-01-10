@@ -16,130 +16,133 @@ val provider = GoogleFont.Provider(
     certificates = R.array.com_google_android_gms_fonts_certs
 )
 
-val outfitFont = GoogleFont("Outfit")
-val interFont = GoogleFont("Inter")
+// MAPPING TO TAILWIND/SNAPSHOT TYPOGRAPHY
+// Font Family: Manrope
 
-val OutfitFontFamily = FontFamily(
-    Font(googleFont = outfitFont, fontProvider = provider, weight = FontWeight.Normal),
-    Font(googleFont = outfitFont, fontProvider = provider, weight = FontWeight.Medium),
-    Font(googleFont = outfitFont, fontProvider = provider, weight = FontWeight.SemiBold),
-    Font(googleFont = outfitFont, fontProvider = provider, weight = FontWeight.Bold),
-    Font(googleFont = outfitFont, fontProvider = provider, weight = FontWeight.ExtraBold),
+val manropeFont = GoogleFont("Manrope")
+
+val ManropeFontFamily = FontFamily(
+    Font(googleFont = manropeFont, fontProvider = provider, weight = FontWeight.ExtraLight),
+    Font(googleFont = manropeFont, fontProvider = provider, weight = FontWeight.Light),
+    Font(googleFont = manropeFont, fontProvider = provider, weight = FontWeight.Normal),
+    Font(googleFont = manropeFont, fontProvider = provider, weight = FontWeight.Medium),
+    Font(googleFont = manropeFont, fontProvider = provider, weight = FontWeight.SemiBold),
+    Font(googleFont = manropeFont, fontProvider = provider, weight = FontWeight.Bold),
+    Font(googleFont = manropeFont, fontProvider = provider, weight = FontWeight.ExtraBold),
 )
 
-val InterFontFamily = FontFamily(
-    Font(googleFont = interFont, fontProvider = provider, weight = FontWeight.Normal),
-    Font(googleFont = interFont, fontProvider = provider, weight = FontWeight.Medium),
-    Font(googleFont = interFont, fontProvider = provider, weight = FontWeight.SemiBold),
-    Font(googleFont = interFont, fontProvider = provider, weight = FontWeight.Bold),
-)
-
-// Fallback if needed, or if offline support is critical, we would bundle fonts.
-// For now relying on downloadable fonts as it's standard.
+// Snapshot equivalents
+// text-xs = 12sp
+// text-sm = 14sp
+// text-base = 16sp
+// text-lg = 18sp
+// text-xl = 20sp
+// text-2xl = 24sp
+// text-3xl = 30sp
 
 val Typography = Typography(
     displayLarge = TextStyle(
-        fontFamily = OutfitFontFamily,
+        fontFamily = ManropeFontFamily,
         fontWeight = FontWeight.Bold,
         fontSize = 57.sp,
         lineHeight = 64.sp,
         letterSpacing = (-0.25).sp
     ),
     displayMedium = TextStyle(
-        fontFamily = OutfitFontFamily,
+        fontFamily = ManropeFontFamily,
         fontWeight = FontWeight.Bold,
         fontSize = 45.sp,
         lineHeight = 52.sp,
         letterSpacing = 0.sp
     ),
     displaySmall = TextStyle(
-        fontFamily = OutfitFontFamily,
+        fontFamily = ManropeFontFamily,
         fontWeight = FontWeight.Bold,
         fontSize = 36.sp,
         lineHeight = 44.sp,
         letterSpacing = 0.sp
     ),
     headlineLarge = TextStyle(
-        fontFamily = OutfitFontFamily,
-        fontWeight = FontWeight.Bold,
-        fontSize = 32.sp,
-        lineHeight = 40.sp,
-        letterSpacing = 0.sp
-    ),
-    headlineMedium = TextStyle(
-        fontFamily = OutfitFontFamily,
-        fontWeight = FontWeight.Bold,
-        fontSize = 28.sp,
+        fontFamily = ManropeFontFamily,
+        fontWeight = FontWeight.ExtraBold, // tall headers often bolder
+        fontSize = 30.sp, // text-3xl
         lineHeight = 36.sp,
         letterSpacing = 0.sp
     ),
-    headlineSmall = TextStyle(
-        fontFamily = OutfitFontFamily,
+    headlineMedium = TextStyle(
+        fontFamily = ManropeFontFamily,
         fontWeight = FontWeight.Bold,
-        fontSize = 24.sp,
+        fontSize = 24.sp, // text-2xl
+        lineHeight = 32.sp,
+        letterSpacing = 0.sp
+    ),
+    headlineSmall = TextStyle(
+        fontFamily = ManropeFontFamily,
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp, // text-xl
         lineHeight = 32.sp,
         letterSpacing = 0.sp
     ),
     titleLarge = TextStyle(
-        fontFamily = OutfitFontFamily,
-        fontWeight = FontWeight.SemiBold,
+        fontFamily = ManropeFontFamily,
+        fontWeight = FontWeight.Bold,
         fontSize = 22.sp,
         lineHeight = 28.sp,
         letterSpacing = 0.sp
     ),
     titleMedium = TextStyle(
-        fontFamily = OutfitFontFamily,
-        fontWeight = FontWeight.Medium,
-        fontSize = 16.sp,
+        fontFamily = ManropeFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 16.sp, // text-base
         lineHeight = 24.sp,
         letterSpacing = 0.15.sp
     ),
     titleSmall = TextStyle(
-        fontFamily = OutfitFontFamily,
-        fontWeight = FontWeight.Medium,
-        fontSize = 14.sp,
+        fontFamily = ManropeFontFamily,
+        fontWeight = FontWeight.Bold,
+        fontSize = 14.sp, // text-sm
         lineHeight = 20.sp,
         letterSpacing = 0.1.sp
     ),
     bodyLarge = TextStyle(
-        fontFamily = InterFontFamily,
+        fontFamily = ManropeFontFamily,
         fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
+        fontSize = 16.sp, // text-base
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp
     ),
     bodyMedium = TextStyle(
-        fontFamily = InterFontFamily,
+        fontFamily = ManropeFontFamily,
         fontWeight = FontWeight.Normal,
-        fontSize = 14.sp,
+        fontSize = 14.sp, // text-sm
         lineHeight = 20.sp,
         letterSpacing = 0.25.sp
     ),
     bodySmall = TextStyle(
-        fontFamily = InterFontFamily,
+        fontFamily = ManropeFontFamily,
         fontWeight = FontWeight.Normal,
-        fontSize = 12.sp,
+        fontSize = 12.sp, // text-xs
         lineHeight = 16.sp,
         letterSpacing = 0.4.sp
     ),
     labelLarge = TextStyle(
-        fontFamily = InterFontFamily,
+        fontFamily = ManropeFontFamily,
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.1.sp
     ),
     labelMedium = TextStyle(
-        fontFamily = InterFontFamily,
+        fontFamily = ManropeFontFamily,
         fontWeight = FontWeight.Medium,
         fontSize = 12.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.5.sp
     ),
     labelSmall = TextStyle(
-        fontFamily = InterFontFamily,
-        fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
+        fontFamily = ManropeFontFamily,
+        fontWeight = FontWeight.Bold,
+        fontSize = 11.sp, // ultra small labels
         lineHeight = 16.sp,
         letterSpacing = 0.5.sp
     )
