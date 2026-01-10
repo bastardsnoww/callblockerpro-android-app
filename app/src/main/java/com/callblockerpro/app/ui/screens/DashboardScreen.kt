@@ -280,7 +280,8 @@ fun DashboardScreen(
                             }
                         }
                     } 
-                } // Close Box
+                    } 
+
 
                 // New Modern Header (Transparent)
                 PremiumHeader(
