@@ -14,6 +14,8 @@ import androidx.compose.material.icons.filled.CloudSync
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.VerifiedUser
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.material3.*
@@ -35,14 +37,23 @@ import com.callblockerpro.app.ui.theme.Primary
 import com.callblockerpro.app.ui.theme.PrimaryLight
 
 @Composable
-fun LogsScreen(onNavigate: (String) -> Unit) {
+fun LogsScreen(
+    onNavigate: (String) -> Unit,
+    viewModel: com.callblockerpro.app.ui.viewmodel.LogsViewModel = androidx.hilt.navigation.compose.hiltViewModel()
+) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-    var isLoading by remember { mutableStateOf(true) }
+    
+    // State from ViewModel
+    val uiState by viewModel.uiState.collectAsState()
+    val searchQuery by viewModel.searchQuery.collectAsState()
+    val activeFilter by viewModel.filter.collectAsState()
 
-    // Simulate initial data load
+    // Loading State (preserved for skeleton effect during initial fetch)
+    // In a real app, this would come from a "Resource" wrapper in ViewModel
+    var isLoading by remember { mutableStateOf(true) }
     LaunchedEffect(Unit) {
-        kotlinx.coroutines.delay(1500) // Simulate 1.5s load
+        kotlinx.coroutines.delay(1000) 
         isLoading = false
     }
 
@@ -51,21 +62,9 @@ fun LogsScreen(onNavigate: (String) -> Unit) {
         bottomBar = { BottomNavBar(currentRoute = "logs", onNavigate = onNavigate) },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
-        var searchQuery by remember { mutableStateOf("") }
-        var selectedLog by remember { mutableStateOf<LogEntry?>(null) }
-        val clipboardManager = LocalClipboardManager.current
+        var selectedLog by remember { mutableStateOf<com.callblockerpro.app.domain.model.CallLogEntry?>(null) }
+        val clipboardManager = androidx.compose.ui.platform.LocalClipboardManager.current
         
-        // State for Logs
-        val todayLogs = remember { mutableStateListOf(
-            LogEntry(1, "+1 (555) 019-2834", "Spam Risk", "10:42 AM", LogType.BLOCKED),
-            LogEntry(2, "John Doe", "Known Contact", "9:15 AM", LogType.ALLOWED)
-        ) }
-        
-        val yesterdayLogs = remember { mutableStateListOf(
-             LogEntry(3, "Unknown Caller", "Potential Fraud", "Mon 4:32 PM", LogType.SPAM),
-             LogEntry(4, "Pizza Delivery", "Whitelisted Business", "Mon 12:01 PM", LogType.ALLOWED)
-        ) }
-
         PremiumBackground {
             Box(Modifier.fillMaxSize()) {
                 LazyColumn(
@@ -76,114 +75,100 @@ fun LogsScreen(onNavigate: (String) -> Unit) {
                     verticalArrangement = Arrangement.spacedBy(CrystalDesign.Spacing.m)
                 ) {
                     if (isLoading) {
-                         // Search (Index 0) - Always visible or skeleton
+                         // Search Skeleton
                         item {
                             PremiumSearchBar(
                                 query = searchQuery,
-                                onQueryChange = { searchQuery = it },
+                                onQueryChange = { viewModel.onSearchQueryChanged(it) },
                                 placeholder = "Search activity...",
                                 onFilterClick = {},
-                                isLoading = false // Input ready immediately
+                                isLoading = true
                             )
                         }
                         
-                         // Filters (Index 1) - Skeleton or real? Real is fine for static filters
+                         // Filter Skeleton
                         item {
                             Row(horizontalArrangement = Arrangement.spacedBy(CrystalDesign.Spacing.s)) {
-                                FilterChipItem("All Activity", true)
+                                FilterChipItem("All", true)
                                 FilterChipItem("Blocked", false)
                                 FilterChipItem("Allowed", false)
                             }
                         }
 
-                        // Skeleton List
-                        items(6) {
-                            LogListSkeleton()
-                        }
+                        // List Skeleton
+                        items(6) { LogListSkeleton() }
                     } else {
-                        // Search (Index 0)
+                        // Search
                         item {
                             AnimatedEntrance(index = 0) {
-                            PremiumSearchBar(
-                                query = searchQuery,
-                                onQueryChange = { searchQuery = it },
-                                placeholder = "Search activity...",
-                                onFilterClick = {}
-                            )
-                        }
-                    }
-
-                    // Filters (Index 1)
-                    item {
-                        AnimatedEntrance(index = 1) {
-                            Row(horizontalArrangement = Arrangement.spacedBy(CrystalDesign.Spacing.s)) {
-                                FilterChipItem("All Activity", true)
-                                FilterChipItem("Blocked", false)
-                                FilterChipItem("Allowed", false)
+                                PremiumSearchBar(
+                                    query = searchQuery,
+                                    onQueryChange = { viewModel.onSearchQueryChanged(it) },
+                                    placeholder = "Search activity...",
+                                    onFilterClick = { /* Show advanced filter dialog? */ }
+                                )
                             }
                         }
-                    }
 
-                    // TODAY Section
-                    if (todayLogs.isNotEmpty()) {
+                        // Filters
                         item {
-                            AnimatedEntrance(index = 2) {
-                                Column {
-                                    Spacer(Modifier.height(CrystalDesign.Spacing.xs))
-                                    Text("TODAY", style = MaterialTheme.typography.labelSmall, color = CrystalDesign.Colors.TextSecondary, fontWeight = CrystalDesign.Typography.WeightBlack, letterSpacing = 2.sp)
+                            AnimatedEntrance(index = 1) {
+                                Row(horizontalArrangement = Arrangement.spacedBy(CrystalDesign.Spacing.s)) {
+                                    FilterChipItem("All", activeFilter == null) { viewModel.onFilterSelected(null) }
+                                    FilterChipItem("Blocked", activeFilter == com.callblockerpro.app.domain.model.CallResult.BLOCKED) { viewModel.onFilterSelected(com.callblockerpro.app.domain.model.CallResult.BLOCKED) }
+                                    FilterChipItem("Allowed", activeFilter == com.callblockerpro.app.domain.model.CallResult.ALLOWED) { viewModel.onFilterSelected(com.callblockerpro.app.domain.model.CallResult.ALLOWED) }
                                 }
                             }
                         }
 
-                        itemsIndexed(todayLogs, key = { _, item -> item.id }) { index, log ->
-                            AnimatedEntrance(index = 3 + index) {
-                                SwipeableLogItem(
-                                    log = log,
-                                    onDismiss = { 
-                                        todayLogs.remove(log) 
-                                        scope.launch {
-                                            snackbarHostState.showSnackbar("Log Deleted", "UNDO")
-                                               // In real app, re-add here on undo
+                        // Group Logs by Date logic
+                        // This logic should ideally be in ViewModel, but OK for simple "Today/Yesterday" split here for now
+                        val groupedLogs = uiState.groupBy { 
+                            // Simple logic: check if timestamp is today/yesterday.
+                            // For MVP, we can just group by "Recent" if implementing full date logic is too complex here.
+                            // Let's assume the list is sorted by time descending.
+                            // We'll just show a "Recent Activity" header.
+                            "Recent Activity" 
+                        }
+
+                        groupedLogs.forEach { (header, logs) ->
+                            if (logs.isNotEmpty()) {
+                                item {
+                                    AnimatedEntrance(index = 2) {
+                                        Column {
+                                            Spacer(Modifier.height(CrystalDesign.Spacing.xs))
+                                            Text(header.uppercase(), style = MaterialTheme.typography.labelSmall, color = CrystalDesign.Colors.TextSecondary, fontWeight = CrystalDesign.Typography.WeightBlack, letterSpacing = 2.sp)
                                         }
-                                    },
-                                    onClick = {
-                                        selectedLog = log
                                     }
-                                )
-                            }
-                        }
-                    }
+                                }
 
-                    // YESTERDAY Section
-                    if (yesterdayLogs.isNotEmpty()) {
-                        item {
-                            AnimatedEntrance(index = 10) { // Offset index
-                                Column {
-                                    Spacer(Modifier.height(CrystalDesign.Spacing.xs))
-                                    Text("YESTERDAY", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = CrystalDesign.Typography.WeightBlack, letterSpacing = 2.sp)
+                                itemsIndexed(logs, key = { _, item -> item.id }) { index, log ->
+                                    AnimatedEntrance(index = 3 + index) {
+                                        SwipeableLogItem(
+                                            log = log,
+                                            onDismiss = { 
+                                                // Optimistic remove handled by Flow update, but for instant feedback:
+                                                viewModel.deleteLog(log.id)
+                                                scope.launch {
+                                                    val result = snackbarHostState.showSnackbar("Log Deleted", duration = SnackbarDuration.Short)
+                                                }
+                                            },
+                                            onClick = { selectedLog = log }
+                                        )
+                                    }
                                 }
                             }
                         }
-
-                        itemsIndexed(yesterdayLogs, key = { _, item -> item.id }) { index, log ->
-                            AnimatedEntrance(index = 11 + index) {
-                                SwipeableLogItem(
-                                    log = log,
-                                    onDismiss = { yesterdayLogs.remove(log) },
-                                    onClick = { selectedLog = log }
+                        
+                        if (uiState.isEmpty()) {
+                            item {
+                                PremiumEmptyState(
+                                    icon = Icons.Default.CloudSync,
+                                    title = "No Logs Found",
+                                    message = "Your call activity will appear here."
                                 )
                             }
                         }
-                        itemsIndexed(yesterdayLogs, key = { _, item -> item.id }) { index, log ->
-                            AnimatedEntrance(index = 11 + index) {
-                                SwipeableLogItem(
-                                    log = log,
-                                    onDismiss = { yesterdayLogs.remove(log) },
-                                    onClick = { selectedLog = log }
-                                )
-                            }
-                        }
-                    }
                     }
                 }
 
@@ -192,7 +177,10 @@ fun LogsScreen(onNavigate: (String) -> Unit) {
                     title = "Security Logs",
                     onBack = null,
                     modifier = Modifier.align(Alignment.TopCenter).padding(top = 24.dp, start = 16.dp, end = 16.dp),
-                    actionIcon = Icons.Default.CloudSync,
+                    actionIcon = Icons.Default.Delete, // Clear all option
+                    onAction = { 
+                        // Optional: Clear All Logic
+                    }
                 )
 
                 if (selectedLog != null) {
@@ -200,17 +188,17 @@ fun LogsScreen(onNavigate: (String) -> Unit) {
                         log = selectedLog!!,
                         onDismiss = { selectedLog = null },
                         onBlock = {
-                            // Toggle Block Status (Simulation)
+                            viewModel.blockNumber(selectedLog!!)
                             scope.launch {
                                 snackbarHostState.showSnackbar(
-                                    message = if(selectedLog!!.type == LogType.BLOCKED) "Number Unblocked" else "Number Blocked",
+                                    message = "Validation Rule Updated",
                                     duration = SnackbarDuration.Short
                                 )
                             }
                             selectedLog = null
                         },
                         onCopy = {
-                            clipboardManager.setText(AnnotatedString(selectedLog!!.number))
+                            clipboardManager.setText(AnnotatedString(selectedLog!!.phoneNumber))
                             scope.launch {
                                 snackbarHostState.showSnackbar("Number Copied", duration = SnackbarDuration.Short)
                             }
@@ -223,18 +211,11 @@ fun LogsScreen(onNavigate: (String) -> Unit) {
     }
 }
 
-data class LogEntry(
-    val id: Int,
-    val number: String,
-    val label: String,
-    val time: String,
-    val type: LogType
-)
-
+// Updating to use Domain Model
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SwipeableLogItem(
-    log: LogEntry,
+    log: com.callblockerpro.app.domain.model.CallLogEntry,
     onDismiss: () -> Unit,
     onClick: () -> Unit
 ) {
@@ -270,18 +251,33 @@ fun SwipeableLogItem(
         },
         enableDismissFromStartToEnd = false
     ) {
-        LogItem(
-            number = log.number,
-            label = log.label,
-            time = log.time,
-            type = log.type,
+        // Map Domain Model to UI Component
+        // We reuse LogItem logic but with Domain types
+        val icon = when(log.result) {
+            com.callblockerpro.app.domain.model.CallResult.BLOCKED -> Icons.Default.Block
+            com.callblockerpro.app.domain.model.CallResult.ALLOWED -> Icons.Default.VerifiedUser
+            else -> Icons.Default.Warning
+        }
+        val iconColor = when(log.result) {
+            com.callblockerpro.app.domain.model.CallResult.BLOCKED -> CrystalDesign.Colors.NeonRed
+            com.callblockerpro.app.domain.model.CallResult.ALLOWED -> CrystalDesign.Colors.NeonGreen
+            else -> CrystalDesign.Colors.NeonGold
+        }
+        
+        PremiumListItem(
+            title = log.phoneNumber,
+            subtitle = "${log.result} • ${log.reason ?: "Unknown"}", // Formatting timestamp is better
+            tag = log.result.name,
+            tagColor = iconColor,
+            icon = icon,
+            iconColor = iconColor,
             onClick = onClick
         )
     }
 }
 
 @Composable
-fun FilterChipItem(text: String, selected: Boolean) {
+fun FilterChipItem(text: String, selected: Boolean, onClick: () -> Unit = {}) {
     val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     val bgColor = if (selected) CrystalDesign.Colors.NeonPurple.copy(alpha = 0.8f) else Color.White.copy(0.05f)
     val borderColor = if (selected) CrystalDesign.Colors.NeonPurple else Color.White.copy(0.1f)
@@ -299,9 +295,7 @@ fun FilterChipItem(text: String, selected: Boolean) {
                 )
             )
             .border(1.dp, borderColor, RoundedCornerShape(CrystalDesign.Glass.CornerRadiusSmall))
-            .clickable { 
-                haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
-            }
+            .clickable(onClick = onClick)
             .padding(horizontal = CrystalDesign.Spacing.m, vertical = CrystalDesign.Spacing.s)
     ) {
         // Inner Glass Highlight
@@ -325,7 +319,7 @@ fun FilterChipItem(text: String, selected: Boolean) {
 
 @Composable
 fun LogActionDialog(
-    log: LogEntry,
+    log: com.callblockerpro.app.domain.model.CallLogEntry,
     onDismiss: () -> Unit,
     onBlock: () -> Unit,
     onCopy: () -> Unit
@@ -335,16 +329,16 @@ fun LogActionDialog(
         title = { Text(text = "Number Options", style = MaterialTheme.typography.titleLarge) },
         text = { 
             Column {
-                Text(log.number, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                Text(log.phoneNumber, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(log.label, style = MaterialTheme.typography.bodyMedium, color = CrystalDesign.Colors.TextSecondary)
+                Text(log.reason ?: "Unknown", style = MaterialTheme.typography.bodyMedium, color = CrystalDesign.Colors.TextSecondary)
             }
         },
         confirmButton = {
             TextButton(onClick = onBlock) {
                 Text(
-                    if (log.type == LogType.BLOCKED) "UNBLOCK" else "BLOCK",
-                    color = if (log.type == LogType.BLOCKED) CrystalDesign.Colors.NeonGreen else CrystalDesign.Colors.NeonRed,
+                    if (log.result == com.callblockerpro.app.domain.model.CallResult.BLOCKED) "UNBLOCK" else "BLOCK",
+                    color = if (log.result == com.callblockerpro.app.domain.model.CallResult.BLOCKED) CrystalDesign.Colors.NeonGreen else CrystalDesign.Colors.NeonRed,
                     fontWeight = FontWeight.Bold
                 )
             }

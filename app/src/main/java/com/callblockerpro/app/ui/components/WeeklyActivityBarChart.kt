@@ -81,5 +81,34 @@ fun WeeklyActivityBarChart(
                 cornerRadius = CornerRadius(4.dp.toPx())
             )
         }
+
+        // PEAK Line (Max value)
+        val maxVal = data.maxOrNull() ?: 1f
+        // We assume the data values are 0..1 relative to height, or if they are raw, we normalize. 
+        // Logic in code implies values are 0..1 (barHeight = size.height * animatedValue).
+        // If data is normalized 0..1:
+        val peakY = size.height - (size.height * maxVal)
+        if (data.isNotEmpty()) {
+             drawLine(
+                color = com.callblockerpro.app.ui.theme.Red.copy(alpha = 0.5f),
+                start = Offset(0f, peakY),
+                end = Offset(size.width, peakY),
+                strokeWidth = 1.dp.toPx(),
+                pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
+            )
+        }
+
+        // AVERAGE Line
+        val avgVal = if (data.isNotEmpty()) data.average().toFloat() else 0f
+        val avgY = size.height - (size.height * avgVal)
+         if (data.isNotEmpty()) {
+            drawLine(
+                color = com.callblockerpro.app.ui.theme.Emerald.copy(alpha = 0.5f),
+                start = Offset(0f, avgY),
+                end = Offset(size.width, avgY),
+                strokeWidth = 1.dp.toPx(),
+                pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
+            )
+        }
     }
 }

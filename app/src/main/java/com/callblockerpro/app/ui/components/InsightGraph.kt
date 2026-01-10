@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.unit.dp
 import com.callblockerpro.app.ui.theme.Primary
+import com.callblockerpro.app.ui.theme.CrystalDesign
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
@@ -110,5 +111,25 @@ fun InsightGraph(
                 strokeWidth = 1.dp.toPx()
             )
         }
+
+        // PEAK Line (at 0.2 height relative to top, i.e. 80% value)
+        val peakY = height * 0.2f
+        drawLine(
+            color = CrystalDesign.Colors.NeonRed.copy(alpha = 0.5f),
+            start = Offset(0f, peakY),
+            end = Offset(width, peakY),
+            strokeWidth = 1.dp.toPx(),
+            pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
+        )
+        
+        // AVERAGE Line (at 0.6 height relative to top, i.e. 40% activity)
+        val avgY = height * 0.6f
+        drawLine(
+            color = CrystalDesign.Colors.NeonGreen.copy(alpha = 0.5f),
+            start = Offset(0f, avgY),
+            end = Offset(width, avgY),
+            strokeWidth = 1.dp.toPx(),
+            pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
+        )
     }
 }

@@ -539,91 +539,77 @@ fun PremiumHeader(
     actionIcon: ImageVector? = null,
     onAction: (() -> Unit)? = null
 ) {
-    val infiniteTransition = rememberInfiniteTransition(label = "HeaderPulse")
-    val isReducedMotion = com.callblockerpro.app.ui.theme.isReducedMotionEnabled()
-    val edgeAlpha by infiniteTransition.animateFloat(
-        initialValue = 0.3f,
-        targetValue = if (isReducedMotion) 0.3f else 0.8f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2000, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "EdgeAlpha"
-    )
-
-    Box(
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+    
+    // Modern Transparent Header
+    Row(
         modifier = modifier
             .fillMaxWidth()
             .height(com.callblockerpro.app.ui.theme.adaptiveHeaderHeight())
-            .padding(
-                horizontal = com.callblockerpro.app.ui.theme.adaptiveContentPadding(),
-                vertical = CrystalDesign.Spacing.xs
-            )
+            .padding(horizontal = 4.dp), // Minimal padding
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        // Main Glass Panel
-        GlassPanel(
-            modifier = Modifier.fillMaxSize(),
-            cornerRadius = com.callblockerpro.app.ui.theme.adaptiveCardRadius(),
-            borderAlpha = 0.15f
-        ) {
-            // Neon Bottom Edge
+        if (onBack != null) {
             Box(
                 modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth(0.6f)
-                    .height(2.dp)
-                    .graphicsLayer { alpha = edgeAlpha }
-                    .background(
-                        Brush.horizontalGradient(
-                            listOf(Color.Transparent, CrystalDesign.Colors.NeonGreen, Color.Transparent)
-                        )
-                    )
-            )
-
-            Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = com.callblockerpro.app.ui.theme.AdaptiveSpacing.medium()),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                if (onBack != null) {
-                    MetallicHeaderButton(
-                        icon = Icons.Default.ChevronRight,
-                        contentDescription = "Go Back",
-                        onClick = onBack,
-                        modifier = Modifier.graphicsLayer { rotationZ = 180f }
-                    )
-                    Spacer(modifier = Modifier.width(com.callblockerpro.app.ui.theme.AdaptiveSpacing.medium()))
-                }
-
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = title.uppercase(),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Black,
-                        color = Color.White,
-                        letterSpacing = 3.sp
-                    )
-                    if (subtitle != null) {
-                        Text(
-                            text = subtitle,
-                            style = MaterialTheme.typography.labelSmall,
-                            color = Color.White.copy(alpha = 0.6f),
-                            fontWeight = FontWeight.Medium
-                        )
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .clickable { 
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onBack() 
                     }
-                }
+                    .background(Color.White.copy(0.05f))
+                    .border(1.dp, Color.White.copy(0.1f), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ChevronRight,
+                    contentDescription = "Back",
+                    tint = Color.White,
+                    modifier = Modifier.graphicsLayer { rotationZ = 180f }
+                )
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+        }
 
-                if (actionIcon != null && onAction != null) {
-                    MetallicHeaderButton(
-                        icon = actionIcon,
-                        contentDescription = "Action",
-                        onClick = onAction
-                    )
-                }
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title.uppercase(),
+                style = MaterialTheme.typography.titleLarge, // Larger, cleaner
+                fontWeight = FontWeight.Black,
+                color = Color.White,
+                letterSpacing = (-0.5).sp // Tighter, modern spacing
+            )
+            if (subtitle != null) {
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = CrystalDesign.Colors.Primary, // Neon accent
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.sp
+                )
+            }
+        }
+
+        if (actionIcon != null && onAction != null) {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .clickable { 
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onAction() 
+                    }
+                    .background(Color.White.copy(0.05f))
+                    .border(1.dp, Color.White.copy(0.1f), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = actionIcon,
+                    contentDescription = "Action",
+                    tint = Color.White,
+                    modifier = Modifier.size(20.dp)
+                )
             }
         }
     }

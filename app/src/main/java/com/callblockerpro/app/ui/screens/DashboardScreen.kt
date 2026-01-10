@@ -43,6 +43,7 @@ fun DashboardScreen(
     val blockedToday by viewModel.blockedToday.collectAsState()
     val totalThreats by viewModel.totalThreats.collectAsState()
     val weeklyActivity by viewModel.weeklyActivity.collectAsState()
+    val recentLogs by viewModel.recentLogs.collectAsState() // [NEW]
 
     var isRoleGranted by remember { 
         mutableStateOf(com.callblockerpro.app.util.CallScreeningPermissions.isCallScreeningRoleGranted(context)) 
@@ -52,6 +53,16 @@ fun DashboardScreen(
         contract = androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(),
         onResult = { isRoleGranted = com.callblockerpro.app.util.CallScreeningPermissions.isCallScreeningRoleGranted(context) }
     )
+
+    // Mode Toast Effect
+    LaunchedEffect(selectedMode) {
+        val modeName = when(selectedMode) {
+            0 -> "Normal Mode"
+            1 -> "Whitelist Mode"
+            else -> "Blocklist Mode"
+        }
+        android.widget.Toast.makeText(context, "$modeName Activated", android.widget.Toast.LENGTH_SHORT).show()
+    }
 
     // Refresh when screen is displayed
     androidx.compose.runtime.DisposableEffect(Unit) {
@@ -67,6 +78,7 @@ fun DashboardScreen(
             Box(Modifier.fillMaxSize()) {
                     // Capture Scroll State
                     val listState = rememberLazyListState()
+                    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
 
                     val maxWidth = com.callblockerpro.app.ui.theme.maxContentWidth()
                     val contentPadding = com.callblockerpro.app.ui.theme.adaptiveContentPadding()
@@ -91,13 +103,16 @@ fun DashboardScreen(
                         // Spacer for header
                         item { Spacer(Modifier.height(0.dp)) }
 
-                        // Mode Selector (Index 0 for animation)
+                        // Mode Selector (Index 0)
                         item {
                             AnimatedEntrance(index = 0) {
                                 MetallicToggle(
                                     options = listOf("Normal", "Whitelist", "Blocklist"),
                                     selectedIndex = selectedMode,
-                                    onOptionSelected = { viewModel.onModeSelected(it) },
+                                    onOptionSelected = { 
+                                        viewModel.onModeSelected(it) 
+                                        haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                                    },
                                     modifier = Modifier.fillMaxWidth()
                                 )
                             }
@@ -105,12 +120,10 @@ fun DashboardScreen(
 
                         // Status Card (PARALLAX ENABLED) (Index 1)
                         item {
-                            // Calculate Parallax Progress
                             val index = listState.firstVisibleItemIndex
                             val offset = listState.firstVisibleItemScrollOffset
                             val parallaxProgress = if (index > 2) 1f else (offset.toFloat() / 500f)
                             
-                            val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
                             AnimatedEntrance(index = 1) {
                                 HomeStatusCard(
                                     blockedCount = blockedToday,
@@ -119,11 +132,15 @@ fun DashboardScreen(
                                     modifier = Modifier
                                         .scrollParallax(parallaxProgress)
                                         .clickable {
+                                            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
                                             if (!isRoleGranted) {
-                                                haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
                                                 com.callblockerpro.app.util.CallScreeningPermissions.createRoleRequestIntent(context)?.let {
                                                     roleLauncher.launch(it)
                                                 }
+                                            } else {
+                                                // [NEW] Toggle Interaction for active state
+                                                viewModel.toggleSystemShield(true)
+                                                android.widget.Toast.makeText(context, "System Shield is Active & Monitoring", android.widget.Toast.LENGTH_SHORT).show()
                                             }
                                         }
                                 )
@@ -140,14 +157,14 @@ fun DashboardScreen(
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text("Weekly Activity", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = CrystalDesign.Typography.WeightBlack)
-                                        val hapticReporting = androidx.compose.ui.platform.LocalHapticFeedback.current
                                         Text(
                                             "FULL REPORT", 
                                             style = MaterialTheme.typography.labelSmall, 
                                             color = PrimaryLight, 
                                             fontWeight = CrystalDesign.Typography.WeightBold, 
                                             modifier = Modifier.clickable {
-                                                hapticReporting.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                                                haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                                                onNavigate("logs") // Navigate to logs for full report
                                             }
                                         )
                                     }
@@ -166,6 +183,7 @@ fun DashboardScreen(
                                             }
                                             Spacer(Modifier.height(24.dp))
                                             Box(Modifier.fillMaxWidth().height(150.dp)) {
+                                                // Added Peak/Avg lines in WeeklyActivityBarChart component directly
                                                 if (weeklyActivity.isNotEmpty()) {
                                                     WeeklyActivityBarChart(data = weeklyActivity)
                                                 } else {
@@ -184,46 +202,48 @@ fun DashboardScreen(
                             }
                         }
 
+                        // Recent Activity (Index 3) - WIRED TO REAL DATA
                         item {
                             AnimatedEntrance(index = 3) {
                                 Column(verticalArrangement = Arrangement.spacedBy(CrystalDesign.Spacing.m)) {
                                     Text("Recent Activity", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = CrystalDesign.Typography.WeightBlack)
                                     Spacer(modifier = Modifier.height(CrystalDesign.Spacing.xs))
                                     
-                                    // 10/10 Storytelling Empty State
-                                    val recentLogs = emptyList<String>() // Simulated empty state for audit
-                                    
                                     if (recentLogs.isEmpty()) {
                                         ScanningHorizon()
                                     } else {
-                                        PremiumListItem(
-                                               title = "+1 (555) 019-2834",
-                                               subtitle = "2m ago • Spam Risk",
-                                               tag = "BLOCKED",
-                                               tagColor = Red,
-                                               icon = Icons.Default.Block,
-                                               iconColor = Red,
-                                               onClick = {}
-                                           )
-                                        PremiumListItem(
-                                               title = "Mom Mobile",
-                                               subtitle = "1h ago • Whitelist",
-                                               tag = "ALLOWED",
-                                               tagColor = Emerald,
-                                               icon = Icons.Default.VerifiedUser,
-                                               iconColor = Emerald,
-                                               onClick = {}
-                                           )
+                                        recentLogs.forEach { log ->
+                                            val icon = when(log.result) {
+                                                com.callblockerpro.app.domain.model.CallResult.BLOCKED -> Icons.Default.Block
+                                                com.callblockerpro.app.domain.model.CallResult.ALLOWED -> Icons.Default.VerifiedUser
+                                                else -> Icons.Default.Warning
+                                            }
+                                            val iconColor = when(log.result) {
+                                                com.callblockerpro.app.domain.model.CallResult.BLOCKED -> Red
+                                                com.callblockerpro.app.domain.model.CallResult.ALLOWED -> Emerald
+                                                else -> CrystalDesign.Colors.NeonGold
+                                            }
+                                            
+                                            PremiumListItem(
+                                                   title = log.phoneNumber,
+                                                   subtitle = "${log.result} • ${log.reason ?: "Unknown"}",
+                                                   tag = log.result.name,
+                                                   tagColor = iconColor,
+                                                   icon = icon,
+                                                   iconColor = iconColor,
+                                                   onClick = { onNavigate("logs") }
+                                               )
+                                        }
                                     }
                                 }
                             }
                         }
                     }
 
-                // Floating Crystal Header
+                // New Modern Header (Transparent)
                 PremiumHeader(
                     title = "CallBlockerPro",
-                    subtitle = "NEON CRYSTAL EVOLUTION",
+                    subtitle = "NEON CRYSTAL", // simplified subtitle
                     onBack = null,
                     modifier = Modifier
                         .align(Alignment.TopCenter)

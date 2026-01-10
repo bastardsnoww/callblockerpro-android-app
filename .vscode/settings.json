@@ -1,5 +1,9 @@
 {
     "java.configuration.updateBuildConfiguration": "automatic",
     "workbench.experimental.cloudChanges.autoStore": "onShutdown",
-    "redhat.telemetry.enabled": true
+    "redhat.telemetry.enabled": true,
+    "git.enableSmartCommit": true,
+    "git.confirmSync": false,
+    "git.autofetch": true,
+    "files.autoSave": "afterDelay"
 }
