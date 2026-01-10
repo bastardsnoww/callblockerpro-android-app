@@ -47,7 +47,7 @@ fun DashboardScreen(
     val blockedToday by viewModel.blockedToday.collectAsState()
     val totalThreats by viewModel.totalThreats.collectAsState()
     val weeklyActivity by viewModel.weeklyActivity.collectAsState()
-    val recentLogs by viewModel.recentLogs.collectAsState() // [NEW]
+    val recentLogs by viewModel.recentLogs.collectAsState()
 
     var isRoleGranted by remember { 
         mutableStateOf(com.callblockerpro.app.util.CallScreeningPermissions.isCallScreeningRoleGranted(context)) 
@@ -58,7 +58,6 @@ fun DashboardScreen(
         onResult = { isRoleGranted = com.callblockerpro.app.util.CallScreeningPermissions.isCallScreeningRoleGranted(context) }
     )
 
-    // Mode Toast Effect
     LaunchedEffect(selectedMode) {
         val modeName = when(selectedMode) {
             0 -> "Normal Mode"
@@ -68,7 +67,6 @@ fun DashboardScreen(
         android.widget.Toast.makeText(context, "$modeName Activated", android.widget.Toast.LENGTH_SHORT).show()
     }
 
-    // Refresh when screen is displayed
     androidx.compose.runtime.DisposableEffect(Unit) {
         isRoleGranted = com.callblockerpro.app.util.CallScreeningPermissions.isCallScreeningRoleGranted(context)
         onDispose {}
@@ -80,213 +78,200 @@ fun DashboardScreen(
     ) { paddingValues ->
         PremiumBackground {
             Box(Modifier.fillMaxSize()) {
-                    // Capture Scroll State
-                    val listState = rememberLazyListState()
-                    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
-
-                    val maxWidth = com.callblockerpro.app.ui.theme.maxContentWidth()
-                    val contentPadding = com.callblockerpro.app.ui.theme.adaptiveContentPadding()
-                    
-                    @OptIn(ExperimentalFoundationApi::class)
-                    CompositionLocalProvider(
-                        LocalOverscrollConfiguration provides null
+                val listState = rememberLazyListState()
+                val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+                val maxWidth = com.callblockerpro.app.ui.theme.maxContentWidth()
+                val contentPadding = com.callblockerpro.app.ui.theme.adaptiveContentPadding()
+                
+                @OptIn(ExperimentalFoundationApi::class)
+                CompositionLocalProvider(
+                    LocalOverscrollConfiguration provides null
+                ) {
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)
+                            .then(
+                                if (maxWidth != androidx.compose.ui.unit.Dp.Unspecified) {
+                                    Modifier.widthIn(max = maxWidth).align(Alignment.TopCenter)
+                                } else Modifier
+                            )
+                            .padding(horizontal = contentPadding),
+                        contentPadding = PaddingValues(
+                            top = com.callblockerpro.app.ui.theme.adaptiveHeaderHeight() + 8.dp,
+                            bottom = 120.dp
+                        ),
+                        verticalArrangement = Arrangement.spacedBy(com.callblockerpro.app.ui.theme.AdaptiveSpacing.large())
                     ) {
-                        LazyColumn(
-                            state = listState,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(paddingValues)
-                                .then(
-                                    if (maxWidth != androidx.compose.ui.unit.Dp.Unspecified) {
-                                        Modifier.widthIn(max = maxWidth).align(Alignment.TopCenter)
-                                    } else Modifier
-                                )
-                                .padding(horizontal = contentPadding),
-                            contentPadding = PaddingValues(
-                                top = com.callblockerpro.app.ui.theme.adaptiveHeaderHeight() + 8.dp,
-                                bottom = 120.dp
-                            ),
-                            verticalArrangement = Arrangement.spacedBy(com.callblockerpro.app.ui.theme.AdaptiveSpacing.large())
-                        ) {
-                            // Spacer for header
-                            item { Spacer(Modifier.height(0.dp)) }
+                        item { Spacer(Modifier.height(0.dp)) }
 
-                            // Mode Selector (Index 0)
-                            item {
-                                AnimatedEntrance(index = 0) {
-                                    MetallicToggle(
-                                        options = listOf("Normal", "Whitelist", "Blocklist"),
-                                        selectedIndex = selectedMode,
-                                        onOptionSelected = { 
-                                            viewModel.onModeSelected(it) 
+                        item {
+                            AnimatedEntrance(index = 0) {
+                                MetallicToggle(
+                                    options = listOf("Normal", "Whitelist", "Blocklist"),
+                                    selectedIndex = selectedMode,
+                                    onOptionSelected = { 
+                                        viewModel.onModeSelected(it) 
+                                        haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                                    },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                        }
+
+                        item {
+                            val index = listState.firstVisibleItemIndex
+                            val offset = listState.firstVisibleItemScrollOffset
+                            val parallaxProgress = if (index > 2) 1f else (offset.toFloat() / 500f)
+                            
+                            AnimatedEntrance(index = 1) {
+                                HomeStatusCard(
+                                    blockedCount = blockedToday,
+                                    threatCount = totalThreats,
+                                    isSystemActive = isRoleGranted,
+                                    modifier = Modifier
+                                        .scrollParallax(parallaxProgress)
+                                        .clickable {
                                             haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
-                                        },
-                                        modifier = Modifier.fillMaxWidth()
-                                    )
-                                }
-                            }
-    
-                            // Status Card (PARALLAX ENABLED) (Index 1)
-                            item {
-                                val index = listState.firstVisibleItemIndex
-                                val offset = listState.firstVisibleItemScrollOffset
-                                val parallaxProgress = if (index > 2) 1f else (offset.toFloat() / 500f)
-                                
-                                AnimatedEntrance(index = 1) {
-                                    HomeStatusCard(
-                                        blockedCount = blockedToday,
-                                        threatCount = totalThreats,
-                                        isSystemActive = isRoleGranted,
-                                        modifier = Modifier
-                                            .scrollParallax(parallaxProgress)
-                                            .clickable {
-                                                haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
-                                                if (!isRoleGranted) {
-                                                    com.callblockerpro.app.util.CallScreeningPermissions.createRoleRequestIntent(context)?.let {
-                                                        roleLauncher.launch(it)
-                                                    }
-                                                } else {
-                                                    // [NEW] Toggle Interaction for active state
-                                                    viewModel.toggleSystemShield(true)
-                                                    android.widget.Toast.makeText(context, "System Shield is Active & Monitoring", android.widget.Toast.LENGTH_SHORT).show()
+                                            if (!isRoleGranted) {
+                                                com.callblockerpro.app.util.CallScreeningPermissions.createRoleRequestIntent(context)?.let {
+                                                    roleLauncher.launch(it)
                                                 }
-                                            }
-                                    )
-                                }
-                            }
-    
-                            // Weekly Insights (Index 2)
-                            item {
-                                AnimatedEntrance(index = 2) {
-                                    Column {
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            Text(
-                                                "Weekly Activity", 
-                                                style = MaterialTheme.typography.titleMedium, // text-lg
-                                                color = Color.White, 
-                                                fontWeight = FontWeight.Bold
-                                            )
-                                            // HTML uses a More button, not text link
-                                            IconButton(onClick = { onNavigate("logs") }) {
-                                                Icon(
-                                                    imageVector = androidx.compose.material.icons.Icons.Default.MoreVert,
-                                                    contentDescription = "Options",
-                                                    tint = CrystalDesign.Colors.TextTertiary
-                                                )
+                                            } else {
+                                                viewModel.toggleSystemShield(true)
+                                                android.widget.Toast.makeText(context, "System Shield is Active & Monitoring", android.widget.Toast.LENGTH_SHORT).show()
                                             }
                                         }
-                                        Spacer(modifier = Modifier.height(20.dp))
-                                        GlassPanel(modifier = Modifier.fillMaxWidth()) {
-                                            Column(Modifier.padding(24.dp).fillMaxWidth()) {
-                                                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(32.dp)) {
-                                                    Column {
-                                                        Text(
-                                                            "AVG. DAILY", 
-                                                            style = MaterialTheme.typography.labelSmall, 
-                                                            color = CrystalDesign.Colors.TextTertiary, // slate-400
-                                                            fontWeight = FontWeight.Bold,
-                                                            letterSpacing = 0.5.sp
-                                                        )
-                                                        Text(
-                                                            "18 Calls", 
-                                                            style = MaterialTheme.typography.headlineSmall, // text-2xl
-                                                            color = Color.White, 
-                                                            fontWeight = FontWeight.Bold
-                                                        )
-                                                    }
-                                                    Column {
-                                                        Text(
-                                                            "PEAK DAY", 
-                                                            style = MaterialTheme.typography.labelSmall, 
-                                                            color = CrystalDesign.Colors.TextTertiary, // slate-400
-                                                            fontWeight = FontWeight.Bold,
-                                                            letterSpacing = 0.5.sp
-                                                        )
-                                                        Text(
-                                                            "Tuesday", 
-                                                            style = MaterialTheme.typography.headlineSmall, // text-2xl
-                                                            color = Color.White, 
-                                                            fontWeight = FontWeight.Bold
-                                                        )
-                                                    }
-                                                }
-                                                Spacer(Modifier.height(24.dp))
-                                                Box(Modifier.fillMaxWidth().height(150.dp)) {
-                                                    // Added Peak/Avg lines in WeeklyActivityBarChart component directly
-                                                    if (weeklyActivity.isNotEmpty()) {
-                                                        WeeklyActivityBarChart(data = weeklyActivity)
-                                                    } else {
-                                                        WeeklyActivityBarChart()
-                                                    }
-                                                }
-                                                Spacer(Modifier.height(16.dp))
-                                                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                                    listOf("M", "T", "W", "T", "F", "S", "S").forEach { 
-                                                        Text(
-                                                            it, 
-                                                            style = MaterialTheme.typography.labelSmall, 
-                                                            color = CrystalDesign.Colors.TextSecondary, // slate-400/500
-                                                            modifier = Modifier.width(CrystalDesign.Spacing.l), 
-                                                            textAlign = androidx.compose.ui.text.style.TextAlign.Center, 
-                                                            fontWeight = FontWeight.Bold
-                                                        )
-                                                    }
-                                                }
-                                            }
+                                )
+                            }
+                        }
+
+                        item {
+                            AnimatedEntrance(index = 2) {
+                                Column {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            "Weekly Activity", 
+                                            style = MaterialTheme.typography.titleMedium,
+                                            color = Color.White, 
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        IconButton(onClick = { onNavigate("logs") }) {
+                                            Icon(
+                                                imageVector = androidx.compose.material.icons.Icons.Default.MoreVert,
+                                                contentDescription = "Options",
+                                                tint = CrystalDesign.Colors.TextTertiary
+                                            )
                                         }
                                     }
-                                }
-                            }
-    
-                            // Recent Activity (Index 3) - WIRED TO REAL DATA
-                            item {
-                                AnimatedEntrance(index = 3) {
-                                    Column(verticalArrangement = Arrangement.spacedBy(CrystalDesign.Spacing.m)) {
-                                        Text("Recent Activity", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = CrystalDesign.Typography.WeightBlack)
-                                        Spacer(modifier = Modifier.height(CrystalDesign.Spacing.xs))
-                                        
-                                        if (recentLogs.isEmpty()) {
-                                            ScanningHorizon()
-                                        } else {
-                                            recentLogs.forEach { log ->
-                                                val icon = when(log.result) {
-                                                    com.callblockerpro.app.domain.model.CallResult.BLOCKED -> Icons.Default.Block
-                                                    com.callblockerpro.app.domain.model.CallResult.ALLOWED -> Icons.Default.VerifiedUser
-                                                    else -> Icons.Default.Warning
+                                    Spacer(modifier = Modifier.height(20.dp))
+                                    GlassPanel(modifier = Modifier.fillMaxWidth()) {
+                                        Column(Modifier.padding(24.dp).fillMaxWidth()) {
+                                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(32.dp)) {
+                                                Column {
+                                                    Text(
+                                                        "AVG. DAILY", 
+                                                        style = MaterialTheme.typography.labelSmall, 
+                                                        color = CrystalDesign.Colors.TextTertiary,
+                                                        fontWeight = FontWeight.Bold,
+                                                        letterSpacing = 0.5.sp
+                                                    )
+                                                    Text(
+                                                        "18 Calls", 
+                                                        style = MaterialTheme.typography.headlineSmall,
+                                                        color = Color.White, 
+                                                        fontWeight = FontWeight.Bold
+                                                    )
                                                 }
-                                                val iconColor = when(log.result) {
-                                                    com.callblockerpro.app.domain.model.CallResult.BLOCKED -> Red
-                                                    com.callblockerpro.app.domain.model.CallResult.ALLOWED -> Emerald
-                                                    else -> CrystalDesign.Colors.NeonGold
+                                                Column {
+                                                    Text(
+                                                        "PEAK DAY", 
+                                                        style = MaterialTheme.typography.labelSmall, 
+                                                        color = CrystalDesign.Colors.TextTertiary,
+                                                        fontWeight = FontWeight.Bold,
+                                                        letterSpacing = 0.5.sp
+                                                    )
+                                                    Text(
+                                                        "Tuesday", 
+                                                        style = MaterialTheme.typography.headlineSmall,
+                                                        color = Color.White, 
+                                                        fontWeight = FontWeight.Bold
+                                                    )
                                                 }
-                                                
-                                                PremiumListItem(
-                                                       title = log.phoneNumber,
-                                                       subtitle = "${log.result} • ${log.reason ?: "Unknown"}",
-                                                       tag = log.result.name,
-                                                       tagColor = iconColor,
-                                                       icon = icon,
-                                                       iconColor = iconColor,
-                                                       onClick = { onNavigate("logs") }
-                                                   )
+                                            }
+                                            Spacer(Modifier.height(24.dp))
+                                            Box(Modifier.fillMaxWidth().height(150.dp)) {
+                                                if (weeklyActivity.isNotEmpty()) {
+                                                    WeeklyActivityBarChart(data = weeklyActivity)
+                                                } else {
+                                                    WeeklyActivityBarChart()
+                                                }
+                                            }
+                                            Spacer(Modifier.height(16.dp))
+                                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                                listOf("M", "T", "W", "T", "F", "S", "S").forEach { 
+                                                    Text(
+                                                        it, 
+                                                        style = MaterialTheme.typography.labelSmall, 
+                                                        color = CrystalDesign.Colors.TextSecondary,
+                                                        modifier = Modifier.width(CrystalDesign.Spacing.l), 
+                                                        textAlign = androidx.compose.ui.text.style.TextAlign.Center, 
+                                                        fontWeight = FontWeight.Bold
+                                                    )
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
                         }
-                    } 
-                    } 
 
-
-                // New Modern Header (Transparent)
+                        item {
+                            AnimatedEntrance(index = 3) {
+                                Column(verticalArrangement = Arrangement.spacedBy(CrystalDesign.Spacing.m)) {
+                                    Text("Recent Activity", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = CrystalDesign.Typography.WeightBlack)
+                                    Spacer(modifier = Modifier.height(CrystalDesign.Spacing.xs))
+                                    
+                                    if (recentLogs.isEmpty()) {
+                                        ScanningHorizon()
+                                    } else {
+                                        recentLogs.forEach { log ->
+                                            val icon = when(log.result) {
+                                                com.callblockerpro.app.domain.model.CallResult.BLOCKED -> Icons.Default.Block
+                                                com.callblockerpro.app.domain.model.CallResult.ALLOWED -> Icons.Default.VerifiedUser
+                                                else -> Icons.Default.Warning
+                                            }
+                                            val iconColor = when(log.result) {
+                                                com.callblockerpro.app.domain.model.CallResult.BLOCKED -> Red
+                                                com.callblockerpro.app.domain.model.CallResult.ALLOWED -> Emerald
+                                                else -> CrystalDesign.Colors.NeonGold
+                                            }
+                                            
+                                            PremiumListItem(
+                                                   title = log.phoneNumber,
+                                                   subtitle = "${log.result} • ${log.reason ?: "Unknown"}",
+                                                   tag = log.result.name,
+                                                   tagColor = iconColor,
+                                                   icon = icon,
+                                                   iconColor = iconColor,
+                                                   onClick = { onNavigate("logs") }
+                                               )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
                 PremiumHeader(
                     title = "CallBlockerPro",
-                    subtitle = "NEON CRYSTAL", // simplified subtitle
+                    subtitle = "NEON CRYSTAL",
                     onBack = null,
                     modifier = Modifier
                         .align(Alignment.TopCenter)
@@ -296,6 +281,6 @@ fun DashboardScreen(
                     onAction = { onNavigate("settings") }
                 )
             }
-        } // Closing PremiumBackground
+        }
     }
 }
