@@ -128,14 +128,16 @@ fun BottomNavBar(
                     .shadow(
                         elevation = 10.dp, 
                         shape = CircleShape,
-                        spotColor = CrystalDesign.Colors.ShadowGlow
+                        spotColor = CrystalDesign.Colors.Primary.copy(alpha = 0.6f)
                     )
                     .background(CrystalDesign.Colors.BackgroundDeep, CircleShape) // Ring effect
-                    .padding(6.dp) // The "ring-8" gap
+                    .padding(8.dp) // ring-8
                     .clip(CircleShape)
                     .background(
                         brush = Brush.linearGradient(
-                            colors = listOf(CrystalDesign.Colors.Primary, CrystalDesign.Colors.PrimaryLight)
+                            colors = listOf(CrystalDesign.Colors.Primary, CrystalDesign.Colors.PrimaryLight),
+                            start = androidx.compose.ui.geometry.Offset(0f, 0f),
+                            end = androidx.compose.ui.geometry.Offset.Infinite
                         )
                     )
                     .clickable {                                     

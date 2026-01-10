@@ -291,13 +291,18 @@ fun StitchRecentItem(log: com.callblockerpro.app.domain.model.CallLogEntry, onCl
     ) {
         Box {
              // [STITCH] Vertical Strip for Blocked Items
+             // [STITCH] Vertical Strip for Item Status
+             // Red for Blocked/Missed, Green for Allowed/Outgoing
+             val showStrip = true // Always show strip now per user request "same way"
+             val stripColorVal = if (isBlocked || isMissed || isSpam) CrystalDesign.Colors.NeonRed else Emerald
+
              if (showStrip) {
                  Box(
                      modifier = Modifier
                          .width(4.dp)
                          .fillMaxHeight()
                          .align(Alignment.CenterStart)
-                         .background(CrystalDesign.Colors.NeonRed)
+                         .background(stripColorVal)
                  )
              }
              
