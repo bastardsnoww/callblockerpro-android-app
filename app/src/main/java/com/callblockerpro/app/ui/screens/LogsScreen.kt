@@ -195,7 +195,7 @@ fun StitchLogItem(log: CallLogEntry) {
         Box {
             // Vertical Strip Indicator (Red for Blocked, Green for Allowed)
             val stripColor = if (isBlocked) CrystalDesign.Colors.NeonRed else com.callblockerpro.app.ui.theme.Emerald
-            Box(Modifier.width(4.dp).fillMaxHeight().background(stripColor).align(Alignment.CenterStart))
+            Box(Modifier.width(6.dp).fillMaxHeight().background(stripColor).align(Alignment.CenterStart))
             
             Row(
                 Modifier.padding(16.dp),

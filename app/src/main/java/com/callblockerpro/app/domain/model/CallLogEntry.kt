@@ -10,7 +10,8 @@ enum class CallResult {
     ALLOWED,
     BLOCKED,
     SILENCED,
-    MISSED
+    MISSED,
+    OUTGOING
 }
 
 @androidx.compose.runtime.Immutable

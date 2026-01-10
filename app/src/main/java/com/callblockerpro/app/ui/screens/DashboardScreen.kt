@@ -17,6 +17,12 @@ import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.DomainDisabled
 import androidx.compose.material.icons.filled.PersonOff
+import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.CallMissed
+import androidx.compose.material.icons.automirrored.filled.CallMade
+import androidx.compose.material.icons.automirrored.filled.CallReceived
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -234,45 +240,45 @@ fun StitchToggle(options: List<String>, selectedIndex: Int, onOptionSelected: (I
     }
 }
 
+
+
 @Composable
 fun StitchRecentItem(log: com.callblockerpro.app.domain.model.CallLogEntry, onClick: () -> Unit) {
-    // Determine visuals based on specific mock data intent
-    // Reference: 
-    // 1. Spam (Red) -> +1 (555)...
-    // 2. Unknown (Orange) -> Unknown Private
-    // 3. Business (Slate) -> Telemarketers Inc.
-    
+    // Determine visuals based on specific mock data
     val isSpam = log.phoneNumber.contains("555")
-    val isHidden = log.phoneNumber.contains("Unknown")
-    val isBusiness = log.phoneNumber.contains("Telemarketers")
+    val isHidden = log.phoneNumber.equals("Unknown Caller")
+    val isJohn = log.phoneNumber.contains("John")
+    val isSarah = log.phoneNumber.contains("Sarah")
     
-    // Fallback logic if not using mocks
+    // Logic mapping from Mock Data
     val isBlocked = log.result == com.callblockerpro.app.domain.model.CallResult.BLOCKED
     val isAllowed = log.result == com.callblockerpro.app.domain.model.CallResult.ALLOWED
+    val isMissed = log.result == com.callblockerpro.app.domain.model.CallResult.MISSED
+    val isOutgoing = log.result == com.callblockerpro.app.domain.model.CallResult.OUTGOING
 
+    // Color Logic
     val primaryColor = when {
-        isSpam -> CrystalDesign.Colors.NeonRed
-        isHidden -> CrystalDesign.Colors.NeonGold // Orange
-        isBusiness -> Color.White // Slate/White per reference
-        isAllowed -> CrystalDesign.Colors.NeonGreen
+        isBlocked && isSpam -> CrystalDesign.Colors.NeonRed
+        isMissed -> CrystalDesign.Colors.NeonRed // Reference uses Red for Missed Call Icon
+        isAllowed || isOutgoing -> CrystalDesign.Colors.Primary // John/Sarah use Gradient/Primary/Indigo
         else -> CrystalDesign.Colors.NeonRed
     }
     
+    // Vertical Strip Logic (Only for Blocked/Spam)
+    val showStrip = isBlocked
+    
+    // Icon Logic
     val icon = when {
-        isSpam -> Icons.Default.PersonOff // person_off
-        isHidden -> Icons.Default.Warning // call_quality -> closest is Warning or PhoneLocked. Using Warning for now or generic Phone.
-        isBusiness -> Icons.Default.DomainDisabled // domain_disabled
-        isAllowed -> Icons.Default.VerifiedUser
+        isSpam -> Icons.Default.Block // block
+        isMissed -> Icons.Default.CallMissed // call_missed
+        isOutgoing -> Icons.AutoMirrored.Filled.CallMade // call_made
+        isAllowed -> Icons.AutoMirrored.Filled.CallReceived // call_received
         else -> Icons.Default.Block
     }
     
-    val badgeText = when {
-        isSpam -> "Spam"
-        isHidden -> "Hidden ID"
-        isBusiness -> "Business"
-        isAllowed -> "Whitelist"
-        else -> "Blocked"
-    }
+    // Badge Logic
+    val showBadge = isBlocked || isMissed
+    val badgeText = if (isSpam) "SPAM RISK" else if (isMissed) "MISSED CALL" else "BLOCKED"
     
     // HTML: group relative overflow-hidden rounded-2xl bg-surface border border-white/5 p-4 transition-all hover:bg-surface-lighter
     Surface(
@@ -283,26 +289,64 @@ fun StitchRecentItem(log: com.callblockerpro.app.domain.model.CallLogEntry, onCl
             .fillMaxWidth()
             .clickable(onClick = onClick)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp) // matches p-4
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                // Icon Box
-                // HTML: h-12 w-12 rounded-full bg-red-500/10 text-red-500 border border-red-500/20 shadow-glow
-                Box(
-                    modifier = Modifier
-                        .size(48.dp) // h-12
-                        .clip(CircleShape)
-                        .background(primaryColor.copy(0.1f))
-                        .border(1.dp, primaryColor.copy(0.2f), CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = null,
-                        tint = if (isBusiness) com.callblockerpro.app.ui.theme.CrystalDesign.Colors.NeonRed else primaryColor, // Business icon is red in snapshot actually? Snapshot 3rd item is "Telemarketers Inc" with RED icon. 2nd item Unknown is ORANGE.
-                        modifier = Modifier.size(24.dp)
-                    )
+        Box {
+             // [STITCH] Vertical Strip for Blocked Items
+             if (showStrip) {
+                 Box(
+                     modifier = Modifier
+                         .width(4.dp)
+                         .fillMaxHeight()
+                         .align(Alignment.CenterStart)
+                         .background(CrystalDesign.Colors.NeonRed)
+                 )
+             }
+             
+             Row(
+                modifier = Modifier.padding(16.dp), // matches p-4
+                verticalAlignment = Alignment.CenterVertically
+             ) {
+                // Icon Box / Avatar
+                if (isJohn || isSarah) {
+                    // Avatar Placeholder
+                    Box(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(RoundedCornerShape(16.dp)) // rounded-2xl
+                            .background(
+                                Brush.linearGradient(
+                                    listOf(
+                                        if (isJohn) androidx.compose.ui.graphics.Color(0xFF6366f1) else CrystalDesign.Colors.SurfaceStitch, // indigo-500 or surface-lighter
+                                        if (isJohn) CrystalDesign.Colors.Primary else CrystalDesign.Colors.SurfaceStitch
+                                    )
+                                )
+                            )
+                            .border(1.dp, Color.White.copy(0.05f), RoundedCornerShape(16.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (isSarah) {
+                             // Image placeholder would go here, using Initials for now
+                             Text("SM", fontWeight = FontWeight.Bold, color = Color.White.copy(0.7f))
+                        } else {
+                             Text("JD", fontWeight = FontWeight.Bold, color = Color.White)
+                        }
+                    }
+                } else {
+                    // Standard Icon Box
+                    Box(
+                        modifier = Modifier
+                            .size(48.dp) // h-12
+                            .clip(RoundedCornerShape(16.dp)) // rounded-2xl
+                            .background(if (isMissed) CrystalDesign.Colors.SurfaceStitch else primaryColor.copy(0.1f)) // Missed is surface-lighter in ref
+                            .border(1.dp, if (isMissed) Color.White.copy(0.05f) else primaryColor.copy(0.2f), RoundedCornerShape(16.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = null,
+                            tint = if (isMissed) CrystalDesign.Colors.NeonRed else primaryColor, // Missed icon is Red
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
                 }
                 
                 Spacer(Modifier.width(16.dp))
@@ -313,53 +357,95 @@ fun StitchRecentItem(log: com.callblockerpro.app.domain.model.CallLogEntry, onCl
                              log.phoneNumber, 
                              style = MaterialTheme.typography.titleSmall, 
                              fontWeight = FontWeight.Bold, 
-                             color = Color.White
+                             color = if (isMissed) Color.White.copy(0.9f) else Color.White
                          )
-                         Spacer(Modifier.width(8.dp))
-                         // Badge
-                         // HTML: rounded bg-red-500/20 px-1.5 py-0.5 text-[10px] font-bold text-red-400 border border-red-500/20
-                         val badgeColor = if (isBusiness) androidx.compose.ui.graphics.Color(0xFFcbd5e1) else primaryColor // Business badge is Slate in snapshot "Business"
-                         val badgeBg = if (isBusiness) androidx.compose.ui.graphics.Color(0xFF334155) else primaryColor // slate-700
                          
-                         Surface(
-                            color = badgeBg.copy(if (isBusiness) 1f else 0.2f),
-                            shape = RoundedCornerShape(4.dp),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, if(isBusiness) Color.White.copy(0.1f) else badgeColor.copy(0.2f))
-                         ) {
-                             Text(
-                                 text = badgeText,
-                                 style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
-                                 fontWeight = FontWeight.Bold,
-                                 color = if (isBusiness) androidx.compose.ui.graphics.Color(0xFFcbd5e1) else badgeColor,
-                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                             )
+                         if (isSpam) {
+                             Spacer(Modifier.width(8.dp))
+                             // Spam Badge
+                            Surface(
+                                color = CrystalDesign.Colors.NeonRed.copy(0.1f),
+                                shape = RoundedCornerShape(4.dp),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, CrystalDesign.Colors.NeonRed.copy(0.1f))
+                            ) {
+                                Text(
+                                    text = "SPAM RISK",
+                                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+                                    fontWeight = FontWeight.Bold,
+                                    color = CrystalDesign.Colors.NeonRed,
+                                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                                )
+                            }
                          }
                     }
                     Spacer(Modifier.height(4.dp))
                     
-                    // Subtitle: "Added 2 hours ago • Auto-detected"
-                    val timeString = when {
-                        isSpam -> "Added 2 hours ago"
-                        isHidden -> "Added yesterday"
-                        isBusiness -> "Added 3 days ago"
-                        else -> "Just now"
+                    // Subtitle logic
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (isOutgoing || isAllowed || isMissed) {
+                            // "Mobile • 5m 23s" or icon + text
+                            if (isOutgoing) {
+                                Icon(Icons.AutoMirrored.Filled.CallMade, null, tint = Color.Gray, modifier = Modifier.size(12.dp))
+                                Spacer(Modifier.width(4.dp))
+                            } else if (isAllowed) {
+                                Icon(Icons.AutoMirrored.Filled.CallReceived, null, tint = Emerald, modifier = Modifier.size(12.dp).graphicsLayer { rotationZ = 180f })
+                                Spacer(Modifier.width(4.dp))
+                            } else if (isMissed) {
+                                Icon(Icons.Default.CallMissed, null, tint = CrystalDesign.Colors.NeonRed, modifier = Modifier.size(12.dp))
+                                Spacer(Modifier.width(4.dp))
+                            }
+                            
+                            Text(
+                                log.reason ?: "",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = if (isMissed) CrystalDesign.Colors.NeonRed else CrystalDesign.Colors.TextTertiary
+                            )
+                        } else {
+                            // Spam timestamp
+                            Text(
+                                "10:42 AM", // Hardcoded for spam mock match
+                                style = MaterialTheme.typography.labelSmall,
+                                color = CrystalDesign.Colors.TextTertiary
+                            )
+                        }
+                        
+                        if (isBlocked) {
+                             Spacer(Modifier.width(4.dp))
+                             Text("• Auto-Blocked", style = MaterialTheme.typography.labelSmall, color = CrystalDesign.Colors.TextTertiary)
+                        }
                     }
-                    Text(
-                        "$timeString • ${log.reason ?: "Auto-blocked"}",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = CrystalDesign.Colors.TextTertiary
-                    )
                 }
                 
-                // Trailing Menu
-                Icon(
-                    Icons.Default.MoreVert,
-                    null,
-                    tint = CrystalDesign.Colors.TextTertiary,
-                    modifier = Modifier.size(20.dp)
-                )
+                // Trailing Action Button
+                if (isAllowed || isOutgoing) {
+                    // Green Call Button
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(CircleShape)
+                            .background(Emerald.copy(0.1f))
+                            .border(1.dp, Emerald.copy(0.2f), CircleShape)
+                            .clickable { /* Call */ },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(Icons.Default.Call, null, tint = Emerald, modifier = Modifier.size(16.dp))
+                    }
+                } else {
+                    // Info Button
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(CircleShape)
+                            .background(Color.White.copy(0.05f))
+                            .clickable { /* Info */ },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(Icons.Default.Info, null, tint = CrystalDesign.Colors.TextTertiary, modifier = Modifier.size(18.dp))
+                    }
+                }
             }
         }
     }
 }
+
 

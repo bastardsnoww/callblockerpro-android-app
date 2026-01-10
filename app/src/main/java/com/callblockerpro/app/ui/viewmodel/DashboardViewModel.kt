@@ -45,32 +45,55 @@ class DashboardViewModel @Inject constructor(
     // Mock Data to match Stitch Reference exactly
     val recentLogs: StateFlow<List<com.callblockerpro.app.domain.model.CallLogEntry>> = MutableStateFlow(
         listOf(
+            // 1. Spam (Red, Strip)
             com.callblockerpro.app.domain.model.CallLogEntry(
                 id = 1,
-                phoneNumber = "+1 (555) 012-3456",
+                phoneNumber = "+1 (555) 019-2834",
                 contactName = null,
-                timestamp = java.time.Instant.now().minusSeconds(7200), // 2 hours ago
+                timestamp = java.time.Instant.now().minusSeconds(7200), // 10:42 AM (approx 2h ago)
                 result = com.callblockerpro.app.domain.model.CallResult.BLOCKED,
                 triggerMode = AppMode.BLOCKLIST,
-                reason = "Auto-detected"
+                reason = "Auto-Blocked"
             ),
+            // 2. John Doe (Green, Allowed)
             com.callblockerpro.app.domain.model.CallLogEntry(
                 id = 2,
-                phoneNumber = "Unknown Private",
-                contactName = null,
-                timestamp = java.time.Instant.now().minusSeconds(86400), // Yesterday
-                result = com.callblockerpro.app.domain.model.CallResult.BLOCKED, // Using Blocked logically for Warning icon mapping in UI
-                triggerMode = AppMode.BLOCKLIST,
-                reason = "User rule"
+                phoneNumber = "John Doe", // Using name in phone field for simple display mapping
+                contactName = "John Doe",
+                timestamp = java.time.Instant.now().minusSeconds(12000), // 9:15 AM
+                result = com.callblockerpro.app.domain.model.CallResult.ALLOWED,
+                triggerMode = AppMode.NEUTRAL,
+                reason = "Mobile • 5m 23s"
             ),
+            // 3. Unknown Caller (Red, Missed)
             com.callblockerpro.app.domain.model.CallLogEntry(
                 id = 3,
-                phoneNumber = "Telemarketers Inc.",
-                contactName = "Business",
-                timestamp = java.time.Instant.now().minusSeconds(259200), // 3 days ago
+                phoneNumber = "Unknown Caller",
+                contactName = null,
+                timestamp = java.time.Instant.now().minusSeconds(15000), // 8:30 AM
+                result = com.callblockerpro.app.domain.model.CallResult.MISSED,
+                triggerMode = AppMode.NEUTRAL,
+                reason = "Missed Call"
+            ),
+            // 4. Sarah Miller (Green, Outgoing)
+            com.callblockerpro.app.domain.model.CallLogEntry(
+                id = 4,
+                phoneNumber = "Sarah Miller",
+                contactName = "Sarah Miller",
+                timestamp = java.time.Instant.now().minus(1, java.time.temporal.ChronoUnit.DAYS).minusSeconds(10000), // Yesterday 6:45 PM
+                result = com.callblockerpro.app.domain.model.CallResult.OUTGOING,
+                triggerMode = AppMode.NEUTRAL, // Neutral/Whitelist
+                reason = "California, USA • 12m 02s"
+            ),
+            // 5. Telemarketing (Red, Strip)
+            com.callblockerpro.app.domain.model.CallLogEntry(
+                id = 5,
+                phoneNumber = "+1 (800) 555-0123",
+                contactName = null,
+                timestamp = java.time.Instant.now().minus(1, java.time.temporal.ChronoUnit.DAYS).minusSeconds(25000), // Yesterday 2:15 PM
                 result = com.callblockerpro.app.domain.model.CallResult.BLOCKED,
                 triggerMode = AppMode.BLOCKLIST,
-                reason = "Community report"
+                reason = "Telemarketing"
             )
         )
     ).asStateFlow()

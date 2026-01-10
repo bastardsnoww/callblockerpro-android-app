@@ -97,9 +97,9 @@ fun BottomNavBar(
                 Spacer(modifier = Modifier.size(64.dp))
 
                 // Right Group
-                 NavIconItem(
+                NavIconItem(
                     icon = androidx.compose.material.icons.Icons.Default.VerifiedUser, // Whitelist placeholder
-                    label = "Whitelist",
+                    label = "Lists",
                     isSelected = currentRoute == "lists", // Mapping Lists to Whitelist for now
                     onClick = { onNavigate("lists") }
                 )
