@@ -47,83 +47,8 @@ fun PremiumSearchBar(
     onFilterClick: (() -> Unit)? = null,
     isLoading: Boolean = false
 ) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Search Field
-        GlassPanel(
-            modifier = Modifier.weight(1f).height(56.dp),
-            cornerRadius = 16.dp
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search",
-                        tint = CrystalDesign.Colors.TextSecondary,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
-                        if (query.isEmpty()) {
-                            Text(
-                                text = placeholder,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = CrystalDesign.Colors.TextSecondary
-                            )
-                        }
-                        BasicTextField(
-                            value = query,
-                            onValueChange = onQueryChange,
-                            textStyle = TextStyle(
-                                color = Color.White,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Medium
-                            ),
-                            cursorBrush = SolidColor(CrystalDesign.Colors.Primary),
-                            modifier = Modifier.fillMaxWidth(),
-                            singleLine = true
-                        )
-                    }
-                    if (isLoading) {
-                        NeonLoader(modifier = Modifier.size(20.dp))
-                    }
-                }
-            }
-        }
-
-        // Optional Filter Button
-        if (onFilterClick != null) {
-            GlassPanel(
-                modifier = Modifier.size(56.dp),
-                cornerRadius = 16.dp
-            ) {
-                val hapticSearch = androidx.compose.ui.platform.LocalHapticFeedback.current
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clickable {
-                            hapticSearch.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
-                            onFilterClick()
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.FilterList,
-                        contentDescription = "Filter",
-                        tint = CrystalDesign.Colors.TextSecondary
-                    )
-                }
-            }
-        }
-    }
+    // Deprecated for Stitch UI - keeping empty shell to prevent breaking changes if called elsewhere, 
+    // but LogsScreen uses inline implementation.
 }
 
 /**
@@ -543,12 +468,12 @@ fun PremiumHeader(
 ) {
     val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     
-    // Modern Transparent Header
+    // Stitch Header
     Row(
         modifier = modifier
             .fillMaxWidth()
             .height(com.callblockerpro.app.ui.theme.adaptiveHeaderHeight())
-            .padding(horizontal = 4.dp), // Minimal padding
+            .padding(horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (onBack != null) {
@@ -573,25 +498,25 @@ fun PremiumHeader(
             }
             Spacer(modifier = Modifier.width(16.dp))
         } else {
-             // [NEW] Shield Icon Box for Home Screen (matches HTML)
-             // HTML: flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary-light text-white shadow-glow ring-1 ring-white/10
+             // [STITCH] Gradient Shield Box with Ring
              Box(
                 modifier = Modifier
-                    .size(40.dp) // h-10 w-10
-                    .clip(RoundedCornerShape(12.dp)) // rounded-xl
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(12.dp))
                     .background(
                         brush = Brush.linearGradient(
                             colors = listOf(
-                                com.callblockerpro.app.ui.theme.CrystalDesign.Colors.Primary,
-                                com.callblockerpro.app.ui.theme.CrystalDesign.Colors.PrimaryLight
+                                com.callblockerpro.app.ui.theme.CrystalDesign.Colors.PrimaryStitch,
+                                com.callblockerpro.app.ui.theme.CrystalDesign.Colors.PrimaryLightStitch
                             )
                         )
                     )
-                    .border(1.dp, Color.White.copy(alpha = 0.1f), RoundedCornerShape(12.dp)),
+                    // ring-1 ring-white/10 equivalent
+                    .border(1.dp, Color.White.copy(0.1f), RoundedCornerShape(12.dp)),
                 contentAlignment = Alignment.Center
              ) {
                  Icon(
-                     imageVector = androidx.compose.material.icons.Icons.Default.VerifiedUser, // shield_lock approx
+                     imageVector = androidx.compose.material.icons.Icons.Default.VerifiedUser, // shield_lock
                      contentDescription = "Shield",
                      tint = Color.White,
                      modifier = Modifier.size(24.dp)
@@ -601,17 +526,23 @@ fun PremiumHeader(
         }
 
         Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title, // Capitalization handled by caller or string
-                style = MaterialTheme.typography.titleLarge, 
-                fontWeight = FontWeight.ExtraBold, // font-extrabold
-                color = Color.White,
-                lineHeight = 20.sp // leading-none
-            )
+            // [STITCH] Title with Mixed Colors
+            androidx.compose.ui.text.AnnotatedString.Builder().apply {
+                append(androidx.compose.ui.text.AnnotatedString("CallBlocker", spanStyle = androidx.compose.ui.text.SpanStyle(color = Color.White)))
+                append(androidx.compose.ui.text.AnnotatedString("Pro", spanStyle = androidx.compose.ui.text.SpanStyle(color = com.callblockerpro.app.ui.theme.CrystalDesign.Colors.PrimaryLightStitch)))
+            }.toAnnotatedString().let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.titleLarge, 
+                    fontWeight = FontWeight.ExtraBold,
+                    lineHeight = 20.sp
+                )
+            }
+            
             if (subtitle != null) {
                 Text(
                     text = subtitle.uppercase(),
-                    style = MaterialTheme.typography.labelSmall,
+                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
                     color = CrystalDesign.Colors.TextTertiary, // slate-500
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp
@@ -620,8 +551,6 @@ fun PremiumHeader(
         }
 
         if (actionIcon != null && onAction != null) {
-             // Settings Button (matches HTML)
-             // HTML: h-10 w-10 ... rounded-full bg-white/5
             Box(
                 modifier = Modifier
                     .size(40.dp)
@@ -630,15 +559,13 @@ fun PremiumHeader(
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         onAction() 
                     }
-                    .background(Color.White.copy(0.05f))
-                    // .border(1.dp, Color.White.copy(0.1f), CircleShape) // HTML doesn't have border on settings btn
-                ,
+                    .background(Color.White.copy(0.05f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = actionIcon,
                     contentDescription = "Action",
-                    tint = CrystalDesign.Colors.TextSecondary, // slate-400
+                    tint = CrystalDesign.Colors.TextTertiary, // slate-400
                     modifier = Modifier.size(20.dp)
                 )
             }

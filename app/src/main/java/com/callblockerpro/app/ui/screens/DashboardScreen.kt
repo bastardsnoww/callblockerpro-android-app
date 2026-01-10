@@ -37,6 +37,7 @@ import com.callblockerpro.app.ui.theme.Red
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalOverscrollConfiguration
 
+
 @Composable
 fun DashboardScreen(
     onNavigate: (String) -> Unit,
@@ -58,214 +59,122 @@ fun DashboardScreen(
         onResult = { isRoleGranted = com.callblockerpro.app.util.CallScreeningPermissions.isCallScreeningRoleGranted(context) }
     )
 
-    // REMOVED: Auto-trigger toast on state change to prevent spam on launch
-    /*
-    LaunchedEffect(selectedMode) { ... }
-    */
-
     androidx.compose.runtime.DisposableEffect(Unit) {
         isRoleGranted = com.callblockerpro.app.util.CallScreeningPermissions.isCallScreeningRoleGranted(context)
         onDispose {}
     }
 
     Scaffold(
-        containerColor = CrystalDesign.Colors.BackgroundDeep,
+        containerColor = CrystalDesign.Colors.BackgroundDarkStitch,
         bottomBar = { BottomNavBar(currentRoute = "home", onNavigate = onNavigate) }
     ) { paddingValues ->
-        PremiumBackground {
             Box(Modifier.fillMaxSize()) {
-                val listState = rememberLazyListState()
-                val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
-                val maxWidth = com.callblockerpro.app.ui.theme.maxContentWidth()
-                val contentPadding = com.callblockerpro.app.ui.theme.adaptiveContentPadding()
-                
-                @OptIn(ExperimentalFoundationApi::class)
-                CompositionLocalProvider(
-                    LocalOverscrollConfiguration provides null
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .padding(horizontal = 24.dp), // px-6
+                    contentPadding = PaddingValues(top = 100.dp, bottom = 120.dp),
+                    verticalArrangement = Arrangement.spacedBy(32.dp)
                 ) {
-                    LazyColumn(
-                        state = listState,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(paddingValues)
-                            .then(
-                                if (maxWidth != androidx.compose.ui.unit.Dp.Unspecified) {
-                                    Modifier.widthIn(max = maxWidth).align(Alignment.TopCenter)
-                                } else Modifier
-                            )
-                            .padding(horizontal = contentPadding),
-                        contentPadding = PaddingValues(
-                            top = com.callblockerpro.app.ui.theme.adaptiveHeaderHeight() + 8.dp,
-                            bottom = 120.dp
-                        ),
-                        verticalArrangement = Arrangement.spacedBy(com.callblockerpro.app.ui.theme.AdaptiveSpacing.large())
-                    ) {
-                        item { Spacer(Modifier.height(0.dp)) }
-
-                        item {
-                            AnimatedEntrance(index = 0) {
-                                MetallicToggle(
-                                    options = listOf("Normal", "Whitelist", "Blocklist"),
-                                    selectedIndex = selectedMode,
-                                    onOptionSelected = { index -> 
-                                        viewModel.onModeSelected(index) 
-                                        haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
-                                        
-                                        // MOVED: Trigger toast ONLY on user interaction
-                                        val modeName = when(index) {
-                                            0 -> "Normal Mode"
-                                            1 -> "Whitelist Mode"
-                                            else -> "Blocklist Mode"
-                                        }
-                                        android.widget.Toast.makeText(context, "$modeName Activated", android.widget.Toast.LENGTH_SHORT).show()
-                                    },
-                                    modifier = Modifier.fillMaxWidth()
-                                )
+                    // 1. Stitch Toggle
+                    item {
+                        StitchToggle(
+                            options = listOf("Normal", "Whitelist", "Blocklist"),
+                            selectedIndex = selectedMode,
+                            onOptionSelected = { index -> 
+                                viewModel.onModeSelected(index) 
                             }
-                        }
+                        )
+                    }
 
-                        item {
-                            val index = listState.firstVisibleItemIndex
-                            val offset = listState.firstVisibleItemScrollOffset
-                            val parallaxProgress = if (index > 2) 1f else (offset.toFloat() / 500f)
+                    // 2. System Status (HomeStatusCard replacement)
+                    item {
+                       HomeStatusCard(
+                            blockedCount = blockedToday,
+                            threatCount = totalThreats,
+                            isSystemActive = isRoleGranted,
+                            modifier = Modifier.clickable {
+                                if (!isRoleGranted) {
+                                    com.callblockerpro.app.util.CallScreeningPermissions.createRoleRequestIntent(context)?.let {
+                                        roleLauncher.launch(it)
+                                    }
+                                } else {
+                                    viewModel.toggleSystemShield(true)
+                                    android.widget.Toast.makeText(context, "System Shield Active", android.widget.Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        )
+                    }
+
+                    // 3. Weekly Activity
+                    item {
+                         Column {
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    "Weekly Insights", 
+                                    style = MaterialTheme.typography.titleLarge,
+                                    color = Color.White, 
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Surface(
+                                    color = CrystalDesign.Colors.PrimaryStitch.copy(0.1f),
+                                    shape = RoundedCornerShape(50),
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, CrystalDesign.Colors.PrimaryStitch.copy(0.2f))
+                                ) {
+                                    Text(
+                                        "FULL REPORT",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = CrystalDesign.Colors.PrimaryLightStitch,
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(16.dp))
                             
-                            AnimatedEntrance(index = 1) {
-                                HomeStatusCard(
-                                    blockedCount = blockedToday,
-                                    threatCount = totalThreats,
-                                    isSystemActive = isRoleGranted,
-                                    modifier = Modifier
-                                        .scrollParallax(parallaxProgress)
-                                        .clickable {
-                                            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
-                                            if (!isRoleGranted) {
-                                                com.callblockerpro.app.util.CallScreeningPermissions.createRoleRequestIntent(context)?.let {
-                                                    roleLauncher.launch(it)
-                                                }
-                                            } else {
-                                                viewModel.toggleSystemShield(true)
-                                                android.widget.Toast.makeText(context, "System Shield is Active & Monitoring", android.widget.Toast.LENGTH_SHORT).show()
-                                            }
+                            // Using existing chart but wrapped in Stitch container
+                            Surface(
+                                color = CrystalDesign.Colors.SurfaceStitch,
+                                shape = RoundedCornerShape(24.dp),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(0.05f)),
+                                shadowElevation = 4.dp
+                            ) {
+                                Column(Modifier.padding(24.dp)) {
+                                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(32.dp)) {
+                                        Column {
+                                            Text("AVG. DAILY", style = MaterialTheme.typography.labelSmall, color = CrystalDesign.Colors.TextTertiary, fontWeight = FontWeight.Bold)
+                                            Text("18 Calls", style = MaterialTheme.typography.titleLarge, color = Color.White, fontWeight = FontWeight.Bold)
                                         }
-                                )
-                            }
-                        }
-
-                        item {
-                            AnimatedEntrance(index = 2) {
-                                Column {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Text(
-                                            "Weekly Activity", 
-                                            style = MaterialTheme.typography.titleMedium,
-                                            color = Color.White, 
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                        IconButton(onClick = { onNavigate("logs") }) {
-                                            Icon(
-                                                imageVector = androidx.compose.material.icons.Icons.Default.MoreVert,
-                                                contentDescription = "Options",
-                                                tint = CrystalDesign.Colors.TextTertiary
-                                            )
+                                        Column {
+                                            Text("PEAK DAY", style = MaterialTheme.typography.labelSmall, color = CrystalDesign.Colors.TextTertiary, fontWeight = FontWeight.Bold)
+                                            Text("Tuesday", style = MaterialTheme.typography.titleLarge, color = Color.White, fontWeight = FontWeight.Bold)
                                         }
-                                    }
-                                    Spacer(modifier = Modifier.height(20.dp))
-                                    GlassPanel(modifier = Modifier.fillMaxWidth()) {
-                                        Column(Modifier.padding(24.dp).fillMaxWidth()) {
-                                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(32.dp)) {
-                                                Column {
-                                                    Text(
-                                                        "AVG. DAILY", 
-                                                        style = MaterialTheme.typography.labelSmall, 
-                                                        color = CrystalDesign.Colors.TextTertiary,
-                                                        fontWeight = FontWeight.Bold,
-                                                        letterSpacing = 0.5.sp
-                                                    )
-                                                    Text(
-                                                        "18 Calls", 
-                                                        style = MaterialTheme.typography.headlineSmall,
-                                                        color = Color.White, 
-                                                        fontWeight = FontWeight.Bold
-                                                    )
-                                                }
-                                                Column {
-                                                    Text(
-                                                        "PEAK DAY", 
-                                                        style = MaterialTheme.typography.labelSmall, 
-                                                        color = CrystalDesign.Colors.TextTertiary,
-                                                        fontWeight = FontWeight.Bold,
-                                                        letterSpacing = 0.5.sp
-                                                    )
-                                                    Text(
-                                                        "Tuesday", 
-                                                        style = MaterialTheme.typography.headlineSmall,
-                                                        color = Color.White, 
-                                                        fontWeight = FontWeight.Bold
-                                                    )
-                                                }
-                                            }
-                                            Spacer(Modifier.height(24.dp))
-                                            Box(Modifier.fillMaxWidth().height(150.dp)) {
-                                                if (weeklyActivity.isNotEmpty()) {
-                                                    WeeklyActivityBarChart(data = weeklyActivity)
-                                                } else {
-                                                    WeeklyActivityBarChart()
-                                                }
-                                            }
-                                            Spacer(Modifier.height(16.dp))
-                                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                                listOf("M", "T", "W", "T", "F", "S", "S").forEach { 
-                                                    Text(
-                                                        it, 
-                                                        style = MaterialTheme.typography.labelSmall, 
-                                                        color = CrystalDesign.Colors.TextSecondary,
-                                                        modifier = Modifier.width(CrystalDesign.Spacing.l), 
-                                                        textAlign = androidx.compose.ui.text.style.TextAlign.Center, 
-                                                        fontWeight = FontWeight.Bold
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    }
+                                     }
+                                     Spacer(Modifier.height(24.dp))
+                                     Box(Modifier.height(120.dp).fillMaxWidth()) {
+                                         WeeklyActivityBarChart(data = weeklyActivity)
+                                     }
                                 }
                             }
                         }
+                    }
 
-                        item {
-                            AnimatedEntrance(index = 3) {
-                                Column(verticalArrangement = Arrangement.spacedBy(CrystalDesign.Spacing.m)) {
-                                    Text("Recent Activity", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = CrystalDesign.Typography.WeightBlack)
-                                    Spacer(modifier = Modifier.height(CrystalDesign.Spacing.xs))
-                                    
-                                    if (recentLogs.isEmpty()) {
-                                        ScanningHorizon()
-                                    } else {
-                                        recentLogs.forEach { log ->
-                                            val icon = when(log.result) {
-                                                com.callblockerpro.app.domain.model.CallResult.BLOCKED -> Icons.Default.Block
-                                                com.callblockerpro.app.domain.model.CallResult.ALLOWED -> Icons.Default.VerifiedUser
-                                                else -> Icons.Default.Warning
-                                            }
-                                            val iconColor = when(log.result) {
-                                                com.callblockerpro.app.domain.model.CallResult.BLOCKED -> Red
-                                                com.callblockerpro.app.domain.model.CallResult.ALLOWED -> Emerald
-                                                else -> CrystalDesign.Colors.NeonGold
-                                            }
-                                            
-                                            PremiumListItem(
-                                                   title = log.phoneNumber,
-                                                   subtitle = "${log.result} • ${log.reason ?: "Unknown"}",
-                                                   tag = log.result.name,
-                                                   tagColor = iconColor,
-                                                   icon = icon,
-                                                   iconColor = iconColor,
-                                                   onClick = { onNavigate("logs") }
-                                               )
-                                        }
+                    // 4. Recent Activity
+                    item {
+                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                            Text("Recent Activity", style = MaterialTheme.typography.titleLarge, color = Color.White, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 8.dp))
+                            
+                            if (recentLogs.isEmpty()) {
+                                ScanningHorizon()
+                            } else {
+                                Column {
+                                    recentLogs.forEach { log ->
+                                        StitchRecentItem(log = log, onClick = { onNavigate("logs") })
                                     }
                                 }
                             }
@@ -273,18 +182,142 @@ fun DashboardScreen(
                     }
                 }
                 
+                // Header Positioned Absolutely
                 PremiumHeader(
-                    title = "CallBlockerPro",
-                    subtitle = "NEON CRYSTAL",
+                    title = "CallBlocker", // Pro string handled in component
+                    subtitle = "Premium Protection",
                     onBack = null,
                     modifier = Modifier
                         .align(Alignment.TopCenter)
                         .statusBarsPadding()
-                        .padding(top = 8.dp, start = 16.dp, end = 16.dp),
+                        .padding(top = 8.dp, start = 24.dp, end = 24.dp), // Padding matches px-6
                     actionIcon = Icons.Default.Settings,
                     onAction = { onNavigate("settings") }
                 )
             }
+    }
+}
+
+@Composable
+fun StitchToggle(options: List<String>, selectedIndex: Int, onOptionSelected: (Int) -> Unit) {
+    Surface(
+        color = CrystalDesign.Colors.SurfaceStitch,
+        shape = RoundedCornerShape(16.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(0.05f)),
+        modifier = Modifier.fillMaxWidth().height(48.dp) // h-10 equivalent-ish + padding
+    ) {
+        Box(Modifier.padding(4.dp)) { // p-1
+            Row(Modifier.fillMaxSize()) {
+                options.forEachIndexed { index, option ->
+                    val isSelected = index == selectedIndex
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .clip(RoundedCornerShape(12.dp))
+                            .clickable { onOptionSelected(index) }
+                            .background(if (isSelected) CrystalDesign.Colors.PrimaryStitch else Color.Transparent),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = option,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isSelected) Color.White else CrystalDesign.Colors.TextTertiary.copy(0.7f)
+                        )
+                    }
+                }
+            }
         }
     }
 }
+
+@Composable
+fun StitchRecentItem(log: com.callblockerpro.app.domain.model.CallLogEntry, onClick: () -> Unit) {
+    val isBlocked = log.result == com.callblockerpro.app.domain.model.CallResult.BLOCKED
+    val isAllowed = log.result == com.callblockerpro.app.domain.model.CallResult.ALLOWED
+    
+    val bgHover = Color.White.copy(0.05f) // Simulation of hover state
+    
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 12.dp, horizontal = 8.dp) // Matches py-3 px-2
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            // Icon
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(
+                         if (isBlocked) CrystalDesign.Colors.NeonRed.copy(0.1f) 
+                         else if (isAllowed) CrystalDesign.Colors.NeonGreen.copy(0.1f)
+                         else CrystalDesign.Colors.NeonGold.copy(0.1f)
+                    )
+                    .border(1.dp, 
+                        if (isBlocked) CrystalDesign.Colors.NeonRed.copy(0.2f) 
+                         else if (isAllowed) CrystalDesign.Colors.NeonGreen.copy(0.2f)
+                         else CrystalDesign.Colors.NeonGold.copy(0.2f),
+                        CircleShape
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    if (isBlocked) Icons.Default.Block else if (isAllowed) Icons.Default.VerifiedUser else Icons.Default.Warning,
+                    null,
+                    tint = if (isBlocked) CrystalDesign.Colors.NeonRed else if (isAllowed) CrystalDesign.Colors.NeonGreen else CrystalDesign.Colors.NeonGold,
+                    modifier = Modifier.size(20.dp)
+                )
+                // Red Dot for Blocked
+                if (isBlocked) {
+                    Box(
+                         Modifier
+                            .align(Alignment.TopEnd)
+                            .offset(x = 2.dp, y = (-2).dp)
+                            .size(10.dp)
+                            .background(CrystalDesign.Colors.BackgroundDarkStitch, CircleShape)
+                            .padding(2.dp)
+                    ) {
+                         Box(Modifier.fillMaxSize().background(CrystalDesign.Colors.NeonRed, CircleShape))
+                    }
+                }
+            }
+            
+            Spacer(Modifier.width(16.dp))
+            
+            Column(Modifier.weight(1f)) {
+                 Text(
+                     log.phoneNumber, 
+                     style = MaterialTheme.typography.bodyMedium, 
+                     fontWeight = FontWeight.Bold, 
+                     color = Color.White
+                 )
+                 Text(
+                     if (isBlocked) "Spam Risk • Auto-Blocked" else if (isAllowed) "Whitelist • Allowed" else "Unknown",
+                     style = MaterialTheme.typography.labelSmall,
+                     color = if (isBlocked) CrystalDesign.Colors.NeonRed.copy(0.8f) else CrystalDesign.Colors.TextTertiary
+                 )
+            }
+            
+            Spacer(Modifier.width(8.dp))
+            
+            Surface(
+                color = Color.White.copy(0.05f),
+                shape = RoundedCornerShape(6.dp)
+            ) {
+                Text(
+                    "2m", 
+                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+                    color = CrystalDesign.Colors.TextTertiary,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                )
+            }
+        }
+        Spacer(Modifier.height(12.dp))
+        Divider(color = Color.White.copy(0.05f))
+    }
+}
+
