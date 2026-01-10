@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -516,11 +517,23 @@ fun PremiumHeader(
                     .border(1.dp, Color.White.copy(0.1f), RoundedCornerShape(12.dp)),
                 contentAlignment = Alignment.Center
              ) {
+                 // Composite Icon: Shield (Base) + Lock (Overlay/Cutout)
+                 // This simulates the 'shield_lock' symbol where the lock is 'inside' the shield.
+                 
+                 // Base Shield
                  Icon(
-                     imageVector = androidx.compose.material.icons.Icons.Default.Lock, // shield_lock -> Lock closely matches the 'lock' description
+                     imageVector = androidx.compose.material.icons.Icons.Default.Shield, 
                      contentDescription = "Shield",
                      tint = Color.White,
                      modifier = Modifier.size(24.dp)
+                 )
+                 
+                 // Inner Lock (Cutout effect using Primary color)
+                 Icon(
+                     imageVector = androidx.compose.material.icons.Icons.Default.Lock,
+                     contentDescription = null,
+                     tint = com.callblockerpro.app.ui.theme.CrystalDesign.Colors.PrimaryStitch, // Matches gradient start to simulate cutout
+                     modifier = Modifier.size(12.dp).offset(y = 1.dp) // Slight offset to center visually in shield body
                  )
              }
              Spacer(modifier = Modifier.width(12.dp))
