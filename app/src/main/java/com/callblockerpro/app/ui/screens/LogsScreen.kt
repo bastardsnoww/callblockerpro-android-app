@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.callblockerpro.app.ui.components.*
 import com.callblockerpro.app.ui.theme.CrystalDesign
+import com.callblockerpro.app.ui.theme.Emerald
 import com.callblockerpro.app.domain.model.CallLogEntry
 import com.callblockerpro.app.domain.model.CallResult
 import kotlinx.coroutines.launch
@@ -177,9 +178,9 @@ fun StitchLogItem(log: CallLogEntry) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Box {
-            if (isBlocked) {
-                Box(Modifier.width(4.dp).fillMaxHeight().background(CrystalDesign.Colors.NeonRed).align(Alignment.CenterStart))
-            }
+            // Vertical Strip Indicator (Red for Blocked, Green for Allowed)
+            val stripColor = if (isBlocked) CrystalDesign.Colors.NeonRed else com.callblockerpro.app.ui.theme.Emerald
+            Box(Modifier.width(4.dp).fillMaxHeight().background(stripColor).align(Alignment.CenterStart))
             
             Row(
                 Modifier.padding(16.dp),
