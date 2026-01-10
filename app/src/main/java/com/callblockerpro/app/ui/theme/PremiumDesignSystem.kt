@@ -44,6 +44,12 @@ object CrystalDesign {
         // Shadows (Tailwind Translations)
         val ShadowGlow = Color(0x805211D4) // rgba(82, 17, 212, 0.5)
         val ShadowGlowGreen = Color(0x6610B981) // rgba(16, 185, 129, 0.4)
+        
+        // Stitch Specifics
+        val BackgroundDarkStitch = Color(0xFF0F0E17)
+        val SurfaceStitch = Color(0xFF1E1B2E)
+        val PrimaryStitch = Color(0xFF5211D4)
+        val PrimaryLightStitch = Color(0xFF7A3EE6)
     }
 
     // --- 2. The Spacing (8pt Grid) ---

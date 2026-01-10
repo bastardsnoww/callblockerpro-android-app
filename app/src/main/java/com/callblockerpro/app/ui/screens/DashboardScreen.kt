@@ -58,14 +58,10 @@ fun DashboardScreen(
         onResult = { isRoleGranted = com.callblockerpro.app.util.CallScreeningPermissions.isCallScreeningRoleGranted(context) }
     )
 
-    LaunchedEffect(selectedMode) {
-        val modeName = when(selectedMode) {
-            0 -> "Normal Mode"
-            1 -> "Whitelist Mode"
-            else -> "Blocklist Mode"
-        }
-        android.widget.Toast.makeText(context, "$modeName Activated", android.widget.Toast.LENGTH_SHORT).show()
-    }
+    // REMOVED: Auto-trigger toast on state change to prevent spam on launch
+    /*
+    LaunchedEffect(selectedMode) { ... }
+    */
 
     androidx.compose.runtime.DisposableEffect(Unit) {
         isRoleGranted = com.callblockerpro.app.util.CallScreeningPermissions.isCallScreeningRoleGranted(context)
@@ -111,9 +107,17 @@ fun DashboardScreen(
                                 MetallicToggle(
                                     options = listOf("Normal", "Whitelist", "Blocklist"),
                                     selectedIndex = selectedMode,
-                                    onOptionSelected = { 
-                                        viewModel.onModeSelected(it) 
+                                    onOptionSelected = { index -> 
+                                        viewModel.onModeSelected(index) 
                                         haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                                        
+                                        // MOVED: Trigger toast ONLY on user interaction
+                                        val modeName = when(index) {
+                                            0 -> "Normal Mode"
+                                            1 -> "Whitelist Mode"
+                                            else -> "Blocklist Mode"
+                                        }
+                                        android.widget.Toast.makeText(context, "$modeName Activated", android.widget.Toast.LENGTH_SHORT).show()
                                     },
                                     modifier = Modifier.fillMaxWidth()
                                 )
