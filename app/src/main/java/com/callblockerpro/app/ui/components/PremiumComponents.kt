@@ -49,8 +49,74 @@ fun PremiumSearchBar(
     onFilterClick: (() -> Unit)? = null,
     isLoading: Boolean = false
 ) {
-    // Deprecated for Stitch UI - keeping empty shell to prevent breaking changes if called elsewhere, 
-    // but LogsScreen uses inline implementation.
+    val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
+    
+    // Stitch Search Bar Container
+    Surface(
+        color = CrystalDesign.Colors.SurfaceStitch,
+        shape = RoundedCornerShape(12.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.1f)),
+        modifier = modifier
+            .fillMaxWidth()
+            .height(50.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 16.dp)
+        ) {
+            // Leading Icon
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = "Search",
+                tint = CrystalDesign.Colors.TextSecondary,
+                modifier = Modifier.size(20.dp)
+            )
+            
+            Spacer(modifier = Modifier.width(12.dp))
+            
+            // Input Field
+            Box(modifier = Modifier.weight(1f)) {
+                if (query.isEmpty()) {
+                    Text(
+                        text = placeholder,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = CrystalDesign.Colors.TextTertiary
+                    )
+                }
+                BasicTextField(
+                    value = query,
+                    onValueChange = onQueryChange,
+                    textStyle = MaterialTheme.typography.bodyMedium.copy(
+                        color = Color.White
+                    ),
+                    singleLine = true,
+                    cursorBrush = SolidColor(Color.White),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            
+            // Trailing Actions (Clear or Filter)
+            if (query.isNotEmpty()) {
+                 Icon(
+                    imageVector = androidx.compose.material.icons.Icons.Default.Close,
+                    contentDescription = "Clear",
+                    tint = CrystalDesign.Colors.TextSecondary,
+                    modifier = Modifier
+                        .size(16.dp)
+                        .clickable { onQueryChange("") }
+                )
+            } else if (onFilterClick != null) {
+                 Icon(
+                    imageVector = androidx.compose.material.icons.Icons.Default.FilterList,
+                    contentDescription = "Filter",
+                    tint = CrystalDesign.Colors.Primary,
+                    modifier = Modifier
+                        .size(20.dp)
+                        .clickable { onFilterClick() }
+                )
+            }
+        }
+    }
 }
 
 /**

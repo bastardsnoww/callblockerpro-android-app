@@ -52,75 +52,73 @@ fun SplashScreen(
         }
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(BackgroundDark),
-        contentAlignment = Alignment.Center
-    ) {
-        PremiumBackground { }
-        
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            // Breathing Shield Animation
-            val infiniteTransition = rememberInfiniteTransition(label = "ShieldBreath")
-            val scale by infiniteTransition.animateFloat(
-                initialValue = 1f,
-                targetValue = 1.1f,
-                animationSpec = infiniteRepeatable(
-                    animation = tween(2000, easing = androidx.compose.animation.core.FastOutSlowInEasing),
-                    repeatMode = RepeatMode.Reverse
-                ),
-                label = "ShieldScale"
-            )
-             val glowAlpha by infiniteTransition.animateFloat(
-                initialValue = 0.3f,
-                targetValue = 0.6f,
-                animationSpec = infiniteRepeatable(
-                    animation = tween(2000),
-                    repeatMode = RepeatMode.Reverse
-                ),
-                label = "ShieldGlow"
-            )
+    StitchScreenWrapper {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                // Breathing Shield Animation
+                val infiniteTransition = rememberInfiniteTransition(label = "ShieldBreath")
+                val scale by infiniteTransition.animateFloat(
+                    initialValue = 1f,
+                    targetValue = 1.1f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(2000, easing = androidx.compose.animation.core.FastOutSlowInEasing),
+                        repeatMode = RepeatMode.Reverse
+                    ),
+                    label = "ShieldScale"
+                )
+                 val glowAlpha by infiniteTransition.animateFloat(
+                    initialValue = 0.3f,
+                    targetValue = 0.6f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(2000),
+                        repeatMode = RepeatMode.Reverse
+                    ),
+                    label = "ShieldGlow"
+                )
 
-            Box(contentAlignment = Alignment.Center) {
-                Box(
-                    modifier = Modifier
-                        .size(120.dp)
-                        .graphicsLayer {
-                            scaleX = scale
-                            scaleY = scale
-                            alpha = glowAlpha
-                        }
-                        .background(Primary, CircleShape)
-                        .blur(32.dp)
+                Box(contentAlignment = Alignment.Center) {
+                    Box(
+                        modifier = Modifier
+                            .size(120.dp)
+                            .graphicsLayer {
+                                scaleX = scale
+                                scaleY = scale
+                                alpha = glowAlpha
+                            }
+                            .background(Primary, CircleShape)
+                            .blur(32.dp)
+                    )
+                    Icon(
+                        imageVector = Icons.Default.Shield,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(80.dp)
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(32.dp))
+                
+                Text(
+                    text = "CALL BLOCKER",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Black,
+                    color = Color.White,
+                    letterSpacing = 2.sp
                 )
-                Icon(
-                    imageVector = Icons.Default.Shield,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(80.dp)
+                Text(
+                    text = "PRO EDITION",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Primary,
+                    letterSpacing = 4.sp
                 )
+                
+                Spacer(modifier = Modifier.height(48.dp))
+                NeonLoader(modifier = Modifier.size(32.dp))
             }
-            
-            Spacer(modifier = Modifier.height(32.dp))
-            
-            Text(
-                text = "CALL BLOCKER",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Black,
-                color = Color.White,
-                letterSpacing = 2.sp
-            )
-            Text(
-                text = "PRO EDITION",
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.Bold,
-                color = Primary,
-                letterSpacing = 4.sp
-            )
-            
-            Spacer(modifier = Modifier.height(48.dp))
-            NeonLoader(modifier = Modifier.size(32.dp))
         }
     }
 }

@@ -41,7 +41,7 @@ fun ScheduleScreen(currentRoute: String, onNavigate: (String) -> Unit) {
         containerColor = CrystalDesign.Colors.BackgroundDeep,
         bottomBar = { BottomNavBar(currentRoute = currentRoute, onNavigate = onNavigate) }
     ) { paddingValues ->
-        PremiumBackground {
+        StitchScreenWrapper {
         Box(Modifier.fillMaxSize()) {
             LazyColumn(
                 modifier = Modifier
@@ -122,7 +122,8 @@ fun ScheduleScreen(currentRoute: String, onNavigate: (String) -> Unit) {
                                      Text(day, style = MaterialTheme.typography.labelSmall, color = if (active) Color.White else Color.Gray, fontWeight = CrystalDesign.Typography.WeightBold)
                                  }
                              }
-                         }
+                             }
+    }
                          
                          Spacer(Modifier.height(24.dp))
                          NeonButton(

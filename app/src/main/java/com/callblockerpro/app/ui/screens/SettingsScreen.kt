@@ -60,9 +60,9 @@ fun SettingsScreen(
     }
 
     Scaffold(
-        containerColor = CrystalDesign.Colors.BackgroundDeep,
         bottomBar = { BottomNavBar(currentRoute = "settings", onNavigate = onNavigate) }
     ) { paddingValues ->
+        StitchScreenWrapper {
         val searchQuery by viewModel.searchQuery.collectAsState()
         val blockUnknown by viewModel.blockUnknown.collectAsState()
         val scamProtection by viewModel.scamProtection.collectAsState()
@@ -226,6 +226,7 @@ fun SettingsScreen(
                     actionIcon = Icons.AutoMirrored.Filled.OpenInNew,
                     onAction = { /* Help */ }
                 )
+            }
             }
         }
     }

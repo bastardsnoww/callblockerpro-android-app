@@ -73,9 +73,9 @@ fun DashboardScreen(
     }
 
     Scaffold(
-        containerColor = CrystalDesign.Colors.BackgroundDarkStitch,
         bottomBar = { BottomNavBar(currentRoute = "home", onNavigate = onNavigate) }
     ) { paddingValues ->
+        StitchScreenWrapper {
             Box(Modifier.fillMaxSize()) {
                 LazyColumn(
                     modifier = Modifier
@@ -203,6 +203,7 @@ fun DashboardScreen(
                     onAction = { onNavigate("settings") }
                 )
             }
+        }
     }
 }
 

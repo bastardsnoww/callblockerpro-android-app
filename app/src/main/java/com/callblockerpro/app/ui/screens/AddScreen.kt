@@ -47,8 +47,8 @@ fun AddScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        PremiumBackground { }
+    StitchScreenWrapper {
+        Box(modifier = Modifier.fillMaxSize()) {
 
         LazyColumn(
             modifier = Modifier
@@ -149,5 +149,6 @@ fun AddScreen(
                 .padding(top = 24.dp)
                 .padding(horizontal = 16.dp)
         )
+        }
     }
 }

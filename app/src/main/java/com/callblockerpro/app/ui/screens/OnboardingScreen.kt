@@ -118,111 +118,113 @@ fun OnboardingScreen(
     }
 
     Scaffold(
-        containerColor = BackgroundDark
+        containerColor = Color.Transparent
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
-            // Pager Section
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-            ) { page ->
-                OnboardingPage(page = page)
-            }
-
-            // Bottom Control Section
+        StitchScreenWrapper {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp)
+                    .fillMaxSize()
+                    .padding(padding)
             ) {
-                // Page Indicators
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    repeat(3) { iteration ->
-                        val color = if (pagerState.currentPage == iteration) Primary else Color.White.copy(alpha = 0.2f)
-                        Box(
-                            modifier = Modifier
-                                .padding(4.dp)
-                                .size(8.dp)
-                                .clip(CircleShape)
-                                .background(color)
-                        )
-                    }
+                // Pager Section
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                ) { page ->
+                    OnboardingPage(page = page)
                 }
-                
-                Spacer(modifier = Modifier.height(24.dp))
 
-                // Primary Button
-                NeonButton(
-                    text = when {
-                        pagerState.currentPage < 2 -> "Next"
-                        checkPermissions() -> "Get Started"
-                        else -> "Grant Permissions"
-                    },
-                    onClick = {
-                        if (pagerState.currentPage < 2) {
-                            scope.launch {
-                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                            }
-                        } else {
-                            if (checkPermissions()) {
-                                // Already have permissions, check Role
-                                val roleIntent = com.callblockerpro.app.util.CallScreeningPermissions.createRoleRequestIntent(context)
-                                if (roleIntent != null && !com.callblockerpro.app.util.CallScreeningPermissions.isCallScreeningRoleGranted(context)) {
-                                    roleLauncher.launch(roleIntent)
-                                } else {
-                                    completeOnboarding()
+                // Bottom Control Section
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp)
+                ) {
+                    // Page Indicators
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        repeat(3) { iteration ->
+                            val color = if (pagerState.currentPage == iteration) Primary else Color.White.copy(alpha = 0.2f)
+                            Box(
+                                modifier = Modifier
+                                    .padding(4.dp)
+                                    .size(8.dp)
+                                    .clip(CircleShape)
+                                    .background(color)
+                            )
+                        }
+                    }
+                    
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // Primary Button
+                    NeonButton(
+                        text = when {
+                            pagerState.currentPage < 2 -> "Next"
+                            checkPermissions() -> "Get Started"
+                            else -> "Grant Permissions"
+                        },
+                        onClick = {
+                            if (pagerState.currentPage < 2) {
+                                scope.launch {
+                                    pagerState.animateScrollToPage(pagerState.currentPage + 1)
                                 }
                             } else {
-                                try {
-                                    launcher.launch(permissionsToRequest)
-                                } catch (e: Exception) {
-                                    // Fallback if system dialog fails
-                                    completeOnboarding()
+                                if (checkPermissions()) {
+                                    // Already have permissions, check Role
+                                    val roleIntent = com.callblockerpro.app.util.CallScreeningPermissions.createRoleRequestIntent(context)
+                                    if (roleIntent != null && !com.callblockerpro.app.util.CallScreeningPermissions.isCallScreeningRoleGranted(context)) {
+                                        roleLauncher.launch(roleIntent)
+                                    } else {
+                                        completeOnboarding()
+                                    }
+                                } else {
+                                    try {
+                                        launcher.launch(permissionsToRequest)
+                                    } catch (e: Exception) {
+                                        // Fallback if system dialog fails
+                                        completeOnboarding()
+                                    }
                                 }
                             }
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    icon = if (pagerState.currentPage < 2) Icons.AutoMirrored.Filled.ArrowForward else null,
-                    color = if (pagerState.currentPage == 2 && !checkPermissions()) Color.White else Primary
-                )
-
-                // Secondary Action (Always visible on last page for stability)
-                AnimatedVisibility(
-                    visible = pagerState.currentPage == 2,
-                    enter = fadeIn(),
-                    exit = fadeOut()
-                ) {
-                    Column(
+                        },
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        icon = if (pagerState.currentPage < 2) Icons.AutoMirrored.Filled.ArrowForward else null,
+                        color = if (pagerState.currentPage == 2 && !checkPermissions()) Color.White else Primary
+                    )
+
+                    // Secondary Action (Always visible on last page for stability)
+                    AnimatedVisibility(
+                        visible = pagerState.currentPage == 2,
+                        enter = fadeIn(),
+                        exit = fadeOut()
                     ) {
-                        Spacer(Modifier.height(16.dp))
-                        TextButton(onClick = completeOnboarding) {
-                            Text(
-                                "Maybe Later",
-                                color = Color.Gray,
-                                style = MaterialTheme.typography.labelLarge
-                            )
-                        }
-                        // Helper text if permissions are persistently denied
-                        if (!checkPermissions()) {
-                            Text(
-                                "Permissions are needed to verify calls locally.",
-                                color = Color.Gray.copy(0.5f),
-                                style = MaterialTheme.typography.labelSmall,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.padding(top = 8.dp)
-                            )
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Spacer(Modifier.height(16.dp))
+                            TextButton(onClick = completeOnboarding) {
+                                Text(
+                                    "Maybe Later",
+                                    color = Color.Gray,
+                                    style = MaterialTheme.typography.labelLarge
+                                )
+                            }
+                            // Helper text if permissions are persistently denied
+                            if (!checkPermissions()) {
+                                Text(
+                                    "Permissions are needed to verify calls locally.",
+                                    color = Color.Gray.copy(0.5f),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.padding(top = 8.dp)
+                                )
+                            }
                         }
                     }
                 }

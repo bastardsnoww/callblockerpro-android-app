@@ -46,9 +46,9 @@ fun ListsScreen(
     viewModel: com.callblockerpro.app.ui.viewmodel.ListsViewModel = hiltViewModel()
 ) {
     Scaffold(
-        containerColor = CrystalDesign.Colors.BackgroundDeep,
         bottomBar = { BottomNavBar(currentRoute = "lists", onNavigate = onNavigate) }
     ) { paddingValues ->
+        StitchScreenWrapper {
         val listType by viewModel.listType.collectAsState(initial = 1)
         val searchQuery by viewModel.searchQuery.collectAsState()
         val currentItems by viewModel.currentItems.collectAsState(initial = emptyList())

@@ -39,9 +39,9 @@ fun LogsScreen(
     val activeFilter by viewModel.filter.collectAsState()
 
     Scaffold(
-        containerColor = CrystalDesign.Colors.BackgroundDarkStitch,
         bottomBar = { BottomNavBar(currentRoute = "logs", onNavigate = onNavigate) }
     ) { paddingValues ->
+        StitchScreenWrapper {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -151,8 +151,9 @@ fun LogsScreen(
             }
         }
     }
+    }
 }
-
+}
 @Composable
 fun StitchFilterChip(text: String, selected: Boolean, isRed: Boolean = false, isGreen: Boolean = false, onClick: () -> Unit) {
     val bgColor = if (selected) {
