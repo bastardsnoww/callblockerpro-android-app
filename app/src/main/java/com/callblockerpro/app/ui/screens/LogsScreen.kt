@@ -196,7 +196,7 @@ fun StitchLogItem(log: CallLogEntry) {
         val stripColor = if (isBlocked) CrystalDesign.Colors.NeonRed else com.callblockerpro.app.ui.theme.Emerald
         Box(
             Modifier
-                .width(8.dp)
+                .width(4.dp)
                 .height(80.dp)
                 .background(
                     color = stripColor,
