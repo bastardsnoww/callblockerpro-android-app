@@ -1,10 +1,11 @@
 {
-	"name": "Android",
-	"image": "mcr.microsoft.com/devcontainers/android:latest",
+	"name": "Universal",
+	"image": "mcr.microsoft.com/devcontainers/universal:2",
 	"features": {
 		"ghcr.io/devcontainers/features/java:1": {
 			"version": "17",
 			"jdkDistro": "ms"
-		}
+		},
+		"ghcr.io/devcontainers/features/android:1": {}
 	}
 }
