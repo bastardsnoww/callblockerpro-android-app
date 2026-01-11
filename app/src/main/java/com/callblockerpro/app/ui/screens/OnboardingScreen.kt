@@ -37,9 +37,10 @@ import com.callblockerpro.app.ui.theme.BackgroundDark
 import com.callblockerpro.app.ui.theme.Emerald
 import com.callblockerpro.app.ui.theme.Primary
 import com.callblockerpro.app.ui.theme.PrimaryLight
+import com.callblockerpro.app.ui.components.NeonButton
+import com.callblockerpro.app.ui.components.StitchScreenWrapper
 import com.callblockerpro.app.ui.viewmodel.OnboardingViewModel
 import kotlinx.coroutines.launch
-import com.callblockerpro.app.ui.components.NeonButton
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -55,12 +56,15 @@ fun OnboardingScreen(
     val roleLauncher = rememberLauncherForActivityResult(
         contract = androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(),
         onResult = { _ ->
-            // Even if they cancel the role request, we finish onboarding
-            // The Dashboard can show a warning later
             viewModel.completeOnboarding()
             onOnboardingFinished()
         }
     )
+
+    val finishOnboarding = {
+        viewModel.completeOnboarding()
+        onOnboardingFinished()
+    }
 
     // Launcher for Permissions
     val launcher = rememberLauncherForActivityResult(
@@ -68,20 +72,17 @@ fun OnboardingScreen(
         onResult = { permissions ->
             val allGranted = permissions.entries.all { it.value }
             if (allGranted) {
-                 // After permissions, we still need to check for the Role
                  val roleIntent = com.callblockerpro.app.util.CallScreeningPermissions.createRoleRequestIntent(context)
                  if (roleIntent != null && !com.callblockerpro.app.util.CallScreeningPermissions.isCallScreeningRoleGranted(context)) {
                      roleLauncher.launch(roleIntent)
                  } else {
-                     viewModel.completeOnboarding()
-                     onOnboardingFinished()
+                     finishOnboarding()
                  }
             }
         }
     )
 
     // Helper to check if permissions are already granted
-
     val checkPermissions = remember(context) {
         {
             val permissionsToCheck = listOf(
@@ -109,12 +110,6 @@ fun OnboardingScreen(
             list.add(Manifest.permission.POST_NOTIFICATIONS)
         }
         list.toTypedArray()
-    }
-    
-    // Safely complete onboarding
-    val completeOnboarding = {
-        viewModel.completeOnboarding()
-        onOnboardingFinished()
     }
 
     Scaffold(
@@ -180,14 +175,14 @@ fun OnboardingScreen(
                                     if (roleIntent != null && !com.callblockerpro.app.util.CallScreeningPermissions.isCallScreeningRoleGranted(context)) {
                                         roleLauncher.launch(roleIntent)
                                     } else {
-                                        completeOnboarding()
+                                        finishOnboarding()
                                     }
                                 } else {
                                     try {
                                         launcher.launch(permissionsToRequest)
                                     } catch (e: Exception) {
                                         // Fallback if system dialog fails
-                                        completeOnboarding()
+                                        finishOnboarding()
                                     }
                                 }
                             }
@@ -208,7 +203,7 @@ fun OnboardingScreen(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Spacer(Modifier.height(16.dp))
-                            TextButton(onClick = completeOnboarding) {
+                            TextButton(onClick = finishOnboarding) {
                                 Text(
                                     "Maybe Later",
                                     color = Color.Gray,

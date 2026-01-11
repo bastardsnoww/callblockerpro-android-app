@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Search
@@ -659,4 +660,27 @@ fun PremiumHeader(
             }
         }
     }
+}
+
+@Composable
+fun PremiumActionCard(
+    title: String,
+    subtitle: String,
+    icon: ImageVector,
+    iconColor: Color,
+    modifier: Modifier = Modifier,
+    tag: String? = null,
+    tagColor: Color = CrystalDesign.Colors.TextSecondary,
+    onClick: () -> Unit
+) {
+    PremiumListItem(
+        title = title,
+        subtitle = subtitle,
+        icon = icon,
+        iconColor = iconColor,
+        tag = tag,
+        tagColor = tagColor,
+        modifier = modifier,
+        onClick = onClick
+    )
 }

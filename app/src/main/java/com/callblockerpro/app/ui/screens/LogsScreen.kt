@@ -150,10 +150,10 @@ fun LogsScreen(
                 }
             }
         }
-    }
+        }
     }
 }
-}
+
 @Composable
 fun StitchFilterChip(text: String, selected: Boolean, isRed: Boolean = false, isGreen: Boolean = false, onClick: () -> Unit) {
     val bgColor = if (selected) {

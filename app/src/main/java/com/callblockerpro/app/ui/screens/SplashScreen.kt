@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.material3.Icon
 import com.callblockerpro.app.ui.components.NeonLoader
 import com.callblockerpro.app.ui.components.PremiumBackground
+import com.callblockerpro.app.ui.components.StitchScreenWrapper
 import kotlinx.coroutines.delay
 
 @Composable

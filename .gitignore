@@ -17,3 +17,7 @@ temp_*
 *.apk
 logs/
 releases/
+
+# Local Android SDK
+android-sdk/
+broken.devcontainer/
