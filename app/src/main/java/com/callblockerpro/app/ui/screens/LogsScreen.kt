@@ -27,6 +27,7 @@ import com.callblockerpro.app.ui.theme.CrystalDesign
 import com.callblockerpro.app.ui.theme.Emerald
 import com.callblockerpro.app.domain.model.CallLogEntry
 import com.callblockerpro.app.domain.model.CallResult
+import com.callblockerpro.app.ui.screens.formatLogTime
 import kotlinx.coroutines.launch
 
 @Composable
