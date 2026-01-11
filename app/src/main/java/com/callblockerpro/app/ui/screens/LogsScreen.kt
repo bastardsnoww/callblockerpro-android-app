@@ -199,7 +199,7 @@ fun StitchLogItem(log: CallLogEntry) {
             Box(Modifier.width(6.dp).fillMaxHeight().background(stripColor).align(Alignment.CenterStart))
             
             Row(
-                Modifier.padding(16.dp),
+                Modifier.padding(start = 22.dp, top = 16.dp, end = 16.dp, bottom = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Icon
