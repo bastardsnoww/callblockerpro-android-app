@@ -193,13 +193,20 @@ fun StitchLogItem(log: CallLogEntry) {
         border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(0.05f)),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Box {
+        Row(modifier = Modifier.fillMaxWidth()) {
             // Vertical Strip Indicator (Red for Blocked, Green for Allowed)
             val stripColor = if (isBlocked) CrystalDesign.Colors.NeonRed else com.callblockerpro.app.ui.theme.Emerald
-            Box(Modifier.width(6.dp).fillMaxHeight().background(stripColor).align(Alignment.CenterStart))
+            Box(
+                Modifier
+                    .width(6.dp)
+                    .fillMaxHeight()
+                    .background(stripColor)
+            )
             
             Row(
-                Modifier.padding(start = 22.dp, top = 16.dp, end = 16.dp, bottom = 16.dp),
+                Modifier
+                    .weight(1f)
+                    .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Icon
