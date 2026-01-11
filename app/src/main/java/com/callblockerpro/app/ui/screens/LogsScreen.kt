@@ -187,26 +187,32 @@ fun StitchFilterChip(text: String, selected: Boolean, isRed: Boolean = false, is
 fun StitchLogItem(log: CallLogEntry) {
     val isBlocked = log.result == CallResult.BLOCKED
     
-    Surface(
-        color = CrystalDesign.Colors.SurfaceStitch,
-        shape = RoundedCornerShape(16.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(0.05f)),
-        modifier = Modifier.fillMaxWidth()
+    // Outer Row containing strip and card
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(0.dp)
     ) {
-        Row(modifier = Modifier.fillMaxWidth()) {
-            // Vertical Strip Indicator (Red for Blocked, Green for Allowed)
-            val stripColor = if (isBlocked) CrystalDesign.Colors.NeonRed else com.callblockerpro.app.ui.theme.Emerald
-            Box(
-                Modifier
-                    .width(6.dp)
-                    .fillMaxHeight()
-                    .background(stripColor)
-            )
-            
+        // Vertical Strip Indicator (Red for Blocked, Green for Allowed) - OUTSIDE Surface
+        val stripColor = if (isBlocked) CrystalDesign.Colors.NeonRed else com.callblockerpro.app.ui.theme.Emerald
+        Box(
+            Modifier
+                .width(8.dp)
+                .height(80.dp)
+                .background(
+                    color = stripColor,
+                    shape = RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp)
+                )
+        )
+        
+        // Card content
+        Surface(
+            color = CrystalDesign.Colors.SurfaceStitch,
+            shape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp),
+            border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(0.05f)),
+            modifier = Modifier.weight(1f)
+        ) {
             Row(
-                Modifier
-                    .weight(1f)
-                    .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp),
+                Modifier.padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Icon
