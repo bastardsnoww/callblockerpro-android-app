@@ -39,12 +39,21 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.callblockerpro.app.ui.theme.Amber
 import com.callblockerpro.app.ui.theme.Emerald
 import com.callblockerpro.app.ui.theme.Red
 import com.callblockerpro.app.ui.theme.CrystalDesign
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.res.stringResource
+import com.callblockerpro.app.R
 
 enum class LogType {
     BLOCKED, ALLOWED, SPAM
@@ -60,7 +69,8 @@ fun LogItem(
     modifier: Modifier = Modifier
 ) {
     val haptic = LocalHapticFeedback.current
-    var isPressed by remember { mutableStateOf(false) }
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
     val scale by animateFloatAsState(
         targetValue = if (isPressed) 0.97f else 1f,
         animationSpec = tween(durationMillis = 100),
@@ -84,33 +94,39 @@ fun LogItem(
         LogType.SPAM -> Triple(Icons.Default.Shield, Amber, Amber.copy(alpha = 0.15f))
     }
 
+    val cdStub = stringResource(R.string.log_item_desc, label, number, time)
+
     GlassPanel(
+        cornerRadius = CrystalDesign.Glass.CornerRadius,
+        borderAlpha = 0.1f,
         modifier = modifier
             .fillMaxWidth()
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
             }
-            .pointerInput(Unit) {
-                detectTapGestures(
-                    onPress = {
-                        isPressed = true
-                        tryAwaitRelease()
-                        isPressed = false
-                    },
-                    onTap = {
-                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = LocalIndication.current,
+                    role = Role.Button,
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         onClick()
                     }
                 )
-            },
-        cornerRadius = CrystalDesign.Glass.CornerRadius,
-        borderAlpha = 0.1f
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .semantics(mergeDescendants = true) {
+                    contentDescription = cdStub
+                }
+                .padding(16.dp)
         ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
             // Advanced Glassy Icon Badge
             Box(
                 modifier = Modifier
@@ -167,4 +183,5 @@ fun LogItem(
             }
         }
     }
+}
 }

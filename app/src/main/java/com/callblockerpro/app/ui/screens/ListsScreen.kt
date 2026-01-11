@@ -39,6 +39,8 @@ import com.callblockerpro.app.ui.theme.BackgroundDark
 import com.callblockerpro.app.ui.theme.Emerald
 import com.callblockerpro.app.ui.theme.Primary
 import com.callblockerpro.app.ui.theme.PrimaryLight
+import androidx.compose.ui.res.stringResource
+import com.callblockerpro.app.R
 
 @Composable
 fun ListsScreen(
@@ -75,7 +77,7 @@ fun ListsScreen(
                         PremiumSearchBar(
                             query = searchQuery,
                             onQueryChange = { viewModel.onSearchQueryChanged(it) },
-                            placeholder = if (listType == 1) "Search blocklist..." else "Search whitelist...",
+                            placeholder = if (listType == 1) stringResource(R.string.protection_search_block) else stringResource(R.string.protection_search_allow),
                             onFilterClick = {}
                         )
                     }
@@ -85,14 +87,14 @@ fun ListsScreen(
                         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                             GlassPanel(modifier = Modifier.weight(1f).height(110.dp)) {
                                 Column(Modifier.padding(20.dp).align(Alignment.BottomStart)) {
-                                    Text("PROTECTED", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = FontWeight.Bold)
+                                    Text(stringResource(R.string.protection_stat_protected), style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = FontWeight.Bold)
                                     Text("428", style = MaterialTheme.typography.headlineSmall, color = Color.White, fontWeight = FontWeight.Black)
                                 }
                                 Icon(Icons.Default.Shield, null, tint = Primary.copy(0.1f), modifier = Modifier.size(80.dp).align(Alignment.TopEnd).offset(20.dp, (-20).dp))
                             }
                             GlassPanel(modifier = Modifier.weight(1f).height(110.dp)) {
                                 Column(Modifier.padding(20.dp).align(Alignment.BottomStart)) {
-                                    Text("DATABASE", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = FontWeight.Bold)
+                                    Text(stringResource(R.string.protection_stat_database), style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = FontWeight.Bold)
                                     Text("v2.4", style = MaterialTheme.typography.headlineSmall, color = Color.White, fontWeight = FontWeight.Black)
                                 }
                                 Icon(Icons.Default.CloudSync, null, tint = Primary.copy(0.1f), modifier = Modifier.size(80.dp).align(Alignment.TopEnd).offset(20.dp, (-20).dp))
@@ -116,15 +118,20 @@ fun ListsScreen(
                             AnimatedEntrance(index = 3) {
                                 PremiumEmptyState(
                                     icon = Icons.Default.Shield,
-                                    title = "List Empty",
-                                    message = "Protect your peace.\nAdd your first number now.",
-                                    actionLabel = "Add Number",
-                                    onActionClick = { onNavigate("add") }
+                                    title = stringResource(R.string.protection_empty_title),
+                                    message = if (listType == 1) stringResource(R.string.protection_empty_desc_block) else stringResource(R.string.protection_empty_desc_allow),
+                                    actionLabel = stringResource(R.string.protection_empty_action),
+                                    onActionClick = { onNavigate("add?type=$listType") },
+                                    secondaryActionLabel = "Import from Log",
+                                    onSecondaryActionClick = { onNavigate("logs") }
                                 )
                             }
                         }
                     } else {
-                        itemsIndexed(currentItems) { index, listItem: ListItem ->
+                        itemsIndexed(
+                            items = currentItems,
+                            key = { _, item -> item.id }
+                        ) { index, listItem: ListItem ->
                              // Ensure compatibility with ViewModel items
                             AnimatedEntrance(index = index + 3) {
                                 PremiumListItem(
@@ -134,7 +141,7 @@ fun ListsScreen(
                                     tagColor = listItem.color,
                                     icon = if (listItem.subtitle == "Business") Icons.Default.DomainDisabled else Icons.Default.PersonOff,
                                     iconColor = listItem.color,
-                                    onClick = {}
+                                    onClick = { /* Shows details dialog in future */ }
                                 )
                             }
                         }
@@ -143,11 +150,11 @@ fun ListsScreen(
 
                 // Floating Crystal Header
                 PremiumHeader(
-                    title = "Protection Lists",
+                    title = stringResource(R.string.protection_header),
                     onBack = null, // Root screen, no back
-                    modifier = Modifier.align(Alignment.TopCenter).padding(top = 24.dp, start = 16.dp, end = 16.dp),
+                    modifier = Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(top = 24.dp, start = 16.dp, end = 16.dp),
                     actionIcon = Icons.Default.Add,
-                    onAction = { onNavigate("add") }
+                    onAction = { onNavigate("add?type=$listType") }
                 )
             }
         }
@@ -196,7 +203,7 @@ fun StitchListToggle(selectedIndex: Int, onOptionSelected: (Int) -> Unit) {
                         )
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            text = "Blocklist",
+                            text = "BLOCKED", // Was "Blocklist"
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = if (isBlocklist) Color.White else CrystalDesign.Colors.TextTertiary
@@ -224,7 +231,7 @@ fun StitchListToggle(selectedIndex: Int, onOptionSelected: (Int) -> Unit) {
                         )
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            text = "Whitelist", // Or "Allowlist" if preferred, but keeping "Whitelist"
+                            text = "ALLOWED", // Was "Allowlist"
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = if (isWhitelist) Color.White else CrystalDesign.Colors.TextTertiary

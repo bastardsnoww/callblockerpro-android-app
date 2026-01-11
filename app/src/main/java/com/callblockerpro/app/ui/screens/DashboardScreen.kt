@@ -18,7 +18,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.DomainDisabled
 import androidx.compose.material.icons.filled.PersonOff
 import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.CallMissed
+import androidx.compose.material.icons.automirrored.filled.CallMissed
 import androidx.compose.material.icons.automirrored.filled.CallMade
 import androidx.compose.material.icons.automirrored.filled.CallReceived
 import androidx.compose.material.icons.filled.Info
@@ -83,21 +83,59 @@ fun DashboardScreen(
                         .padding(paddingValues)
                         .padding(horizontal = 24.dp), // px-6
                     contentPadding = PaddingValues(top = 100.dp, bottom = 120.dp),
-                    verticalArrangement = Arrangement.spacedBy(32.dp)
+                    verticalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
                     // 1. Stitch Toggle
                     item {
                         StitchToggle(
-                            options = listOf("Normal", "Whitelist", "Blocklist"),
+                            options = listOf("Standard", "Relaxed", "Strict"),
                             selectedIndex = selectedMode,
                             onOptionSelected = { index -> 
                                 viewModel.onModeSelected(index) 
                             }
                         )
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            text = when(selectedMode) {
+                                0 -> "Standard: Blocks known spam & user blocklist"
+                                1 -> "Relaxed: Allows contacts & allowlist"
+                                else -> "Strict: Blocks everything except allowlist"
+                            },
+                            style = MaterialTheme.typography.labelSmall,
+                            color = CrystalDesign.Colors.TextTertiary,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
                     }
 
                     // 2. System Status (HomeStatusCard replacement)
                     item {
+                       var showStatusDialog by remember { mutableStateOf(false) }
+
+                       if (showStatusDialog) {
+                           AlertDialog(
+                               onDismissRequest = { showStatusDialog = false },
+                               title = { Text("System Status", color = Color.White) },
+                               text = { 
+                                   Column {
+                                       Text("Gradient AI Engine: Active", color = Color.White.copy(0.8f))
+                                       Spacer(Modifier.height(4.dp))
+                                       Text("Database Version: v2.4 (Latest)", color = Color.White.copy(0.6f))
+                                       Spacer(Modifier.height(4.dp))
+                                       Text("Protection Level: High", color = Emerald)
+                                   }
+                               },
+                               confirmButton = {
+                                   TextButton(onClick = { showStatusDialog = false }) {
+                                       Text("OK", color = Primary)
+                                   }
+                               },
+                               containerColor = CrystalDesign.Colors.SurfaceStitch,
+                               textContentColor = Color.White
+                           )
+                       }
+
+                       val lastBlocked by viewModel.lastBlockedCall.collectAsState()
+
                        HomeStatusCard(
                             blockedCount = blockedToday,
                             threatCount = totalThreats,
@@ -108,11 +146,33 @@ fun DashboardScreen(
                                         roleLauncher.launch(it)
                                     }
                                 } else {
-                                    viewModel.toggleSystemShield(true)
-                                    android.widget.Toast.makeText(context, "System Shield Active", android.widget.Toast.LENGTH_SHORT).show()
+                                    showStatusDialog = true
                                 }
                             }
                         )
+                        
+                        if (lastBlocked != null) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            // Small "Toast" Card for Last Blocked
+                            Surface(
+                                color = CrystalDesign.Colors.SurfaceStitch,
+                                shape = RoundedCornerShape(12.dp),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, CrystalDesign.Colors.NeonRed.copy(0.2f)),
+                                modifier = Modifier.fillMaxWidth().clickable { onNavigate("logs") }
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(Icons.Default.Block, null, tint = CrystalDesign.Colors.NeonRed, modifier = Modifier.size(20.dp))
+                                    Spacer(Modifier.width(12.dp))
+                                    Column {
+                                        Text("LAST BLOCKED CALL", style = MaterialTheme.typography.labelSmall, color = CrystalDesign.Colors.NeonRed, fontWeight = FontWeight.Bold)
+                                        Text(lastBlocked?.phoneNumber ?: "Unknown", style = MaterialTheme.typography.bodyMedium, color = Color.White, fontWeight = FontWeight.Bold)
+                                    }
+                                }
+                            }
+                        }
                     }
 
                     // 3. Weekly Activity
@@ -198,9 +258,9 @@ fun DashboardScreen(
                     modifier = Modifier
                         .align(Alignment.TopCenter)
                         .statusBarsPadding()
-                        .padding(top = 8.dp, start = 24.dp, end = 24.dp), // Padding matches px-6
-                    actionIcon = Icons.Default.Settings,
-                    onAction = { onNavigate("settings") }
+                        .padding(top = 8.dp, start = 24.dp, end = 24.dp),
+                    actionIcon = null,
+                    onAction = null
                 )
             }
         }
@@ -271,7 +331,7 @@ fun StitchRecentItem(log: com.callblockerpro.app.domain.model.CallLogEntry, onCl
     // Icon Logic
     val icon = when {
         isSpam -> Icons.Default.Block // block
-        isMissed -> Icons.Default.CallMissed // call_missed
+        isMissed -> Icons.AutoMirrored.Filled.CallMissed // call_missed
         isOutgoing -> Icons.AutoMirrored.Filled.CallMade // call_made
         isAllowed -> Icons.AutoMirrored.Filled.CallReceived // call_received
         else -> Icons.Default.Block
@@ -397,7 +457,7 @@ fun StitchRecentItem(log: com.callblockerpro.app.domain.model.CallLogEntry, onCl
                                 Icon(Icons.AutoMirrored.Filled.CallReceived, null, tint = Emerald, modifier = Modifier.size(12.dp).graphicsLayer { rotationZ = 180f })
                                 Spacer(Modifier.width(4.dp))
                             } else if (isMissed) {
-                                Icon(Icons.Default.CallMissed, null, tint = CrystalDesign.Colors.NeonRed, modifier = Modifier.size(12.dp))
+                                Icon(Icons.AutoMirrored.Filled.CallMissed, null, tint = CrystalDesign.Colors.NeonRed, modifier = Modifier.size(12.dp))
                                 Spacer(Modifier.width(4.dp))
                             }
                             

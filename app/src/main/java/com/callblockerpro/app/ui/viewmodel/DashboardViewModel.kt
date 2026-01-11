@@ -42,61 +42,15 @@ class DashboardViewModel @Inject constructor(
         .map { it?.weeklyActivity ?: emptyList() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    // Mock Data to match Stitch Reference exactly
-    val recentLogs: StateFlow<List<com.callblockerpro.app.domain.model.CallLogEntry>> = MutableStateFlow(
-        listOf(
-            // 1. Spam (Red, Strip)
-            com.callblockerpro.app.domain.model.CallLogEntry(
-                id = 1,
-                phoneNumber = "+1 (555) 019-2834",
-                contactName = null,
-                timestamp = java.time.Instant.now().minusSeconds(7200), // 10:42 AM (approx 2h ago)
-                result = com.callblockerpro.app.domain.model.CallResult.BLOCKED,
-                triggerMode = AppMode.BLOCKLIST,
-                reason = "Auto-Blocked"
-            ),
-            // 2. John Doe (Green, Allowed)
-            com.callblockerpro.app.domain.model.CallLogEntry(
-                id = 2,
-                phoneNumber = "John Doe", // Using name in phone field for simple display mapping
-                contactName = "John Doe",
-                timestamp = java.time.Instant.now().minusSeconds(12000), // 9:15 AM
-                result = com.callblockerpro.app.domain.model.CallResult.ALLOWED,
-                triggerMode = AppMode.NEUTRAL,
-                reason = "Mobile • 5m 23s"
-            ),
-            // 3. Unknown Caller (Red, Missed)
-            com.callblockerpro.app.domain.model.CallLogEntry(
-                id = 3,
-                phoneNumber = "Unknown Caller",
-                contactName = null,
-                timestamp = java.time.Instant.now().minusSeconds(15000), // 8:30 AM
-                result = com.callblockerpro.app.domain.model.CallResult.MISSED,
-                triggerMode = AppMode.NEUTRAL,
-                reason = "Missed Call"
-            ),
-            // 4. Sarah Miller (Green, Outgoing)
-            com.callblockerpro.app.domain.model.CallLogEntry(
-                id = 4,
-                phoneNumber = "Sarah Miller",
-                contactName = "Sarah Miller",
-                timestamp = java.time.Instant.now().minus(1, java.time.temporal.ChronoUnit.DAYS).minusSeconds(10000), // Yesterday 6:45 PM
-                result = com.callblockerpro.app.domain.model.CallResult.OUTGOING,
-                triggerMode = AppMode.NEUTRAL, // Neutral/Whitelist
-                reason = "California, USA • 12m 02s"
-            ),
-            // 5. Telemarketing (Red, Strip)
-            com.callblockerpro.app.domain.model.CallLogEntry(
-                id = 5,
-                phoneNumber = "+1 (800) 555-0123",
-                contactName = null,
-                timestamp = java.time.Instant.now().minus(1, java.time.temporal.ChronoUnit.DAYS).minusSeconds(25000), // Yesterday 2:15 PM
-                result = com.callblockerpro.app.domain.model.CallResult.BLOCKED,
-                triggerMode = AppMode.BLOCKLIST,
-                reason = "Telemarketing"
-            )
-        )
-    ).asStateFlow()
+    // Real Data from Repository
+    val recentLogs: StateFlow<List<com.callblockerpro.app.domain.model.CallLogEntry>> = callLogRepository.getRecentLogs(10)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val lastBlockedCall: StateFlow<com.callblockerpro.app.domain.model.CallLogEntry?> = recentLogs
+        .map { logs -> 
+            logs.firstOrNull { it.result == com.callblockerpro.app.domain.model.CallResult.BLOCKED }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     fun toggleSystemShield(isActive: Boolean) {
         viewModelScope.launch {

@@ -40,25 +40,9 @@
 # Coroutines - Rely on library consumer rules
 # -keep class kotlinx.coroutines.** { *; }
 
-# Keep Retrofit (if added in future)
--keepattributes Signature, InnerClasses, EnclosingMethod
--keepattributes RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations
--keepattributes AnnotationDefault
--keepclassmembers,allowshrinking,allowobfuscation interface * {
-    @retrofit2.http.* <methods>;
-}
--dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
--dontwarn javax.annotation.**
--dontwarn kotlin.Unit
--dontwarn retrofit2.KotlinExtensions
--dontwarn retrofit2.KotlinExtensions$*
 
-# Keep Gson TypeAdapters (if using Gson)
--keep class com.google.gson.** { *; }
--keep class * extends com.google.gson.TypeAdapter
--keep class * implements com.google.gson.TypeAdapterFactory
--keep class * implements com.google.gson.JsonSerializer
--keep class * implements com.google.gson.JsonDeserializer
+
+
 
 # Keep data classes used with Gson/Serialization
 -keepclassmembers class com.callblockerpro.app.domain.model.** { *; }

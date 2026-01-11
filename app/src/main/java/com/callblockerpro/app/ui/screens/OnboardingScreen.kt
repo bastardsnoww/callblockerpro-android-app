@@ -3,6 +3,11 @@ package com.callblockerpro.app.ui.screens
 import android.Manifest
 import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -25,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -40,6 +46,8 @@ import com.callblockerpro.app.ui.theme.PrimaryLight
 import com.callblockerpro.app.ui.components.NeonButton
 import com.callblockerpro.app.ui.components.StitchScreenWrapper
 import com.callblockerpro.app.ui.viewmodel.OnboardingViewModel
+import androidx.compose.ui.res.stringResource
+import com.callblockerpro.app.R
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -87,7 +95,8 @@ fun OnboardingScreen(
         {
             val permissionsToCheck = listOf(
                 Manifest.permission.READ_PHONE_STATE,
-                Manifest.permission.READ_CALL_LOG
+                Manifest.permission.READ_CALL_LOG,
+                Manifest.permission.READ_CONTACTS
             ).toMutableList()
             
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -104,7 +113,8 @@ fun OnboardingScreen(
     val permissionsToRequest = remember {
         val list = mutableListOf(
              Manifest.permission.READ_PHONE_STATE,
-             Manifest.permission.READ_CALL_LOG
+             Manifest.permission.READ_CALL_LOG,
+             Manifest.permission.READ_CONTACTS
         )
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             list.add(Manifest.permission.POST_NOTIFICATIONS)
@@ -121,6 +131,16 @@ fun OnboardingScreen(
                     .fillMaxSize()
                     .padding(padding)
             ) {
+                // Top Bar with Skip Button
+                Box(Modifier.fillMaxWidth().padding(16.dp)) {
+                    TextButton(
+                        onClick = finishOnboarding,
+                        modifier = Modifier.align(Alignment.CenterEnd)
+                    ) {
+                        Text(stringResource(R.string.onboarding_skip), color = Color.Gray, style = MaterialTheme.typography.labelMedium)
+                    }
+                }
+
                 // Pager Section
                 HorizontalPager(
                     state = pagerState,
@@ -156,12 +176,43 @@ fun OnboardingScreen(
                     
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Primary Button
+    var showRationale by remember { mutableStateOf(false) }
+
+    if (showRationale) {
+        AlertDialog(
+            onDismissRequest = { showRationale = false },
+            title = { Text(stringResource(R.string.onboarding_permission_title), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold) },
+            text = { Text(stringResource(R.string.onboarding_permission_rational), style = MaterialTheme.typography.bodyMedium) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showRationale = false
+                        try {
+                            launcher.launch(permissionsToRequest)
+                        } catch (e: Exception) {
+                            finishOnboarding()
+                        }
+                    }
+                ) {
+                    Text(stringResource(R.string.action_continue), color = Primary)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showRationale = false }) {
+                    Text(stringResource(R.string.action_cancel), color = Color.Gray)
+                }
+            },
+            containerColor = com.callblockerpro.app.ui.theme.CrystalDesign.Colors.SurfaceStitch,
+            titleContentColor = Color.White,
+            textContentColor = com.callblockerpro.app.ui.theme.CrystalDesign.Colors.TextSecondary
+        )
+    }
+
                     NeonButton(
                         text = when {
-                            pagerState.currentPage < 2 -> "Next"
-                            checkPermissions() -> "Get Started"
-                            else -> "Grant Permissions"
+                            pagerState.currentPage < 2 -> stringResource(R.string.onboarding_next)
+                            checkPermissions() -> stringResource(R.string.onboarding_get_started)
+                            else -> stringResource(R.string.onboarding_grant_permissions)
                         },
                         onClick = {
                             if (pagerState.currentPage < 2) {
@@ -178,12 +229,8 @@ fun OnboardingScreen(
                                         finishOnboarding()
                                     }
                                 } else {
-                                    try {
-                                        launcher.launch(permissionsToRequest)
-                                    } catch (e: Exception) {
-                                        // Fallback if system dialog fails
-                                        finishOnboarding()
-                                    }
+                                    // Show Rationale first!
+                                    showRationale = true
                                 }
                             }
                         },
@@ -192,62 +239,33 @@ fun OnboardingScreen(
                         color = if (pagerState.currentPage == 2 && !checkPermissions()) Color.White else Primary
                     )
 
-                    // Secondary Action (Always visible on last page for stability)
-                    AnimatedVisibility(
-                        visible = pagerState.currentPage == 2,
-                        enter = fadeIn(),
-                        exit = fadeOut()
-                    ) {
-                        Column(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Spacer(Modifier.height(16.dp))
-                            TextButton(onClick = finishOnboarding) {
-                                Text(
-                                    "Maybe Later",
-                                    color = Color.Gray,
-                                    style = MaterialTheme.typography.labelLarge
-                                )
-                            }
-                            // Helper text if permissions are persistently denied
-                            if (!checkPermissions()) {
-                                Text(
-                                    "Permissions are needed to verify calls locally.",
-                                    color = Color.Gray.copy(0.5f),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier.padding(top = 8.dp)
-                                )
-                            }
-                        }
+                        // Removed Bottom "Maybe Later" since we moved it to top
+                        Spacer(Modifier.height(8.dp))
                     }
                 }
             }
         }
     }
-}
-
 @Composable
 fun OnboardingPage(page: Int) {
     val content = when (page) {
         0 -> OnboardingContent(
-            title = "Bank-Grade\nProtection",
-            description = "Advanced AI analyzes call patterns in real-time to block scams before your phone even rings.",
+            title = stringResource(R.string.onboarding_p1_title),
+            description = stringResource(R.string.onboarding_p1_desc),
             icon = Icons.Default.Shield,
             highlight = true
         )
         1 -> OnboardingContent(
-            title = "Your Privacy\nFirst",
-            description = "We process everything locally on your device. Your call logs and contacts never leave your phone.",
+            title = stringResource(R.string.onboarding_p2_title),
+            description = stringResource(R.string.onboarding_p2_desc),
             icon = Icons.Default.VisibilityOff,
             highlight = false
         )
         else -> OnboardingContent(
-            title = "Empower Your\nDigital Life",
-            description = "Grant permissions to enable full protection. We need access to identify and filter incoming calls.",
-            icon = Icons.Default.Security,
-            highlight = false
+             title = stringResource(R.string.onboarding_p3_title),
+             description = stringResource(R.string.onboarding_p3_desc),
+             icon = Icons.Default.Security,
+             highlight = false
         )
     }
 
@@ -258,9 +276,24 @@ fun OnboardingPage(page: Int) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        val infiniteTransition = rememberInfiniteTransition(label = "OnboardingPulse")
+        val scale by infiniteTransition.animateFloat(
+            initialValue = 1f,
+            targetValue = if (page == 2) 1.1f else 1f, // Only pulse on last page
+            animationSpec = infiniteRepeatable(
+                animation = tween(1000),
+                repeatMode = RepeatMode.Reverse
+            ),
+            label = "IconScale"
+        )
+
         Box(
             modifier = Modifier
                 .size(180.dp)
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                }
                 .clip(CircleShape)
                 .background(
                     Brush.radialGradient(
@@ -307,7 +340,7 @@ fun OnboardingPage(page: Int) {
                     .padding(horizontal = 12.dp, vertical = 6.dp)
              ) {
                  Icon(Icons.Default.Check, null, tint = Emerald, modifier = Modifier.size(16.dp))
-                 Text("Zero-Data Collection Policy", style = MaterialTheme.typography.labelSmall, color = Emerald, fontWeight = FontWeight.Bold)
+                 Text(stringResource(R.string.onboarding_trust_badge), style = MaterialTheme.typography.labelSmall, color = Emerald, fontWeight = FontWeight.Bold)
              }
         }
     }

@@ -25,7 +25,7 @@ val Red = Color(0xFFF43F5E)     // Neon Rose/Red
 
 // Text - Crystal White
 val TextPrimaryDark = Color(0xFFF8FAFC)
-val TextSecondaryDark = Color.White.copy(alpha = 0.6f) // Pure crystal opacity
+val TextSecondaryDark = Color.White.copy(alpha = 0.8f) // Better contrast
 
 val TextPrimaryLight = Color(0xFF0F172A)
 val TextSecondaryLight = Color.Black.copy(alpha = 0.6f)

@@ -27,8 +27,39 @@ import com.callblockerpro.app.ui.theme.PrimaryLight
 import com.callblockerpro.app.ui.components.PremiumHeader
 import com.callblockerpro.app.ui.components.PremiumActionCard
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScheduleScreen() {
+fun ScheduleScreen(
+    viewModel: com.callblockerpro.app.ui.viewmodel.ScheduleViewModel = androidx.hilt.navigation.compose.hiltViewModel()
+) {
+    val workHoursEnabled by viewModel.workHoursEnabled.collectAsState()
+    val startTime by viewModel.startTime.collectAsState()
+    val endTime by viewModel.endTime.collectAsState()
+    
+    var showTimePicker by remember { mutableStateOf(false) }
+    var isPickingStartTime by remember { mutableStateOf(true) }
+    
+    val timePickerState = rememberTimePickerState()
+
+    if (showTimePicker) {
+        AlertDialog(
+            onDismissRequest = { showTimePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.updateTime(isPickingStartTime, timePickerState.hour, timePickerState.minute)
+                    showTimePicker = false
+                }) { Text("OK", color = Primary) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showTimePicker = false }) { Text("Cancel", color = Color.Gray) }
+            },
+            text = {
+                TimePicker(state = timePickerState)
+            },
+            containerColor = CrystalDesign.Colors.SurfaceStitch
+        )
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -41,8 +72,8 @@ fun ScheduleScreen() {
         ) {
             item {
                 ScheduleStatusCard(
-                    mode = "WHITELIST MODE",
-                    time = "Active until 08:00 AM"
+                    mode = if (workHoursEnabled) "WORK MODE" else "AUTOMATION OFF",
+                    time = if (workHoursEnabled) "Active ${startTime} - ${endTime}" else "Tap to enable"
                 )
             }
 
@@ -59,13 +90,64 @@ fun ScheduleScreen() {
             item {
                 PremiumActionCard(
                     title = "Work Hours",
-                    subtitle = "09:00 AM - 05:00 PM",
+                    subtitle = "${startTime} - ${endTime}",
                     icon = Icons.Default.Schedule,
-                    iconColor = Color(0xFF3B82F6),
-                    tag = "active",
-                    tagColor = Emerald,
-                    onClick = {}
+                    iconColor = if (workHoursEnabled) Color(0xFF3B82F6) else Color.Gray,
+                    tag = if (workHoursEnabled) "active" else "disabled",
+                    tagColor = if (workHoursEnabled) Emerald else Color.Gray,
+                    onClick = { viewModel.toggleWorkHours(!workHoursEnabled) }
                 )
+            }
+            
+            if (workHoursEnabled) {
+                item {
+                    // Quick Presets
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        listOf("09:00" to "17:00", "10:00" to "18:00").forEach { (start, end) ->
+                            SuggestionChip(
+                                onClick = { 
+                                    viewModel.updateTime(true, start.split(":")[0].toInt(), 0)
+                                    viewModel.updateTime(false, end.split(":")[0].toInt(), 0)
+                                },
+                                label = { Text("$start - $end") },
+                                colors = SuggestionChipDefaults.suggestionChipColors(
+                                    containerColor = Color.White.copy(0.05f),
+                                    labelColor = Color.White
+                                ),
+                                border = null
+                            )
+                        }
+                    }
+                }
+
+                item {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        PremiumActionCard(
+                            title = "Start Time",
+                            subtitle = startTime.toString(),
+                            icon = Icons.Default.Schedule,
+                            iconColor = Primary,
+                            tag = null,
+                            modifier = Modifier.weight(1f),
+                            onClick = { 
+                                isPickingStartTime = true
+                                showTimePicker = true 
+                            }
+                        )
+                        PremiumActionCard(
+                            title = "End Time",
+                            subtitle = endTime.toString(),
+                            icon = Icons.Default.Schedule,
+                            iconColor = Primary,
+                            tag = null,
+                            modifier = Modifier.weight(1f),
+                            onClick = { 
+                                isPickingStartTime = false
+                                showTimePicker = true 
+                            }
+                        )
+                    }
+                }
             }
             item { Spacer(Modifier.height(80.dp)) }
         }

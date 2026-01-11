@@ -142,7 +142,7 @@ val Typography = Typography(
     labelSmall = TextStyle(
         fontFamily = ManropeFontFamily,
         fontWeight = FontWeight.Bold,
-        fontSize = 11.sp, // ultra small labels
+        fontSize = 12.sp, // improved from 11.sp
         lineHeight = 16.sp,
         letterSpacing = 0.5.sp
     )

@@ -46,16 +46,26 @@ private val LightColorScheme = lightColorScheme(
 fun CallBlockerProTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = false, // Disabled by default to stay true to our custom design
+    dynamicColor: Boolean = true, 
     content: @Composable () -> Unit
 ) {
-    // Force Dark Theme for "Premier" Feel
-    val colorScheme = DarkColorScheme
-    
+    val colorScheme = when {
+        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            val context = LocalContext.current
+            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }
+        darkTheme -> DarkColorScheme
+        else -> LightColorScheme
+    }
+
     val view = LocalView.current
     if (!view.isInEditMode) {
-        // Optional: We can still set a default, but respecting system is better.
-        // For now, removing the forced override allows system defaults or per-screen handling.
+        SideEffect {
+            val window = (view.context as Activity).window
+            // Let the system handle the status bar color for edge-to-edge
+            window.statusBarColor = Color.Transparent.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+        }
     }
 
     MaterialTheme(

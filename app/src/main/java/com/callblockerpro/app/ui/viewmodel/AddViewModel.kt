@@ -12,9 +12,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+import androidx.lifecycle.SavedStateHandle
+
 @HiltViewModel
 class AddViewModel @Inject constructor(
-    private val listRepository: ListRepository
+    private val listRepository: ListRepository,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _number = MutableStateFlow("")
@@ -24,7 +27,8 @@ class AddViewModel @Inject constructor(
     val name: StateFlow<String> = _name.asStateFlow()
 
     // 0 = Whitelist, 1 = Blocklist (Default)
-    private val _targetList = MutableStateFlow(1) 
+    private val typeArg: Int? = savedStateHandle["type"]
+    private val _targetList = MutableStateFlow(typeArg ?: 1)  
     val targetList: StateFlow<Int> = _targetList.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)

@@ -32,7 +32,7 @@ googleHttpClient = "1.43.3"
 securityCrypto = "1.0.0"
 firebaseBom = "33.7.0"
 googleServices = "4.4.2"
-firebaseCrashlytics = "3.0.2"
+firebaseCrashlytics = "2.9.9"
 paging = "3.2.1"
 
 [libraries]

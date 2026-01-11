@@ -1,4 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">CallBlockerPro</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_logs">Logs</string>
+    <string name="nav_protection">Protection</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_skip">Skip Setup</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_get_started">Get Protected</string>
+    <string name="onboarding_grant_permissions">Enable Protection</string>
+    <string name="onboarding_trust_badge">100% Private &amp; Local</string>
+
+    <string name="onboarding_p1_title">Bank-Grade\nProtection</string>
+    <string name="onboarding_p1_desc">Advanced AI analyzes call patterns in real-time to block scams instantly.</string>
+
+    <string name="onboarding_p2_title">100% Private\nand Local</string>
+    <string name="onboarding_p2_desc">Your call logs and contacts never leave this device. We track nothing.</string>
+
+    <string name="onboarding_p3_title">Enable Your\nShield</string>
+    <string name="onboarding_p3_desc">To identify spam and silence unknown callers, the app needs permission to screen your calls.</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_greeting_morning">Good Morning</string>
+    <string name="dashboard_greeting_afternoon">Good Afternoon</string>
+    <string name="dashboard_greeting_evening">Good Evening</string>
+    <string name="dashboard_protection_active">Protection Active</string>
+    <string name="dashboard_protection_subtitle">You are safe.</string>
+    
+    <string name="dashboard_stat_scams">Scams Blocked</string>
+    <string name="dashboard_stat_saved">Time Saved</string>
+
+    <string name="dashboard_activity_title">Weekly Activity</string>
+    <string name="dashboard_recent_title">Recent Events</string>
+    <string name="dashboard_recent_action">View All</string>
+
+    <!-- Protection Lists (Formerly Lists) -->
+    <string name="protection_header">Protection Lists</string>
+    <string name="protection_tab_allowlist">Allowlist</string>
+    <string name="protection_tab_blocklist">Blocklist</string>
+    <string name="protection_search_allow">Search allowlist...</string>
+    <string name="protection_search_block">Search blocklist...</string>
+    
+    <string name="protection_stat_protected">Protected</string>
+    <string name="protection_stat_database">Database</string>
+    
+    <string name="protection_empty_title">All Quiet Here</string>
+    <string name="protection_empty_desc_block">No numbers blocked yet.\nAdd a number to silence it forever.</string>
+    <string name="protection_empty_desc_allow">No numbers allowed yet.\nTrusted contacts skip the screening.</string>
+    <string name="protection_empty_action">Add Number</string>
+
+    <!-- Add Number -->
+    <string name="add_number_header">Add Number</string>
+    <string name="add_number_header_block">Block Number</string>
+    <string name="add_number_header_allow">Allow Number</string>
+    <string name="add_input_phone">Phone Number</string>
+    <string name="add_input_phone_placeholder">e.g. +1 555 123 4567</string>
+    <string name="add_input_name">Name (Optional)</string>
+    <string name="add_input_name_placeholder">e.g. John Doe</string>
+    <string name="add_import_contacts">Import Contact</string>
+    
+    <string name="add_action_block">Block Number</string>
+    <string name="add_action_allow">Allow Number</string>
+
+    <!-- Settings -->
+    <string name="settings_header">Settings</string>
+    <string name="settings_search_placeholder">Search settings...</string>
+    
+    <string name="settings_group_protection">Protection Preferences</string>
+    <string name="settings_block_unknown">Silence Unknown Callers</string>
+    <string name="settings_block_unknown_desc">Only allow contacts</string>
+    <string name="settings_scam_shield">Active Scam Shield</string>
+
+    <string name="settings_auto_schedule">Quiet Hours</string>
+    <string name="settings_auto_schedule_desc">10:00 PM - 7:00 AM</string>
+
+    <string name="settings_group_general">General</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_biometric">Biometric Unlock</string>
+    
+    <string name="settings_group_support">Support</string>
+    <string name="settings_help_center">Help Center</string>
+    <string name="settings_report_issue">Report an Issue</string>
+    <string name="settings_sign_out">Sign Out</string>
+    <string name="settings_sign_out_confirm_title">Sign Out?</string>
+    <string name="settings_sign_out_confirm_desc">Are you sure you want to sign out?</string>
+    <string name="action_cancel">Cancel</string>
+    
+    <string name="version_template">Version %1$s (Build %2$d)</string>
+
+    <string name="log_item_desc">%1$s call from %2$s at %3$s</string>
+    <string name="onboarding_permission_title">Permission Required</string>
+    <string name="settings_device_protected">Device Protected</string>
+    <string name="settings_device_local_desc">100% Local Data. No Cloud Sync.</string>
+    <string name="settings_privacy_policy">Privacy Policy</string>
+    <string name="settings_scam_shield_desc">On-device analysis only</string>
+    
+    <string name="onboarding_permission_rational">To block spam calls effectively, we need access to your phone state and call logs. \n\n🔒 We check your Contacts LOCALLY so we don\'t block your friends. No data ever leaves this phone.</string>
+    <string name="action_continue">Continue</string>
 </resources>

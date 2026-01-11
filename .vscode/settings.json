@@ -5,5 +5,14 @@
     "git.enableSmartCommit": true,
     "git.confirmSync": false,
     "git.autofetch": true,
-    "files.autoSave": "afterDelay"
+    "files.autoSave": "afterDelay",
+    "java.jdt.ls.java.home": "/usr/local/sdkman/candidates/java/21.0.9-ms",
+    "java.import.gradle.java.home": "/usr/local/sdkman/candidates/java/21.0.9-ms",
+    "java.configuration.runtimes": [
+        {
+            "name": "JavaSE-21",
+            "path": "/usr/local/sdkman/candidates/java/21.0.9-ms",
+            "default": true
+        }
+    ]
 }

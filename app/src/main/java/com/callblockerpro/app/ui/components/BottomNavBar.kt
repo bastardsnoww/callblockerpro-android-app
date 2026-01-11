@@ -47,6 +47,8 @@ import com.callblockerpro.app.ui.theme.Primary
 import com.callblockerpro.app.ui.theme.BackgroundDark
 import com.callblockerpro.app.ui.theme.PrimaryLight
 import com.callblockerpro.app.ui.theme.CrystalDesign
+import androidx.compose.ui.res.stringResource
+import com.callblockerpro.app.R
 
 @Composable
 fun BottomNavBar(
@@ -81,14 +83,14 @@ fun BottomNavBar(
                 // Left Group
                 NavIconItem(
                     icon = Icons.Default.Dashboard,
-                    label = "Home",
+                    label = stringResource(R.string.nav_home),
                     isSelected = currentRoute == "home",
                     onClick = { onNavigate("home") }
                 )
                 
                 NavIconItem(
                     icon = androidx.compose.material.icons.Icons.AutoMirrored.Filled.ListAlt,
-                    label = "Logs",
+                    label = stringResource(R.string.nav_logs),
                     isSelected = currentRoute == "logs",
                     onClick = { onNavigate("logs") }
                 )
@@ -99,14 +101,14 @@ fun BottomNavBar(
                 // Right Group
                 NavIconItem(
                     icon = androidx.compose.material.icons.Icons.Default.VerifiedUser, // Whitelist placeholder
-                    label = "Lists",
+                    label = stringResource(R.string.nav_protection),
                     isSelected = currentRoute == "lists", // Mapping Lists to Whitelist for now
                     onClick = { onNavigate("lists") }
                 )
                 
                 NavIconItem(
                     icon = Icons.Default.Settings,
-                    label = "Settings",
+                    label = stringResource(R.string.nav_settings),
                     isSelected = currentRoute == "settings",
                     onClick = { onNavigate("settings") }
                 )
@@ -140,15 +142,18 @@ fun BottomNavBar(
                             end = androidx.compose.ui.geometry.Offset.Infinite
                         )
                     )
-                    .clickable {                                     
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        onNavigate("add") 
-                    },
+                    .clickable(
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onNavigate("add") 
+                        },
+                        role = androidx.compose.ui.semantics.Role.Button
+                    ),
                 contentAlignment = Alignment.Center
              ) {
                  Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Add",
+                    contentDescription = stringResource(R.string.protection_empty_action), // Reusing "Add Number" or just "Add"
                     tint = Color.White,
                     modifier = Modifier.size(32.dp)
                 )
@@ -169,7 +174,12 @@ fun NavIconItem(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = Modifier.clickable(onClick = onClick).padding(8.dp)
+        modifier = Modifier
+            .clickable(
+                onClick = onClick,
+                role = androidx.compose.ui.semantics.Role.Tab
+            )
+            .padding(8.dp)
     ) {
         Icon(
             imageVector = icon,

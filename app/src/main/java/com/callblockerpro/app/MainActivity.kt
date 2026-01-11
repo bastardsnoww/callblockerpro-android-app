@@ -12,6 +12,8 @@ class MainActivity : androidx.activity.ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Manual Edge-to-Edge for compatibility
+        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
         
         setContent {
             com.callblockerpro.app.ui.theme.CallBlockerProTheme {

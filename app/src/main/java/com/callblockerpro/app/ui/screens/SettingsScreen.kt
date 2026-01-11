@@ -26,6 +26,8 @@ import com.callblockerpro.app.ui.theme.Emerald
 import com.callblockerpro.app.ui.theme.Primary
 import com.callblockerpro.app.ui.theme.PrimaryLight
 import com.callblockerpro.app.ui.theme.CrystalDesign
+import androidx.compose.ui.res.stringResource
+import com.callblockerpro.app.R
 
 @Composable
 fun SettingsScreen(
@@ -33,31 +35,8 @@ fun SettingsScreen(
     viewModel: com.callblockerpro.app.ui.viewmodel.SettingsViewModel = hiltViewModel()
 ) {
     val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
-    var showLogoutDialog by remember { mutableStateOf(false) }
+    // Removed Logout Dialog
 
-    if (showLogoutDialog) {
-        AlertDialog(
-            onDismissRequest = { showLogoutDialog = false },
-            title = { Text("Sign Out", style = MaterialTheme.typography.titleLarge) },
-            text = { Text("Are you sure you want to sign out?", style = MaterialTheme.typography.bodyMedium) },
-            confirmButton = {
-                TextButton(onClick = { 
-                    showLogoutDialog = false 
-                    /* TODO: Logout Logic */ 
-                }) {
-                    Text("Sign Out", color = CrystalDesign.Colors.NeonRed)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showLogoutDialog = false }) {
-                    Text("Cancel", color = CrystalDesign.Colors.TextSecondary)
-                }
-            },
-            containerColor = CrystalDesign.Colors.BackgroundSurface,
-            titleContentColor = Color.White,
-            textContentColor = CrystalDesign.Colors.TextSecondary
-        )
-    }
 
     Scaffold(
         bottomBar = { BottomNavBar(currentRoute = "settings", onNavigate = onNavigate) }
@@ -78,7 +57,7 @@ fun SettingsScreen(
                     contentPadding = PaddingValues(top = 100.dp, bottom = 120.dp, start = CrystalDesign.Spacing.l, end = CrystalDesign.Spacing.l),
                     verticalArrangement = Arrangement.spacedBy(CrystalDesign.Spacing.l)
                 ) {
-                    // Profile Card
+                    // Local Data Management Header (Replaces Profile)
                     item {
                         GlassPanel(
                             modifier = Modifier.fillMaxWidth(),
@@ -95,23 +74,17 @@ fun SettingsScreen(
                                     modifier = Modifier
                                         .size(60.dp)
                                         .clip(CircleShape)
-                                        .background(Brush.linearGradient(listOf(Primary, PrimaryLight))),
+                                        .background(Brush.linearGradient(listOf(Emerald, Primary))),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text("JD", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Black, color = Color.White)
+                                    Icon(Icons.Default.Shield, contentDescription = null, tint = Color.White, modifier = Modifier.size(32.dp))
                                 }
                                 Spacer(Modifier.width(16.dp))
                                 Column(Modifier.weight(1f)) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Text("John Doe", style = MaterialTheme.typography.titleMedium, fontWeight = CrystalDesign.Typography.WeightBlack, color = Color.White)
-                                        Spacer(Modifier.width(CrystalDesign.Spacing.xs))
-                                        Box(Modifier.background(Primary.copy(0.2f), RoundedCornerShape(6.dp)).padding(horizontal = 8.dp, vertical = 2.dp)) {
-                                            Text("PRO", style = MaterialTheme.typography.labelSmall, color = PrimaryLight, fontWeight = CrystalDesign.Typography.WeightBlack, fontSize = 10.sp)
-                                        }
-                                    }
-                                    Text("+1 (555) 012-3456", style = MaterialTheme.typography.bodySmall, color = CrystalDesign.Colors.TextTertiary, fontWeight = CrystalDesign.Typography.WeightMedium)
+                                    Text(stringResource(R.string.settings_device_protected), style = MaterialTheme.typography.titleMedium, fontWeight = CrystalDesign.Typography.WeightBlack, color = Color.White)
+                                    Spacer(Modifier.height(4.dp))
+                                    Text(stringResource(R.string.settings_device_local_desc), style = MaterialTheme.typography.bodySmall, color = CrystalDesign.Colors.TextTertiary, fontWeight = CrystalDesign.Typography.WeightMedium)
                                 }
-                                Icon(Icons.Default.ChevronRight, null, tint = Color.Gray.copy(0.5f))
                             }
                         }
                     }
@@ -121,45 +94,46 @@ fun SettingsScreen(
                         PremiumSearchBar(
                             query = searchQuery,
                             onQueryChange = { viewModel.onSearchQueryChanged(it) },
-                            placeholder = "Search features..."
+                            placeholder = stringResource(R.string.settings_search_placeholder)
                         )
                     }
 
                     // Preference Group
                     item {
-                        SettingsGroup("Protection Preferences") {
+                        SettingsGroup(stringResource(R.string.settings_group_protection)) {
                             SettingsToggleRow(
                                 icon = Icons.Default.Block,
                                 iconColor = CrystalDesign.Colors.NeonRed,
-                                title = "Block Unknown Callers",
-                                subtitle = "Only allow contacts",
+                                title = stringResource(R.string.settings_block_unknown),
+                                subtitle = stringResource(R.string.settings_block_unknown_desc),
                                 checked = blockUnknown,
                                 onCheckedChange = { viewModel.toggleBlockUnknown() }
                             )
                             SettingsToggleRow(
                                 icon = Icons.Default.Warning,
                                 iconColor = CrystalDesign.Colors.NeonGold,
-                                title = "Scam Protection",
-                                subtitle = "Strict filtering",
+                                title = stringResource(R.string.settings_scam_shield),
+                                subtitle = stringResource(R.string.settings_scam_shield_desc),
                                 checked = scamProtection,
                                 onCheckedChange = { viewModel.toggleScamProtection() }
                             )
                             SettingsLinkRow(
                                 icon = Icons.Default.Schedule,
                                 iconColor = CrystalDesign.Colors.NeonBlue,
-                                title = "Auto-Schedule",
-                                subtitle = "10:00 PM - 7:00 AM"
+                                title = stringResource(R.string.settings_auto_schedule),
+                                subtitle = stringResource(R.string.settings_auto_schedule_desc),
+                                onClick = { onNavigate("schedule") }
                             )
                         }
                     }
                     
                     // General Group
                     item {
-                        SettingsGroup("General") {
+                        SettingsGroup(stringResource(R.string.settings_group_general)) {
                             SettingsToggleRow(
                                 icon = Icons.Default.Notifications,
                                 iconColor = CrystalDesign.Colors.NeonPurple,
-                                title = "Notifications",
+                                title = stringResource(R.string.settings_notifications),
                                 subtitle = null,
                                 checked = notifications,
                                 onCheckedChange = { viewModel.toggleNotifications() }
@@ -167,7 +141,7 @@ fun SettingsScreen(
                             SettingsToggleRow(
                                 icon = Icons.Default.Face,
                                 iconColor = CrystalDesign.Colors.NeonGreen,
-                                title = "Biometric Unlock",
+                                title = stringResource(R.string.settings_biometric),
                                 subtitle = null,
                                 checked = faceId,
                                 onCheckedChange = { viewModel.toggleFaceId() }
@@ -184,43 +158,41 @@ fun SettingsScreen(
 
                     // Support Group
                     item {
-                        SettingsGroup("Support") {
+                        SettingsGroup(stringResource(R.string.settings_group_support)) {
                             SettingsLinkRow(
-                                title = "Help Center", 
+                                title = stringResource(R.string.settings_help_center), 
                                 icon = null, 
                                 iconColor = Color.Unspecified, 
                                 trailingIcon = Icons.AutoMirrored.Filled.OpenInNew,
-                                onClick = { uriHandler.openUri("https://example.com/help") }
+                                onClick = { uriHandler.openUri("https://github.com/bastardsnoww/callblockerpro-android-app/wiki") } // Real URL
                             )
-                            SettingsLinkRow(title = "Report an Issue", icon = null, iconColor = Color.Unspecified, onClick = {})
+                            SettingsLinkRow(
+                                title = stringResource(R.string.settings_privacy_policy), 
+                                icon = null, 
+                                iconColor = Color.Unspecified, 
+                                trailingIcon = Icons.AutoMirrored.Filled.OpenInNew,
+                                onClick = { uriHandler.openUri("https://github.com/bastardsnoww/callblockerpro-android-app/blob/main/PRIVACY.md") } // Real URL
+                            )
+                            SettingsLinkRow(title = stringResource(R.string.settings_report_issue), icon = null, iconColor = Color.Unspecified, onClick = {})
                         }
                         Spacer(Modifier.height(CrystalDesign.Spacing.m))
 
-                        // Destructive Action: Log Out
-                        Button(
-                            onClick = { showLogoutDialog = true },
-                            modifier = Modifier.fillMaxWidth().height(56.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, CrystalDesign.Colors.NeonRed.copy(alpha = 0.5f)),
-                            shape = RoundedCornerShape(CrystalDesign.Glass.CornerRadiusSmall)
-                        ) {
-                            Icon(Icons.AutoMirrored.Filled.Logout, null, tint = CrystalDesign.Colors.NeonRed)
-                            Spacer(Modifier.width(CrystalDesign.Spacing.xs))
-                            Text("Sign Out", color = CrystalDesign.Colors.NeonRed, fontWeight = CrystalDesign.Typography.WeightBold)
-                        }
+                        // Removed Destructive Sign Out (Not applicable for local-first app)
+
 
                         Spacer(Modifier.height(CrystalDesign.Spacing.m))
                         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("Version 4.2.0 (Build 302)", style = MaterialTheme.typography.labelSmall, color = CrystalDesign.Colors.TextTertiary, letterSpacing = 2.sp)
+                            Text(stringResource(R.string.version_template, "4.2.0", 302), style = MaterialTheme.typography.labelSmall, color = CrystalDesign.Colors.TextTertiary, letterSpacing = 2.sp)
                         }
                     }
                 }
 
                 // Floating Crystal Header
                 PremiumHeader(
-                    title = "Settings",
+                    title = stringResource(R.string.settings_header),
                     modifier = Modifier
                         .align(Alignment.TopCenter)
+                        .statusBarsPadding()
                         .padding(top = 24.dp)
                         .padding(horizontal = 16.dp),
                     actionIcon = Icons.AutoMirrored.Filled.OpenInNew,

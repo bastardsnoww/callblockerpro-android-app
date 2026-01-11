@@ -144,7 +144,10 @@ fun LogsScreen(
                         Text("TODAY", style = MaterialTheme.typography.labelSmall, color = CrystalDesign.Colors.TextTertiary, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
                     }
                     
-                    itemsIndexed(uiState) { _, log ->
+                    itemsIndexed(
+                        items = uiState,
+                        key = { _, log -> log.id }
+                    ) { _, log ->
                         StitchLogItem(log)
                     }
                 }
@@ -186,13 +189,16 @@ fun StitchFilterChip(text: String, selected: Boolean, isRed: Boolean = false, is
 @Composable
 fun StitchLogItem(log: CallLogEntry) {
     val isBlocked = log.result == CallResult.BLOCKED
+    // Heuristic: If no name and not in contacts (null name), and length is standard
+    val isUnknown = log.contactName.isNullOrEmpty()
+    val isSuspicious = isUnknown && log.phoneNumber.length >= 10 // Simple heuristic
     
     // Outer Row containing strip and card
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(0.dp)
     ) {
-        // Vertical Strip Indicator (Red for Blocked, Green for Allowed) - OUTSIDE Surface
+        // Vertical Strip Indicator
         val stripColor = if (isBlocked) CrystalDesign.Colors.NeonRed else com.callblockerpro.app.ui.theme.Emerald
         Box(
             Modifier
@@ -222,7 +228,7 @@ fun StitchLogItem(log: CallLogEntry) {
                         .clip(RoundedCornerShape(12.dp))
                         .background(
                             if (isBlocked) CrystalDesign.Colors.NeonRed.copy(0.1f) 
-                            else CrystalDesign.Colors.SurfaceStitch // Lighter surface
+                            else CrystalDesign.Colors.SurfaceStitch
                         )
                         .border(1.dp, if (isBlocked) CrystalDesign.Colors.NeonRed.copy(0.2f) else Color.White.copy(0.05f), RoundedCornerShape(12.dp)),
                     contentAlignment = Alignment.Center
@@ -238,8 +244,17 @@ fun StitchLogItem(log: CallLogEntry) {
                 
                 Column(Modifier.weight(1f)) {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text(log.phoneNumber, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold, color = Color.White)
-                        Text("10:42 AM", style = MaterialTheme.typography.labelSmall, color = CrystalDesign.Colors.TextTertiary)
+                        Text(
+                            if (log.contactName.isNullOrEmpty()) log.phoneNumber else log.contactName, 
+                            style = MaterialTheme.typography.bodyLarge, 
+                            fontWeight = FontWeight.Bold, 
+                            color = Color.White
+                        )
+                        Text(
+                            formatLogTime(log.timestamp),
+                            style = MaterialTheme.typography.labelSmall, 
+                            color = CrystalDesign.Colors.TextTertiary
+                        )
                     }
                     Spacer(Modifier.height(4.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -250,14 +265,29 @@ fun StitchLogItem(log: CallLogEntry) {
                                 border = androidx.compose.foundation.BorderStroke(1.dp, CrystalDesign.Colors.NeonRed.copy(0.1f))
                             ) {
                                 Text(
-                                    "SPAM RISK", 
+                                    "BLOCKED", 
                                     style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp), 
                                     color = CrystalDesign.Colors.NeonRed,
                                     modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
                                 )
                             }
                             Spacer(Modifier.width(8.dp))
+                        } else if (isSuspicious) {
+                             Surface(
+                                color = CrystalDesign.Colors.NeonGold.copy(0.1f),
+                                shape = RoundedCornerShape(4.dp),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, CrystalDesign.Colors.NeonGold.copy(0.2f))
+                            ) {
+                                Text(
+                                    "UNKNOWN", 
+                                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp), 
+                                    color = CrystalDesign.Colors.NeonGold,
+                                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                                )
+                            }
+                            Spacer(Modifier.width(8.dp))
                         }
+                        
                         Text(
                             if (isBlocked) "• Auto-Blocked" else "Mobile • 5m 23s", 
                             style = MaterialTheme.typography.labelSmall, 
@@ -268,11 +298,17 @@ fun StitchLogItem(log: CallLogEntry) {
                 
                 Spacer(Modifier.width(8.dp))
                 
+                // Report Action Button (New Feature)
                 IconButton(
-                    onClick = { /* Info */ },
+                    onClick = { /* Report Logic (Mock for now) */ },
                     modifier = Modifier.size(32.dp).background(Color.White.copy(0.05f), CircleShape)
                 ) {
-                    Icon(Icons.Default.Info, null, tint = CrystalDesign.Colors.TextTertiary, modifier = Modifier.size(18.dp))
+                    Icon(
+                        Icons.Default.Report, 
+                        contentDescription = "Report Spam", 
+                        tint = CrystalDesign.Colors.NeonGold, 
+                        modifier = Modifier.size(18.dp)
+                    )
                 }
             }
         }

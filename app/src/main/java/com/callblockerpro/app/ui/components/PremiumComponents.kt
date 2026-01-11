@@ -51,6 +51,7 @@ fun PremiumSearchBar(
     isLoading: Boolean = false
 ) {
     val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     
     // Stitch Search Bar Container
     Surface(
@@ -107,14 +108,29 @@ fun PremiumSearchBar(
                         .clickable { onQueryChange("") }
                 )
             } else if (onFilterClick != null) {
-                 Icon(
-                    imageVector = androidx.compose.material.icons.Icons.Default.FilterList,
-                    contentDescription = "Filter",
-                    tint = CrystalDesign.Colors.Primary,
+                Box(
                     modifier = Modifier
-                        .size(20.dp)
-                        .clickable { onFilterClick() }
-                )
+                        .size(48.dp)
+                        .clickable(
+                             role = androidx.compose.ui.semantics.Role.Button,
+                             onClick = { 
+                                 focusManager.clearFocus()
+                                 haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                                 onFilterClick() 
+                             }
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    // Note: Filter button haptic omitted or needs 'haptic' val hoisted.
+                    // Adding haptic val at top of function:
+                    // val haptic = LocalHapticFeedback.current
+                    Icon(
+                        imageVector = androidx.compose.material.icons.Icons.Default.FilterList,
+                        contentDescription = "Filter",
+                        tint = CrystalDesign.Colors.Primary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
             }
         }
     }
@@ -150,74 +166,81 @@ fun PremiumListItem(
                 scaleX = scale
                 scaleY = scale
             }
-            .clip(RoundedCornerShape(CrystalDesign.Glass.CornerRadius))
-            .clickable {
-                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                onClick()
-            },
+            .clip(RoundedCornerShape(CrystalDesign.Glass.CornerRadius)),
         cornerRadius = CrystalDesign.Glass.CornerRadius,
         borderAlpha = 0.12f
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Icon Box
         Box(
             modifier = Modifier
-                .size(48.dp)
-                .background(iconColor.copy(alpha = 0.1f), CircleShape)
-                .border(1.dp, iconColor.copy(alpha = 0.2f), CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(imageVector = icon, contentDescription = null, tint = iconColor, modifier = Modifier.size(24.dp))
-        }
-
-        Spacer(modifier = Modifier.width(16.dp))
-
-        // Text Content
-        Column(modifier = Modifier.weight(1f)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleSmall,
-                    color = Color.White,
-                    fontWeight = CrystalDesign.Typography.WeightBold
-                )
-                if (tag != null) {
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Box(
-                        modifier = Modifier
-                            .background(tagColor.copy(alpha = 0.15f), RoundedCornerShape(6.dp))
-                            .border(1.dp, tagColor.copy(alpha = 0.2f), RoundedCornerShape(6.dp))
-                            .padding(horizontal = 6.dp, vertical = 2.dp)
-                    ) {
-                        Text(
-                            text = tag.uppercase(),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = tagColor,
-                            fontSize = 10.sp, // Explicit small caption override for tags if needed, or define in Type
-                            fontWeight = CrystalDesign.Typography.WeightBlack
-                        )
+                .fillMaxWidth()
+                .clickable(
+                    role = androidx.compose.ui.semantics.Role.Button,
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onClick()
                     }
+                )
+                .padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Icon Box
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(iconColor.copy(alpha = 0.1f), CircleShape)
+                        .border(1.dp, iconColor.copy(alpha = 0.2f), CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(imageVector = icon, contentDescription = null, tint = iconColor, modifier = Modifier.size(24.dp))
+                }
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                // Text Content
+                Column(modifier = Modifier.weight(1f)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = title,
+                            style = MaterialTheme.typography.titleSmall,
+                            color = Color.White,
+                            fontWeight = CrystalDesign.Typography.WeightBold
+                        )
+                        if (tag != null) {
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Box(
+                                modifier = Modifier
+                                    .background(tagColor.copy(alpha = 0.15f), RoundedCornerShape(6.dp))
+                                    .border(1.dp, tagColor.copy(alpha = 0.2f), RoundedCornerShape(6.dp))
+                                    .padding(horizontal = 6.dp, vertical = 2.dp)
+                            ) {
+                                Text(
+                                    text = tag.uppercase(),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = tagColor,
+                                    fontSize = 10.sp, 
+                                    fontWeight = CrystalDesign.Typography.WeightBlack
+                                )
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray
+                    )
+                }
+
+                // Trailing
+                if (trailingContent != null) {
+                    Spacer(modifier = Modifier.width(12.dp))
+                    trailingContent()
                 }
             }
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = subtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray
-            )
         }
-
-        // Trailing
-        if (trailingContent != null) {
-            Spacer(modifier = Modifier.width(12.dp))
-            trailingContent()
-        }
-    }
     }
 }
 
@@ -230,7 +253,9 @@ fun PremiumEmptyState(
     title: String,
     message: String,
     actionLabel: String? = null,
-    onActionClick: (() -> Unit)? = null
+    onActionClick: (() -> Unit)? = null,
+    secondaryActionLabel: String? = null,
+    onSecondaryActionClick: (() -> Unit)? = null
 ) {
     Column(
         modifier = Modifier
@@ -279,6 +304,15 @@ fun PremiumEmptyState(
                 shape = RoundedCornerShape(50)
             ) {
                 Text(text = actionLabel, fontWeight = FontWeight.Bold)
+            }
+        }
+
+        if (secondaryActionLabel != null && onSecondaryActionClick != null) {
+            Spacer(modifier = Modifier.height(8.dp))
+            TextButton(
+                onClick = onSecondaryActionClick
+            ) {
+                Text(text = secondaryActionLabel, color = CrystalDesign.Colors.TextTertiary)
             }
         }
     }
@@ -347,7 +381,8 @@ fun NeonButton(
                 onClick = {
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                     onClick()
-                }
+                },
+                role = androidx.compose.ui.semantics.Role.Button
             )
             .background(
                 brush = Brush.verticalGradient(
@@ -546,26 +581,36 @@ fun PremiumHeader(
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (onBack != null) {
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .clickable { 
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        onBack() 
+                Box(
+                    modifier = Modifier
+                        .size(48.dp) // Accessibility: Minimum Touch Target
+                        .clip(CircleShape)
+                        .clickable(
+                            role = androidx.compose.ui.semantics.Role.Button,
+                            onClick = { 
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                onBack() 
+                            }
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp) // Visual Size
+                            .clip(CircleShape)
+                            .background(Color.White.copy(0.05f))
+                            .border(1.dp, Color.White.copy(0.1f), CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ChevronRight,
+                            contentDescription = "Back",
+                            tint = Color.White,
+                            modifier = Modifier.graphicsLayer { rotationZ = 180f }
+                        )
                     }
-                    .background(Color.White.copy(0.05f))
-                    .border(1.dp, Color.White.copy(0.1f), CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ChevronRight,
-                    contentDescription = "Back",
-                    tint = Color.White,
-                    modifier = Modifier.graphicsLayer { rotationZ = 180f }
-                )
-            }
-            Spacer(modifier = Modifier.width(16.dp))
+                }
+            Spacer(modifier = Modifier.width(8.dp))
         } else {
              // [STITCH] Gradient Shield Box with Ring
              Box(
@@ -634,29 +679,36 @@ fun PremiumHeader(
         if (actionIcon != null && onAction != null) {
             Box(
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(48.dp) // Accessibility: Minimum Touch Target
                     .clip(CircleShape)
                     .clickable { 
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         onAction() 
-                    }
-                    .background(
-                        brush = Brush.linearGradient(
-                            colors = listOf(
-                                com.callblockerpro.app.ui.theme.CrystalDesign.Colors.PrimaryStitch,
-                                com.callblockerpro.app.ui.theme.CrystalDesign.Colors.PrimaryLightStitch
-                            )
-                        )
-                    )
-                    .border(1.dp, Color.White.copy(0.1f), CircleShape),
+                    },
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = actionIcon,
-                    contentDescription = "Action",
-                    tint = Color.White,
-                    modifier = Modifier.size(20.dp)
-                )
+                 Box(
+                    modifier = Modifier
+                        .size(40.dp) // Visual Size
+                        .clip(CircleShape)
+                        .background(
+                            brush = Brush.linearGradient(
+                                colors = listOf(
+                                    com.callblockerpro.app.ui.theme.CrystalDesign.Colors.PrimaryStitch,
+                                    com.callblockerpro.app.ui.theme.CrystalDesign.Colors.PrimaryLightStitch
+                                )
+                            )
+                        )
+                        .border(1.dp, Color.White.copy(0.1f), CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = actionIcon,
+                        contentDescription = "Action",
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
             }
         }
     }

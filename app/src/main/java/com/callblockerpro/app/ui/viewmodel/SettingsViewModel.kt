@@ -1,29 +1,38 @@
 package com.callblockerpro.app.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.callblockerpro.app.data.repository.UserPreferencesRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SettingsViewModel : ViewModel() {
+@HiltViewModel
+class SettingsViewModel @Inject constructor(
+    private val userPreferencesRepository: UserPreferencesRepository
+) : ViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
     // Protection Preferences
-    private val _blockUnknown = MutableStateFlow(false)
-    val blockUnknown: StateFlow<Boolean> = _blockUnknown.asStateFlow()
+    val blockUnknown: StateFlow<Boolean> = userPreferencesRepository.blockUnknown
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
-    private val _scamProtection = MutableStateFlow(true)
-    val scamProtection: StateFlow<Boolean> = _scamProtection.asStateFlow()
+    val scamProtection: StateFlow<Boolean> = userPreferencesRepository.scamProtection
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
     // General Preferences
-    private val _notifications = MutableStateFlow(true)
-    val notifications: StateFlow<Boolean> = _notifications.asStateFlow()
+    val notifications: StateFlow<Boolean> = userPreferencesRepository.notificationsEnabled
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
-    private val _faceId = MutableStateFlow(false)
-    val faceId: StateFlow<Boolean> = _faceId.asStateFlow()
+    val faceId: StateFlow<Boolean> = userPreferencesRepository.isBiometricEnabled
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
 
     fun onSearchQueryChanged(query: String) {
@@ -31,18 +40,26 @@ class SettingsViewModel : ViewModel() {
     }
 
     fun toggleBlockUnknown() {
-        _blockUnknown.update { !it }
+        viewModelScope.launch {
+            userPreferencesRepository.saveBlockUnknown(!blockUnknown.value)
+        }
     }
 
     fun toggleScamProtection() {
-        _scamProtection.update { !it }
+        viewModelScope.launch {
+            userPreferencesRepository.saveScamProtection(!scamProtection.value)
+        }
     }
 
     fun toggleNotifications() {
-        _notifications.update { !it }
+        viewModelScope.launch {
+            userPreferencesRepository.saveNotificationsEnabled(!notifications.value)
+        }
     }
 
     fun toggleFaceId() {
-        _faceId.update { !it }
+        viewModelScope.launch {
+            userPreferencesRepository.saveBiometricEnabled(!faceId.value)
+        }
     }
 }
